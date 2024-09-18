@@ -29,7 +29,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <main className="w-full 2xl:container h-full mx-auto">
+          <main className="w-full 2xl:container h-full mx-auto mt-20 md:mt-16">
             {children}
           </main>
         </ThemeProvider>
