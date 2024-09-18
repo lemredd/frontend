@@ -10,19 +10,19 @@ const useNavbarRoutes = (): TNavbarRoute[] => {
       },
       {
         label: 'About',
-        path: '/about',
+        path: '/about/',
       },
       {
         label: 'Contact',
-        path: '/contact',
+        path: '/contact/',
       },
       {
         label: 'Profile',
-        path: '/profile',
+        path: '/profile/',
       },
       {
         label: 'Search',
-        path: '/search',
+        path: '/search/',
       },
     ],
     [],

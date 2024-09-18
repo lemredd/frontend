@@ -17,7 +17,7 @@ export function Navbar() {
   const [state, setState] = useState(false)
 
   return (
-    <nav className="bg-foreground dark:bg-background w-full py-3 md:py-5">
+    <nav className="fixed top-0 z-50 bg-background w-full shadow-sm py-5 md:py-0">
       <div className="items-center px-4 max-w-screen-xl mx-auto md:flex md:px-8">
         <div className="flex items-center justify-between  md:block">
           <Link href="/">
@@ -39,26 +39,30 @@ export function Navbar() {
             state ? 'block' : 'hidden'
           }`}
         >
-          <ul className="justify-center items-center space-y-8 md:flex md:space-x-6 md:space-y-0">
+          <ul className="justify-center items-center space-y-5 md:flex md:space-x-6 md:space-y-0">
             {navbarRoutes.map((route, idx) => (
               <li
                 key={idx}
                 className={cn(
-                  'text-gray-600 hover:text-blue-primary',
-                  activePath == route.path &&
-                    'md:border-b-2 text-blue-primary border-blue-primary',
+                  'text-gray-600 hover:text-blue-primary relative md:py-5',
+                  activePath === route.path && 'text-blue-primary',
                 )}
               >
-                <Link
-                  href={route.path}
-                  className=""
-                >
-                  {route.label}
-                </Link>
+                <Link href={route.path}>{route.label}</Link>
+                {/* Span positioned at the bottom */}
+                <span
+                  className={cn(
+                    'absolute left-0 bottom-0 w-full h-1 bg-blue-primary',
+                    activePath === route.path
+                      ? 'scale-0 md:scale-100'
+                      : 'scale-0',
+                  )}
+                />
               </li>
             ))}
           </ul>
         </div>
+
         <div
           className={`flex md:items-center md:justify-center space-x-2 md:space-x-1 mt-2 md:block md:pb-0 md:mt-0 ${
             state ? 'block' : 'hidden'
