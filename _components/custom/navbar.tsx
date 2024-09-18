@@ -5,6 +5,7 @@ import Link from 'next/link'
 // import { Icons } from '@/components/icons'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
+import { RiUserSearchFill } from 'react-icons/ri'
 import useActivePath from '../../_hooks/useActivePath'
 import useNavbarRoutes from '../../_hooks/useNavbarRoutes'
 import { cn } from '../../lib/utils'
@@ -20,10 +21,12 @@ export function Navbar() {
     <nav className="fixed top-0 z-50 bg-background w-full shadow-sm py-5 md:py-0">
       <div className="items-center px-4 max-w-screen-xl mx-auto md:flex md:px-8">
         <div className="flex items-center justify-between  md:block">
-          <Link href="/">
-            <h1 className="text-xl font-bold text-blue-primary">
-              Task Grabber
-            </h1>
+          <Link
+            href="/"
+            className="inline-flex space-x-1 items-center"
+          >
+            <RiUserSearchFill className="size-6 fill-primary" />
+            <h1 className="text-xl font-bold text-primary">Task Grabber</h1>
           </Link>
           <div className="md:hidden">
             <button
@@ -44,15 +47,15 @@ export function Navbar() {
               <li
                 key={idx}
                 className={cn(
-                  'text-gray-600 hover:text-blue-primary relative md:py-5',
-                  activePath === route.path && 'text-blue-primary',
+                  'text-gray-600 hover:text-primary relative md:py-5',
+                  activePath === route.path && 'text-primary',
                 )}
               >
                 <Link href={route.path}>{route.label}</Link>
                 {/* Span positioned at the bottom */}
                 <span
                   className={cn(
-                    'absolute left-0 bottom-0 w-full h-1 bg-blue-primary',
+                    'absolute left-0 bottom-0 w-full h-1 bg-primary',
                     activePath === route.path
                       ? 'scale-0 md:scale-100'
                       : 'scale-0',
@@ -69,16 +72,13 @@ export function Navbar() {
           }`}
         >
           <Button
-            variant="outline"
-            asChild
-          >
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-          <Button
-            variant="custom"
+            variant="ghost"
             asChild
           >
             <Link href="/sign-up">Sign Up</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/sign-in">Sign In</Link>
           </Button>
         </div>
       </div>
