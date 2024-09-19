@@ -1,6 +1,7 @@
 'use client'
 import { CardWrapper } from '@/_components/custom/auth/card-wrapper'
 import { FormError } from '@/_components/custom/form-error'
+import { FormSuccess } from '@/_components/custom/form-success'
 import { Button } from '@/_components/ui/button'
 import {
   Form,
@@ -78,7 +79,8 @@ export const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message="some" />
+          <FormError message="" />
+          <FormSuccess message="" />
           <Button
             type="submit"
             className="w-full"
