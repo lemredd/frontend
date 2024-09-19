@@ -48,7 +48,11 @@ export function Navbar() {
                 key={idx}
                 className={cn(
                   'text-gray-600 hover:text-primary relative md:py-5',
-                  activePath === route.path && 'text-primary',
+                  // Apply 'text-primary' for the active path
+                  activePath === route.path ||
+                    (route.path !== '/' && activePath.startsWith(route.path))
+                    ? 'text-primary'
+                    : '',
                 )}
               >
                 <Link href={route.path}>{route.label}</Link>
@@ -56,7 +60,8 @@ export function Navbar() {
                 <span
                   className={cn(
                     'absolute left-0 bottom-0 w-full h-1 bg-primary',
-                    activePath === route.path
+                    activePath === route.path ||
+                      (route.path !== '/' && activePath.startsWith(route.path))
                       ? 'scale-0 md:scale-100'
                       : 'scale-0',
                   )}
@@ -75,10 +80,10 @@ export function Navbar() {
             variant="ghost"
             asChild
           >
-            <Link href="/sign-up">Sign Up</Link>
+            <Link href="/auth/login">Login</Link>
           </Button>
           <Button asChild>
-            <Link href="/sign-in">Sign In</Link>
+            <Link href="/auth/join">Join Now</Link>
           </Button>
         </div>
       </div>
