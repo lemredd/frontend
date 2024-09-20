@@ -1,7 +1,7 @@
+import { Navbar } from '@/components/custom/navbar'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
-import { Navbar } from '../_components/custom/navbar'
-import { ThemeProvider } from '../_components/providers/theme-provider'
 import './globals.css'
 
 const poppins = Poppins({

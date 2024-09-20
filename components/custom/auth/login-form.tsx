@@ -1,8 +1,9 @@
 'use client'
-import { CardWrapper } from '@/_components/custom/auth/card-wrapper'
-import { FormError } from '@/_components/custom/form-error'
-import { FormSuccess } from '@/_components/custom/form-success'
-import { Button } from '@/_components/ui/button'
+import { login } from '@/actions/login'
+import { CardWrapper } from '@/components/custom/auth/card-wrapper'
+import { FormError } from '@/components/custom/form-error'
+import { FormSuccess } from '@/components/custom/form-success'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -10,10 +11,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/_components/ui/form'
-import { Input } from '@/_components/ui/input'
-import { LoginSchema } from '@/_schemas'
-import { login } from '@/actions/login'
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { LoginSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
@@ -35,8 +35,9 @@ export const LoginForm = () => {
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     startTransition(() => {
       login(values).then((data) => {
+        console.log(data)
         setError(data?.error)
-        setSuccess(data?.success)
+        // setSuccess(data?.success)
       })
     })
   }

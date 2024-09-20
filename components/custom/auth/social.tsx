@@ -1,5 +1,5 @@
 'use client'
-import { Button } from '@/_components/ui/button'
+import { Button } from '@/components/ui/button'
 import { FcGoogle } from 'react-icons/fc'
 export const Social = () => {
   return (

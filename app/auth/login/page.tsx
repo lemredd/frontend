@@ -1,4 +1,4 @@
-import { LoginForm } from '@/_components/custom/auth/login-form'
+import { LoginForm } from '@/components/custom/auth/login-form'
 
 export default function JoinPage() {
   return (

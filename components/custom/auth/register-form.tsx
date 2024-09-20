@@ -1,9 +1,10 @@
 'use client'
-import { CardWrapper } from '@/_components/custom/auth/card-wrapper'
-import { FormError } from '@/_components/custom/form-error'
-import { FormSuccess } from '@/_components/custom/form-success'
-import { Button } from '@/_components/ui/button'
-import { Checkbox } from '@/_components/ui/checkbox'
+import { register } from '@/actions/register'
+import { CardWrapper } from '@/components/custom/auth/card-wrapper'
+import { FormError } from '@/components/custom/form-error'
+import { FormSuccess } from '@/components/custom/form-success'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -11,10 +12,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/_components/ui/form'
-import { Input } from '@/_components/ui/input'
-import { RegisterSchema } from '@/_schemas'
-import { register } from '@/actions/register'
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { RegisterSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'

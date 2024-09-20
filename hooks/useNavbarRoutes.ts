@@ -1,4 +1,4 @@
-import { TNavbarRoute } from '@/_constants/types'
+import { TNavbarRoute } from '@/constants/types'
 import { useMemo } from 'react'
 
 const useNavbarRoutes = (): TNavbarRoute[] => {
@@ -12,18 +12,18 @@ const useNavbarRoutes = (): TNavbarRoute[] => {
         label: 'About',
         path: '/about',
       },
-      {
-        label: 'Contact',
-        path: '/contact',
-      },
-      {
-        label: 'Profile',
-        path: '/profile',
-      },
-      {
-        label: 'Search',
-        path: '/search',
-      },
+      // {
+      //   label: 'Contact',
+      //   path: '/contact',
+      // },
+      // {
+      //   label: 'Profile',
+      //   path: '/profile',
+      // },
+      // {
+      //   label: 'Search',
+      //   path: '/search',
+      // },
     ],
     [],
   )
