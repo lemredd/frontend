@@ -34,7 +34,10 @@ export const RegisterSchema = z
         /[^A-Za-z0-9]/,
         'Password must contain at least one special character',
       ),
-    name: z.string().min(1, {
+    firstName: z.string().min(1, {
+      message: 'Name is required',
+    }),
+    lastName: z.string().min(1, {
       message: 'Name is required',
     }),
     // role: z.string().min(1, {
