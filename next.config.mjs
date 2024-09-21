@@ -33,6 +33,21 @@ const nextConfig = {
       },
     ],
   },
+
+  redirects: async () => [
+    {
+      source: "/",
+      has: [
+        {
+          type: "query",
+          key: "token",
+          value: undefined
+        }
+      ],
+      destination: "/auth/verify",
+      permanent: true
+    }
+  ]
 }
 
 export default nextConfig
