@@ -23,7 +23,8 @@ import * as z from 'zod'
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>('')
-  const [success, setSuccess] = useState<string | undefined>('')
+  //const [success, setSuccess] = useState<string | undefined>('')
+  const [validatedUserInfo, setValidatedUserInfo] = useState<z.infer<typeof RegisterSchema>>()
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -40,8 +41,9 @@ export const RegisterForm = () => {
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     startTransition(() => {
       register(values).then((data) => {
-        setError(data?.error)
-        setSuccess(data?.success)
+        if (data?.error) return setError(data?.error)
+
+        setValidatedUserInfo(values)
       })
     })
   }
@@ -188,7 +190,7 @@ export const RegisterForm = () => {
             />
           </div>
           <FormError message={error} />
-          <FormSuccess message={success} />
+          {/* <FormSuccess message={success} /> */}
           <Button
             type="submit"
             disabled={isPending}
