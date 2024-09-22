@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
 
   if (!data?.is_completed && !request.nextUrl.pathname.startsWith('/user/setup')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/user/setup'
+    url.pathname = '/user/setup/skills'
     return NextResponse.redirect(url)
   }
 
