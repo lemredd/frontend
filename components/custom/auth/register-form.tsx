@@ -26,7 +26,6 @@ export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>('')
   //const [success, setSuccess] = useState<string | undefined>('')
-  const [validatedUserInfo, setValidatedUserInfo] = useState<z.infer<typeof RegisterSchema>>()
   const [step, setStep] = useState(0)
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -41,6 +40,7 @@ export const RegisterForm = () => {
     },
   })
 
+
   const roleForm = useForm<z.infer<typeof RoleSchema>>({
     resolver: zodResolver(RoleSchema),
     defaultValues: { roleCode: '', }
@@ -51,16 +51,14 @@ export const RegisterForm = () => {
       register(values).then((data) => {
         if (data?.error) return setError(data?.error)
 
-        setValidatedUserInfo(values)
         setStep(1)
       })
     })
   }
 
   const onRoleSubmit = (values: z.infer<typeof RoleSchema>) => {
-    console.log({ ...values, ...validatedUserInfo })
     startTransition(() => {
-      registerWithRole({ ...values, ...validatedUserInfo! }).then((data) => {
+      registerWithRole({ ...values, ...form.getValues() }).then((data) => {
         if (data?.error) return setError(data?.error)
       })
     })
@@ -68,7 +66,7 @@ export const RegisterForm = () => {
 
   return (
     <CardWrapper
-      headerLabel={!validatedUserInfo ? "Create an account" : "Select your role"}
+      headerLabel={!step ? "Create an account" : "Select your role"}
       backButtonLabel="Already have an account?"
       backButtonHref="/auth/login"
       showSocial
