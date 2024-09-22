@@ -85,3 +85,12 @@ export const RegisterWithRoleSchema = z.object({
 export const SkillsSchema = z.object({
   skillIds: z.array(z.string().min(1, { message: 'skill is required' })),
 })
+
+export const DescriptionSchema = z.object({
+  shortDescription: z.string().min(1, {
+    message: 'Description is required',
+  }),
+  longDescription: z.string().min(1, {
+    message: 'Description is required',
+  })
+})
