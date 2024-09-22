@@ -81,3 +81,7 @@ export const RegisterWithRoleSchema = z.object({
     message: 'role is required',
   })
 })
+
+export const SkillsSchema = z.object({
+  skillIds: z.array(z.string().min(1, { message: 'skill is required' })),
+})
