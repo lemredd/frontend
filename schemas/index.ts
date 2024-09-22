@@ -70,17 +70,14 @@ export const RegisterSchema = z
     }
   })
 
+export const RoleSchema = z.object({
+  roleCode: z.string().min(1, {
+    message: 'role is required',
+  }),
+})
 export const RegisterWithRoleSchema = z.object({
   ...registerFields,
   roleCode: z.string().min(1, {
     message: 'role is required',
-  }).refine(async value => {
-    const client = createClient()
-    const { error } = await client
-      .from('roles')
-      .select('code')
-      .eq('code', value)
-      .single()
-    return !error
-  }, 'Role does not exist')
+  })
 })
