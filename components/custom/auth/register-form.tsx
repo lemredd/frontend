@@ -2,9 +2,7 @@
 import { register, registerWithRole } from '@/actions/register'
 import { CardWrapper } from '@/components/custom/auth/card-wrapper'
 import { FormError } from '@/components/custom/form-error'
-import { FormSuccess } from '@/components/custom/form-success'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,

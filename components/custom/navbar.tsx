@@ -22,7 +22,6 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const navbarRoutes = useNavbarRoutes()
   const activePath = useActivePath()
-  console.log("navbar", user)
 
   return (
     <nav className="fixed top-0 z-50 bg-background w-full shadow-sm py-5 md:py-0">
