@@ -4,6 +4,7 @@ import { CardWrapper } from '@/components/custom/auth/card-wrapper'
 import { FormError } from '@/components/custom/form-error'
 import { FormSuccess } from '@/components/custom/form-success'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
@@ -15,7 +16,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { RegisterSchema, RegisterWithRoleSchema } from '@/schemas'
+import { RegisterSchema, RoleSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
@@ -26,6 +27,7 @@ export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>('')
   //const [success, setSuccess] = useState<string | undefined>('')
   const [validatedUserInfo, setValidatedUserInfo] = useState<z.infer<typeof RegisterSchema>>()
+  const [step, setStep] = useState(0)
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -39,12 +41,9 @@ export const RegisterForm = () => {
     },
   })
 
-  const roleForm = useForm<z.infer<typeof RegisterWithRoleSchema>>({
-    resolver: zodResolver(RegisterWithRoleSchema),
-    defaultValues: {
-      ...form.getValues(),
-      roleCode: '',
-    },
+  const roleForm = useForm<z.infer<typeof RoleSchema>>({
+    resolver: zodResolver(RoleSchema),
+    defaultValues: { roleCode: '', }
   })
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
@@ -53,13 +52,15 @@ export const RegisterForm = () => {
         if (data?.error) return setError(data?.error)
 
         setValidatedUserInfo(values)
+        setStep(1)
       })
     })
   }
 
-  const onRoleSubmit = (values: z.infer<typeof RegisterWithRoleSchema>) => {
+  const onRoleSubmit = (values: z.infer<typeof RoleSchema>) => {
+    console.log({ ...values, ...validatedUserInfo })
     startTransition(() => {
-      registerWithRole(values).then((data) => {
+      registerWithRole({ ...values, ...validatedUserInfo! }).then((data) => {
         if (data?.error) return setError(data?.error)
       })
     })
@@ -72,7 +73,7 @@ export const RegisterForm = () => {
       backButtonHref="/auth/login"
       showSocial
     >
-      {!validatedUserInfo && (
+      {!step && (
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -214,57 +215,62 @@ export const RegisterForm = () => {
               disabled={isPending}
               className="w-full"
             >
-              Join Task Grabber
-            </Button>
-          </form>
-        </Form>
-      )}
-
-      {validatedUserInfo && (
-        <Form {...roleForm}>
-          <form
-            onSubmit={roleForm.handleSubmit(onRoleSubmit)}
-            className="space-y-6"
-          >
-            <FormField control={roleForm.control} name="roleCode" render={({ field }) => (
-              <FormItem className="space-y-3">
-                <FormLabel>Select a role</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="SKR" />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        I will grab tasks
-                      </FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="PDR" />
-                      </FormControl>
-                      <FormLabel className="font-normal">I will post tasks</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-            <FormError message={error} />
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="w-full"
-            >
               Proceed
             </Button>
           </form>
         </Form>
       )}
-    </CardWrapper>
+
+      {step === 1 && (
+        <>
+          <Button className="mb-4" variant="link" onClick={() => setStep(0)}>Back</Button>
+          <Form {...roleForm}>
+            <form
+              onSubmit={roleForm.handleSubmit(onRoleSubmit)}
+              className="space-y-6"
+            >
+              <FormField control={roleForm.control} name="roleCode" render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Select a role</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      {/* TODO: wrap in Card */}
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="SKR" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          I will grab tasks
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="PDR" />
+                        </FormControl>
+                        <FormLabel className="font-normal">I will post tasks</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormError message={error} />
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full"
+              >
+                Join Task Grabber
+              </Button>
+            </form>
+          </Form>
+        </>
+      )
+      }
+    </CardWrapper >
   )
 }
