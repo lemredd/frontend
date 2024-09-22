@@ -21,11 +21,11 @@ export function SelectedSkills({ form, skills }: Props) {
   return (
     <Card className="shadow-none">
       <CardHeader><h3 className="text-lg">{selectedSkills.length} skills selected</h3></CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-wrap gap-4">
         {selectedSkills.map(({ name, id }) => (
-          <div key={id} className="flex items-center justify-between">
-            <span>{name}</span>
-            <Button variant="destructive"><CloseIcon onClick={() => removeSkill(id)} /></Button>
+          <div key={id} className="rounded-full p-2 flex items-center gap-2 border border-slate-300" title={name}>
+            <span className="text-sm max-w-[100px] truncate">{name}</span>
+            <Button variant="destructive" size="icon" className="size-6 rounded-full"><CloseIcon onClick={() => removeSkill(id)} /></Button>
           </div>))}
       </CardContent>
     </Card>
