@@ -2,6 +2,8 @@
 
 import { RegisterSchema, RegisterWithRoleSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import * as z from 'zod'
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
@@ -36,4 +38,7 @@ export const registerWithRole = async (values: z.infer<typeof RegisterWithRoleSc
   })
 
   if (error) return { error: error.message }
+
+  revalidatePath('/', 'layout')
+  redirect('/auth/verify/tell')
 }
