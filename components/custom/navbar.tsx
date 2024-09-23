@@ -9,6 +9,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import useActivePath from '@/hooks/useActivePath'
+import useIsAuthenticated from '@/hooks/useIsAuthenticated'
 import useNavbarRoutes from '@/hooks/useNavbarRoutes'
 import { cn } from '@/lib/utils'
 import { User } from '@supabase/supabase-js'
@@ -22,6 +23,7 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const navbarRoutes = useNavbarRoutes()
   const activePath = useActivePath()
+  const isAuthenticated = useIsAuthenticated()
 
   return (
     <nav className="fixed top-0 z-50 bg-background w-full shadow-sm py-5 md:py-0">
