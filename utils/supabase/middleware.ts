@@ -1,20 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-function redirectTo(path: string, request: NextRequest) {
-  const url = request.nextUrl.clone()
-  url.pathname = path
-  return NextResponse.redirect(url)
-}
-
 export async function updateSession(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request })
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } =
     process.env
-  const isAuthRoute =
-    request.nextUrl.pathname.startsWith('/auth/login') ||
-    request.nextUrl.pathname.startsWith('/auth/join')
-  let supabaseResponse = NextResponse.next({ request })
-
+  const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
   const supabase = createServerClient(
     NEXT_PUBLIC_SUPABASE_URL!,
     NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -40,13 +31,16 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // If user exists, check the profile completion status
-  if (user) {
-    if (request.nextUrl.pathname.startsWith('/auth')) {
-      return redirectTo('/', request)
-    }
+  const role_code = user?.user_metadata?.role_code
 
-    const { data, error } = await supabase
+  const Redirect = (path: string) => {
+    const url = request.nextUrl.clone()
+    url.pathname = path
+    return NextResponse.redirect(url)
+  }
+
+  if (user) {
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('is_completed')
       .eq('user_id', user.id)
@@ -58,25 +52,51 @@ export async function updateSession(request: NextRequest) {
       })
     }
 
-    if (
-      !data?.is_completed &&
-      !request.nextUrl.pathname.startsWith('/user/setup')
-    ) {
-      return redirectTo('/user/setup/skills', request)
+    if (request.nextUrl.pathname.startsWith('/auth')) {
+      return Redirect('/')
     }
 
-    if (
-      data?.is_completed &&
-      request.nextUrl.pathname.startsWith('/user/setup')
-    ) {
-      return redirectTo('/', request)
+    switch (role_code) {
+      case 'SKR':
+        if (!request.nextUrl.pathname.startsWith('/skr')) {
+          if (
+            !profile?.is_completed &&
+            !request.nextUrl.pathname.startsWith('/skr/setup')
+          ) {
+            return Redirect('/skr/setup/skills')
+          }
+          if (
+            profile?.is_completed &&
+            request.nextUrl.pathname.startsWith('/skr/setup')
+          ) {
+            return Redirect('/')
+          }
+        }
+        break
+
+      // TODO: ADD FOR PROVIDER
+      case 'PDR':
+        if (!request.nextUrl.pathname.startsWith('/pdr')) {
+          return Redirect('/pdr/dashboard')
+        }
+        break
+
+      // TODO: ADD FOR ADMIN
+      case 'ADMIN':
+        if (!request.nextUrl.pathname.startsWith('/admin')) {
+          return Redirect('/admin/dashboard')
+        }
+        break
+
+      default:
+        // TODO: GIVE DEFAULT
+        break
     }
   }
-  // If no user is logged in, redirect to the login page
-  else if (!user) {
-    if (!isAuthRoute) {
-      return redirectTo('/auth/login', request)
-    }
+
+  // If no user is logged in, redirect to login page unless it's an auth route
+  if (!user && !isAuthRoute) {
+    return Redirect('/auth/login')
   }
 
   return supabaseResponse
