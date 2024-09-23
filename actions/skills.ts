@@ -25,5 +25,5 @@ export const addSkills = async (values: z.infer<typeof SkillsSchema>) => {
   if (error) return { error: error.code }
 
   revalidatePath('/', 'layout')
-  redirect('/user/setup/description')
+  redirect('/skr/setup/description')
 }
