@@ -52,8 +52,8 @@ export async function updateSession(request: NextRequest) {
       })
     }
 
-    if (request.nextUrl.pathname.startsWith('/auth')) {
-      return Redirect('/')
+    if (isAuthRoute) {
+      if (!request.url.includes('logout')) return Redirect('/')
     }
 
     switch (role_code) {
