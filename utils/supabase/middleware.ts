@@ -1,12 +1,23 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function redirectTo(path: string, request: NextRequest) {
+  const url = request.nextUrl.clone()
+  url.pathname = path
+  return NextResponse.redirect(url)
+}
+
 export async function updateSession(request: NextRequest) {
+  const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } =
+    process.env
+  const isAuthRoute =
+    request.nextUrl.pathname.startsWith('/auth/login') ||
+    request.nextUrl.pathname.startsWith('/auth/join')
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    NEXT_PUBLIC_SUPABASE_URL!,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -29,19 +40,10 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // If no user is logged in, redirect to the login page
-  if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
-  }
-
   // If user exists, check the profile completion status
   if (user) {
     if (request.nextUrl.pathname.startsWith('/auth')) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/'
-      return NextResponse.redirect(url)
+      return redirectTo('/', request)
     }
 
     const { data, error } = await supabase
@@ -60,18 +62,20 @@ export async function updateSession(request: NextRequest) {
       !data?.is_completed &&
       !request.nextUrl.pathname.startsWith('/user/setup')
     ) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/user/setup/skills'
-      return NextResponse.redirect(url)
+      return redirectTo('/user/setup/skills', request)
     }
 
     if (
       data?.is_completed &&
       request.nextUrl.pathname.startsWith('/user/setup')
     ) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/'
-      return NextResponse.redirect(url)
+      return redirectTo('/', request)
+    }
+  }
+  // If no user is logged in, redirect to the login page
+  else if (!user) {
+    if (!isAuthRoute) {
+      return redirectTo('/auth/login', request)
     }
   }
 
