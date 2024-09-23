@@ -65,12 +65,13 @@ export async function updateSession(request: NextRequest) {
           ) {
             return Redirect('/skr/setup/skills')
           }
-          if (
-            profile?.is_completed &&
-            request.nextUrl.pathname.startsWith('/skr/setup')
-          ) {
-            return Redirect('/')
-          }
+        }
+        if (
+          profile?.is_completed &&
+          request.nextUrl.pathname.startsWith('/skr/setup')
+        ) {
+          console.log("profile is complete")
+          return Redirect('/')
         }
         break
 
