@@ -33,6 +33,14 @@ const nextConfig = {
       },
     ],
   },
+
+  redirects: async () => [
+    {
+      source: '/skr/setup',
+      destination: '/skr/setup/profile',
+      permanent: true,
+    }
+  ]
 }
 
 export default nextConfig
