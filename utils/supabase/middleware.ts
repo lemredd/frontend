@@ -67,7 +67,7 @@ export async function updateSession(request: NextRequest) {
           !profile?.is_completed &&
           !request.nextUrl.pathname.startsWith('/skr/setup')
         ) {
-          return Redirect('/skr/setup/skills')
+          return Redirect('/skr/setup')
         }
         if (
           profile?.is_completed &&
