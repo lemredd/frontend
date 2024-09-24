@@ -57,35 +57,35 @@ export async function updateSession(request: NextRequest) {
     }
 
     switch (role_code) {
-      case 'SKR':
+      case 'seeker':
         if (!request.nextUrl.pathname.startsWith('/skr')) {
-          if (
-            !profile?.is_completed &&
-            !request.nextUrl.pathname.startsWith('/skr/setup')
-          ) {
-            return Redirect('/skr/setup/skills')
-          }
+          // TODO: FIX
+        }
+        if (
+          !profile?.is_completed &&
+          !request.nextUrl.pathname.startsWith('/skr/setup')
+        ) {
+          return Redirect('/skr/setup/skills')
         }
         if (
           profile?.is_completed &&
           request.nextUrl.pathname.startsWith('/skr/setup')
         ) {
-          console.log("profile is complete")
-          return Redirect('/')
+          return Redirect('/skr')
         }
         break
 
       // TODO: ADD FOR PROVIDER
-      case 'PDR':
+      case 'provider':
         if (!request.nextUrl.pathname.startsWith('/pdr')) {
-          return Redirect('/pdr/dashboard')
+          return Redirect('/pdr')
         }
         break
 
       // TODO: ADD FOR ADMIN
-      case 'ADMIN':
+      case 'admin':
         if (!request.nextUrl.pathname.startsWith('/admin')) {
-          return Redirect('/admin/dashboard')
+          return Redirect('/admin')
         }
         break
 
