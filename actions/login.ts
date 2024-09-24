@@ -1,5 +1,6 @@
 'use server'
 
+import { formatErrorMessage } from '@/lib/utils'
 import { LoginSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
@@ -20,7 +21,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
 
   if (error) {
     return {
-      error: error.code,
+      error: formatErrorMessage(error.code || 'Something went wrong'),
     }
   }
 

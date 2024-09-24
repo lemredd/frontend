@@ -1,5 +1,6 @@
 'use server'
 
+import { formatErrorMessage } from '@/lib/utils'
 import { RegisterSchema, RegisterWithRoleSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
@@ -15,7 +16,9 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   }
 }
 
-export const registerWithRole = async (values: z.infer<typeof RegisterWithRoleSchema>) => {
+export const registerWithRole = async (
+  values: z.infer<typeof RegisterWithRoleSchema>,
+) => {
   const validatedFields = RegisterWithRoleSchema.safeParse(values)
   if (!validatedFields.success) {
     return {
@@ -37,7 +40,7 @@ export const registerWithRole = async (values: z.infer<typeof RegisterWithRoleSc
     },
   })
 
-  if (error) return { error: error.message }
+  if (error) return { error: formatErrorMessage(error.message) }
 
   revalidatePath('/', 'layout')
   redirect('/auth/verify/tell')
