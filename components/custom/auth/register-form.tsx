@@ -32,13 +32,13 @@ export const RegisterForm = () => {
   const role_selections = [
     {
       label: 'Seeker',
-      value: 'seeker',
+      value: 'SKR',
       icon: SeekerSVG,
       desc: 'I will grab tasks',
     },
     {
       label: 'Provider',
-      value: 'PROVIDER',
+      value: 'PDR',
       icon: ProviderSVG,
       desc: 'I will post tasks',
     },
