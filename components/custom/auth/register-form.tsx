@@ -271,7 +271,10 @@ export const RegisterForm = () => {
                         className="flex items-center justify-center flex-col md:flex-row md:space-x-4"
                       >
                         {role_selections.map((role) => (
-                          <FormItem className="w-full">
+                          <FormItem
+                            className="w-full"
+                            key={role.value}
+                          >
                             <FormControl>
                               <RadioGroupCard value={role.value}>
                                 <div className="flex flex-col space-x-3 items-center justify-center p-3">

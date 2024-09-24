@@ -1,11 +1,11 @@
+import { useEffect, useState, useTransition } from 'react'
+import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 import * as z from 'zod'
-import { useState, useEffect, useTransition } from "react"
-import { ControllerRenderProps, UseFormReturn } from "react-hook-form"
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { FormError } from '@/components/custom/form-error'
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -14,10 +14,9 @@ import {
   FormLabel,
 } from '@/components/ui/form'
 
-import { SkillsSchema } from "@/schemas"
-import { addSkills } from "@/actions/skills"
-import { createClient } from "@/utils/supabase/client"
-
+import { addSkills } from '@/actions/skills'
+import { SkillsSchema } from '@/schemas'
+import { createClient } from '@/utils/supabase/client'
 
 interface Props<S = Record<string, string>> {
   selectedCategory: string
@@ -25,7 +24,12 @@ interface Props<S = Record<string, string>> {
   skills: S[]
   setSkills: React.Dispatch<React.SetStateAction<S[]>>
 }
-export function SkillsForm({ selectedCategory, form, skills, setSkills }: Props) {
+export function SkillsForm({
+  selectedCategory,
+  form,
+  skills,
+  setSkills,
+}: Props) {
   const supabase = createClient()
 
   const [error, setError] = useState<string | undefined>('')
@@ -34,9 +38,9 @@ export function SkillsForm({ selectedCategory, form, skills, setSkills }: Props)
     if (!selectedCategory) return
 
     supabase
-      .from("skills")
-      .select("id,name")
-      .eq("skill_category_id", selectedCategory)
+      .from('skills')
+      .select('id,name')
+      .eq('skill_category_id', selectedCategory)
       .then(({ data }) => {
         setSkills(data!)
       })
@@ -44,16 +48,18 @@ export function SkillsForm({ selectedCategory, form, skills, setSkills }: Props)
 
   function addSkill(
     field: ControllerRenderProps<z.infer<typeof SkillsSchema>>,
-    skill: Record<string, string>
+    skill: Record<string, string>,
   ) {
     field.onChange([...field.value, skill.id])
   }
 
   function removeSkill(
     field: ControllerRenderProps<z.infer<typeof SkillsSchema>>,
-    skill: Record<string, any>
+    skill: Record<string, string>,
   ) {
-    field.onChange((field.value as string[]).filter((id: string) => id !== skill.id))
+    field.onChange(
+      (field.value as string[]).filter((id: string) => id !== skill.id),
+    )
   }
 
   const [isPending, startTransition] = useTransition()
@@ -69,7 +75,9 @@ export function SkillsForm({ selectedCategory, form, skills, setSkills }: Props)
   return (
     <>
       <Card>
-        <CardHeader><h3 className="text-lg">Select skills</h3></CardHeader>
+        <CardHeader>
+          <h3 className="text-lg">Select skills</h3>
+        </CardHeader>
         <Form {...form}>
           <form
             id="skills-form"
@@ -77,34 +85,40 @@ export function SkillsForm({ selectedCategory, form, skills, setSkills }: Props)
             className="space-y-6"
           >
             <CardContent className="space-y-4">
-              {!!(skills && skills.length) && skills.map(skill => (
-                <FormField
-                  key={skill.id}
-                  control={form.control}
-                  name="skillIds"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value.includes(skill.id)}
-                          onCheckedChange={checked => {
-                            checked
-                              ? addSkill(field, skill)
-                              : removeSkill(field, skill)
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="cursor-pointer">{skill.name}</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              ))
-              }
+              {!!(skills && skills.length) &&
+                skills.map((skill) => (
+                  <FormField
+                    key={skill.id}
+                    control={form.control}
+                    name="skillIds"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value.includes(skill.id)}
+                            onCheckedChange={(checked) => {
+                              checked
+                                ? addSkill(field, skill)
+                                : removeSkill(field, skill)
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="cursor-pointer">
+                          {skill.name}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
               {!selectedCategory && (
-                <p className="text-sm text-slate-500">Select a category to see available skills</p>
+                <p className="text-sm text-slate-500">
+                  Select a category to see available skills
+                </p>
               )}
-              {(selectedCategory && !skills.length) && (
-                <p className="text-sm text-slate-500">This category has no skills yet.</p>
+              {selectedCategory && !skills.length && (
+                <p className="text-sm text-slate-500">
+                  This category has no skills yet.
+                </p>
               )}
             </CardContent>
             <FormError message={error} />
