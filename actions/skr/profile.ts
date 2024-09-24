@@ -29,11 +29,11 @@ export const editProfile = async (values: z.infer<typeof DescriptionSchema>) => 
     .update({
       short_desc: values.shortDescription,
       long_desc: values.longDescription,
-      is_completed: true, // TODO: make into supabase trigger instead
     })
     .eq('id', profile!.id)
   if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
-  redirect('/skr/setup/address')
+  //redirect('/skr/setup/address')
+  redirect('/skr/setup/skills')
 }
