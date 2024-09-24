@@ -59,7 +59,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     switch (role_code) {
-      case 'seeker':
+      case 'SKR':
         if (!request.nextUrl.pathname.startsWith('/skr')) {
           return Redirect('/skr')
         }
@@ -78,7 +78,7 @@ export async function updateSession(request: NextRequest) {
         break
 
       // TODO: ADD FOR PROVIDER
-      case 'provider':
+      case 'PDR':
         if (!request.nextUrl.pathname.startsWith('/pdr')) {
           return Redirect('/pdr')
         }
