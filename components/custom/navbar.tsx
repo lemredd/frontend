@@ -1,5 +1,6 @@
 'use client'
 
+import Logout from '@/components/custom/auth/logout'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -65,12 +66,7 @@ export function Navbar({ user }: NavbarProps) {
         </Button>
       </>
     ) : (
-      <form
-        action="/auth/logout"
-        method="post"
-      >
-        <Button variant="destructive">Logout</Button>
-      </form>
+      <Logout />
     )
 
   return (
