@@ -27,7 +27,7 @@ import { ChevronLeft } from 'lucide-react'
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>('')
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(0)
 
   const role_selections = [
     {
