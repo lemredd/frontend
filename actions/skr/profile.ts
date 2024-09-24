@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { DescriptionSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 
-export const describe = async (values: z.infer<typeof DescriptionSchema>) => {
+export const editProfile = async (values: z.infer<typeof DescriptionSchema>) => {
   const supabase = createClient()
   const validatedFields = DescriptionSchema.safeParse(values)
 
@@ -35,5 +35,5 @@ export const describe = async (values: z.infer<typeof DescriptionSchema>) => {
   if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/skr/setup/address')
 }
