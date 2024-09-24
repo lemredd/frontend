@@ -5,7 +5,9 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } =
     process.env
+  const publicRoutes = ['/', '/about/']
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
+  const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname)
   const supabase = createServerClient(
     NEXT_PUBLIC_SUPABASE_URL!,
     NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -59,7 +61,7 @@ export async function updateSession(request: NextRequest) {
     switch (role_code) {
       case 'seeker':
         if (!request.nextUrl.pathname.startsWith('/skr')) {
-          // TODO: FIX
+          return Redirect('/skr')
         }
         if (
           !profile?.is_completed &&
@@ -95,8 +97,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // If no user is logged in, redirect to login page unless it's an auth route
-  if (!user && !isAuthRoute) {
+  if (!user && !isAuthRoute && !isPublicRoute) {
     return Redirect('/auth/login')
   }
 
