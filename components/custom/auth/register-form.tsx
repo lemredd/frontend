@@ -13,18 +13,36 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { RadioGroup, RadioGroupCard } from '@/components/ui/radio-group'
 import { RegisterSchema, RoleSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import ProviderSVG from '@/public/svgs/provider.svg'
+import SeekerSVG from '@/public/svgs/seeker.svg'
+import { ChevronLeft } from 'lucide-react'
+
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>('')
-  //const [success, setSuccess] = useState<string | undefined>('')
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(1)
+
+  const role_selections = [
+    {
+      label: 'Seeker',
+      value: 'seeker',
+      icon: SeekerSVG,
+      desc: 'I will grab tasks',
+    },
+    {
+      label: 'Provider',
+      value: 'PROVIDER',
+      icon: ProviderSVG,
+      desc: 'I will post tasks',
+    },
+  ]
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -38,10 +56,9 @@ export const RegisterForm = () => {
     },
   })
 
-
   const roleForm = useForm<z.infer<typeof RoleSchema>>({
     resolver: zodResolver(RoleSchema),
-    defaultValues: { roleCode: '', }
+    defaultValues: { roleCode: '' },
   })
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
@@ -64,7 +81,7 @@ export const RegisterForm = () => {
 
   return (
     <CardWrapper
-      headerLabel={!step ? "Create an account" : "Select your role"}
+      headerLabel={!step ? 'Create an account' : 'Select your role'}
       backButtonLabel="Already have an account?"
       backButtonHref="/auth/login"
       showSocial
@@ -75,12 +92,12 @@ export const RegisterForm = () => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
               <FormField
                 control={form.control}
                 name="firstName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
                       <Input
@@ -98,14 +115,14 @@ export const RegisterForm = () => {
                 control={form.control}
                 name="lastName"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="w-full">
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         disabled={isPending}
                         type="text"
-                        placeholder="Juan Dela Cruz"
+                        placeholder="Dela Cruz"
                       />
                     </FormControl>
                     <FormMessage />
@@ -182,6 +199,7 @@ export const RegisterForm = () => {
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
+                    {/* TODO: ADD AGREEMENT AND PRIVACY POLICY */}
                     <FormLabel className="cursor-pointer">
                       I agree to the Task Grabber{' '}
                       <a
@@ -205,7 +223,6 @@ export const RegisterForm = () => {
               />
             </div>
             <FormError message={error} />
-            {/* <FormSuccess message={success} /> */}
             <Button
               type="submit"
               disabled={isPending}
@@ -219,41 +236,61 @@ export const RegisterForm = () => {
 
       {step === 1 && (
         <>
-          <Button className="mb-4" variant="link" onClick={() => setStep(0)}>Back</Button>
+          <div className="flex flex-col space-y-3 mb-3">
+            <Button
+              variant="link"
+              onClick={() => {
+                setStep(0)
+                setError('')
+              }}
+              className="w-fit inline-flex space-x-2 items-center justify-center p-0"
+            >
+              <ChevronLeft />
+              Back
+            </Button>
+
+            <div className="flex space-x-3">
+              <h1 className="text-lg font-semibold">Select account role</h1>
+              <p></p>
+            </div>
+          </div>
           <Form {...roleForm}>
             <form
               onSubmit={roleForm.handleSubmit(onRoleSubmit)}
               className="space-y-6"
             >
-              <FormField control={roleForm.control} name="roleCode" render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Select a role</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-col space-y-1"
-                    >
-                      {/* TODO: wrap in Card */}
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="SKR" />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          I will grab tasks
-                        </FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="PDR" />
-                        </FormControl>
-                        <FormLabel className="font-normal">I will post tasks</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                control={roleForm.control}
+                name="roleCode"
+                render={({ field }) => (
+                  <FormItem className="space-y-4">
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex items-center justify-center flex-col md:flex-row md:space-x-4"
+                      >
+                        {role_selections.map((role) => (
+                          <FormItem className="w-full">
+                            <FormControl>
+                              <RadioGroupCard value={role.value}>
+                                <div className="flex flex-col space-x-3 items-center justify-center p-3">
+                                  <role.icon className="text-primary" />
+                                  <h6 className="font-semibold">
+                                    {role.label}
+                                  </h6>
+                                  <p className="text-sm">{role.desc}</p>
+                                </div>
+                              </RadioGroupCard>
+                            </FormControl>
+                          </FormItem>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormError message={error} />
               <Button
                 type="submit"
@@ -265,8 +302,7 @@ export const RegisterForm = () => {
             </form>
           </Form>
         </>
-      )
-      }
-    </CardWrapper >
+      )}
+    </CardWrapper>
   )
 }
