@@ -6,6 +6,7 @@ import CloseIcon from "@/public/svgs/close.svg"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { SkillsSchema } from "@/schemas"
+import { Chip } from '@/components/ui/chip'
 
 interface Props<S = Record<string, string>> {
   form: UseFormReturn<z.infer<typeof SkillsSchema>>
@@ -23,10 +24,16 @@ export function SelectedSkills({ form, skills }: Props) {
       <CardHeader><h3 className="text-lg">{selectedSkills.length} skills selected</h3></CardHeader>
       <CardContent className="flex flex-wrap gap-4">
         {selectedSkills.map(({ name, id }) => (
-          <div key={id} className="rounded-full p-2 flex items-center gap-2 border border-slate-300" title={name}>
-            <span className="text-sm max-w-[100px] truncate">{name}</span>
-            <Button variant="destructive" size="icon" className="size-6 rounded-full"><CloseIcon onClick={() => removeSkill(id)} /></Button>
-          </div>))}
+          <Chip
+            key={id}
+            content={name}
+            afterContent={(
+              <Button variant="destructive" size="icon" className="size-6 rounded-full">
+                <CloseIcon onClick={() => removeSkill(id)} />
+              </Button>
+            )}
+          />
+        ))}
       </CardContent>
     </Card>
   )
