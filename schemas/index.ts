@@ -1,7 +1,5 @@
 import * as z from 'zod'
 
-import { createClient } from '@/utils/supabase/client'
-
 export const LoginSchema = z.object({
   email: z.string().email({
     message: 'Email is required',
@@ -36,10 +34,10 @@ const registerFields = {
       'Password must contain at least one special character',
     ),
   firstName: z.string().min(1, {
-    message: 'Name is required',
+    message: 'First name is required',
   }),
   lastName: z.string().min(1, {
-    message: 'Name is required',
+    message: 'Last name is required',
   }),
   // }),
   // profile_picture:
@@ -58,7 +56,7 @@ const registerFields = {
 }
 export const RegisterSchema = z
   .object({
-    ...registerFields
+    ...registerFields,
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -79,7 +77,7 @@ export const RegisterWithRoleSchema = z.object({
   ...registerFields,
   roleCode: z.string().min(1, {
     message: 'role is required',
-  })
+  }),
 })
 
 export const SkillsSchema = z.object({
@@ -92,5 +90,5 @@ export const DescriptionSchema = z.object({
   }),
   longDescription: z.string().min(1, {
     message: 'Description is required',
-  })
+  }),
 })
