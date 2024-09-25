@@ -82,6 +82,18 @@ export async function updateSession(request: NextRequest) {
         if (!request.nextUrl.pathname.startsWith('/pdr')) {
           return Redirect('/pdr')
         }
+        if (
+          !profile?.is_completed &&
+          !request.nextUrl.pathname.startsWith('/pdr/setup')
+        ) {
+          return Redirect('/pdr/setup')
+        }
+        if (
+          profile?.is_completed &&
+          request.nextUrl.pathname.startsWith('/pdr/setup')
+        ) {
+          return Redirect('/pdr')
+        }
         break
 
       // TODO: ADD FOR ADMIN
