@@ -1,7 +1,7 @@
 import { TNavbarRoute } from '@/constants/types'
 import { useMemo } from 'react'
 
-type UserRole = 'seeker' | 'provider' | 'admin' | null
+type UserRole = 'SKR' | 'PDR' | 'ADMIN' | null
 
 const useNavbarRoutes = (role: UserRole): TNavbarRoute[] => {
   const NavbarRoutes: TNavbarRoute[] = useMemo(() => {
@@ -11,14 +11,14 @@ const useNavbarRoutes = (role: UserRole): TNavbarRoute[] => {
       { label: 'About', path: '/about' },
     ]
 
-    // Routes for seekers
+    // Routes for SKRs
     const seekerRoutes: TNavbarRoute[] = [
       { label: 'Home', path: '/skr' },
       { label: 'Grab Tasks', path: '/skr/tasks' },
       { label: 'Profile', path: '/skr/profile' },
     ]
 
-    // Routes for providers
+    // Routes for PDRs
     const providerRoutes: TNavbarRoute[] = [
       { label: 'Home', path: '/pdr' },
       { label: 'Post Tasks', path: '/pdr/tasks/post' },
@@ -33,11 +33,11 @@ const useNavbarRoutes = (role: UserRole): TNavbarRoute[] => {
     ]
 
     // Return different routes based on the role
-    if (role === 'seeker') {
+    if (role === 'SKR') {
       return seekerRoutes
-    } else if (role === 'provider') {
+    } else if (role === 'PDR') {
       return providerRoutes
-    } else if (role === 'admin') {
+    } else if (role === 'ADMIN') {
       return adminRoutes
     } else {
       return publicRoutes // For unauthenticated users
