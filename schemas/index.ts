@@ -84,13 +84,22 @@ export const SkillsSchema = z.object({
   skillIds: z.array(z.string().min(1, { message: 'skill is required' })),
 })
 
-export const DescriptionSchema = z.object({
+export const ProfileDescriptionSchema = z.object({
   shortDescription: z.string().min(1, {
     message: 'Description is required',
   }),
   longDescription: z.string().min(1, {
     message: 'Description is required',
   }),
+})
+
+export const AddressSchema = z.object({
+  province: z.string().min(1, { message: 'province is required' }),
+  city_muni: z.string().min(1, { message: 'City/Municipality is required' }),
+  barangay: z.string().min(1, { message: 'barangay is required' }),
+  address_1: z.string().min(1, { message: 'Address 1 is required' }).optional(),
+  address_2: z.string().min(1, { message: 'Address 2 is required' }).optional(),
+  postal_code: z.string().min(1, { message: 'Postal code is required' }).optional(),
 })
 
 export const JobSchema = z.object({
