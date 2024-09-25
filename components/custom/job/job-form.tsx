@@ -29,14 +29,17 @@ interface PartialFieldsProps {
   setStep: React.Dispatch<React.SetStateAction<number>>
 }
 
-interface NameAndDescriptionFieldsProps extends PartialFieldsProps {
-  isJobNameAndDescriptionFilled: boolean
-}
 function NameAndDescriptionFields({
   form,
-  setStep,
-  isJobNameAndDescriptionFilled
-}: NameAndDescriptionFieldsProps) {
+  setStep
+}: PartialFieldsProps) {
+  const isJobNameAndDescriptionFilled = (
+    !!form.getValues().name
+    && !form.getFieldState('name').invalid
+  ) && (
+      !!form.getValues().description
+      && !form.getFieldState('description').invalid
+    )
   return (
     <>
       <FormField
@@ -141,7 +144,7 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
       form.setValue('skill_ids', skillIds.filter(skillId => skillId !== id))
       if (skillIds.length === 1) setStep(2)
     } else {
-      form.setValue('skill_ids', [...form.getValues().skill_ids, id])
+      form.setValue('skill_ids', [...skillIds, id])
       setStep(3)
     }
   }
@@ -222,7 +225,6 @@ export function JobForm() {
   const canPost = Object.values(form.getValues()).every(value => (
     value instanceof Array ? !!value.length : !!value
   ))
-  const isJobNameAndDescriptionFilled = !!form.getValues().name && !!form.getValues().description
 
   function onSubmit() {
     startTransition(() => {
@@ -242,7 +244,6 @@ export function JobForm() {
           <NameAndDescriptionFields
             form={form}
             setStep={setStep}
-            isJobNameAndDescriptionFilled={isJobNameAndDescriptionFilled}
           />
         ) : (
           <div className="flex justify-between w-full">
