@@ -14,7 +14,7 @@ import {
   FormLabel,
 } from '@/components/ui/form'
 
-import { addSkills } from '@/actions/skills'
+import { addSkills } from '@/actions/skr/skills'
 import { SkillsSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/client'
 
@@ -44,6 +44,7 @@ export function SkillsForm({
       .then(({ data }) => {
         setSkills(data!)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory])
 
   function addSkill(
