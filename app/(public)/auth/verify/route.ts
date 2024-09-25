@@ -21,4 +21,6 @@ export async function GET(request: NextRequest) {
 
   const roleCode = String(data?.user?.user_metadata?.role_code).toLocaleLowerCase()
   redirectTo.pathname = `/${roleCode}/setup`
+
+  return NextResponse.redirect(redirectTo)
 }
