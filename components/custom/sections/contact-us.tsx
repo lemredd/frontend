@@ -33,7 +33,6 @@ const ContactUs = () => {
   const onSubmit = (values: z.infer<typeof ContactUsSchema>) => {
     startTransition(() => {
       setError('')
-      console.log(values)
     })
   }
   return (

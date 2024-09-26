@@ -8,7 +8,6 @@ interface FooterProps {
 
 export const Footer = ({ role }: FooterProps) => {
   const navbarRoutes = useNavbarRoutes(role)
-  console.log(navbarRoutes)
   return (
     <footer className="w-full px-6 2xl:px-0 pt-10 text-foreground">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">

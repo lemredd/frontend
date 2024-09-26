@@ -22,6 +22,5 @@ export const logout = async () => {
     }
   }
 
-  // Revalidation can't happen directly, return success response
   return { success: true }
 }

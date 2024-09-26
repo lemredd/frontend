@@ -1,20 +1,22 @@
 'use client'
 
-import { logout } from '@/actions/logout'
 import { Button } from '@/components/ui/button'
+import { useAuthStore } from '@/store/AuthStore'
 import { useRouter } from 'next/navigation'
 
 const Logout = () => {
   const router = useRouter()
+  const logout = useAuthStore((state) => state.logout)
 
   const handleLogout = async () => {
-    const response = await logout()
-
-    if (response?.error) {
-      console.error('Logout failed:', response.error)
-    } else {
-      router.push('/auth/login')
-    }
+    await logout()
+      .then(() => {
+        router.push('/auth/login')
+      })
+      .catch((error: any) => {
+        //  if (error) setError(error.message)
+        console.log(error)
+      })
   }
 
   return (
