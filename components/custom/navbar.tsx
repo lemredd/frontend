@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 import { User } from '@supabase/supabase-js'
 import { Menu } from 'lucide-react'
 import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
 import { RiUserSearchFill } from 'react-icons/ri'
 
 interface NavbarProps {
@@ -24,37 +25,68 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const navbarRoutes = useNavbarRoutes(user?.user_metadata?.role_code)
   const activePath = useActivePath()
-  const renderNavbarLinks = () => (
+  const [showBackground, setShowBackground] = useState<boolean>(false)
+  const [showNavbar, setShowNavbar] = useState<boolean>(true)
+  const [prevScrollPos, setPrevScrollPos] = useState<number>(0)
+
+  const TOP_OFFSET = 50
+
+  const handleScroll = useCallback(() => {
+    const currentScrollPos = window.scrollY
+    if (currentScrollPos <= TOP_OFFSET) {
+      setShowNavbar(true)
+    } else if (currentScrollPos > prevScrollPos) {
+      setShowNavbar(false)
+    } else {
+      setShowNavbar(true)
+    }
+
+    setShowBackground(currentScrollPos >= TOP_OFFSET)
+    setPrevScrollPos(currentScrollPos)
+  }, [prevScrollPos])
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [handleScroll])
+
+  const renderNavbarLinks = (fromSheet: boolean) => (
     <>
       {navbarRoutes.map((route, idx) => (
         <li
           key={idx}
           className={cn(
-            'text-gray-600 hover:text-primary relative md:py-5',
+            'text-foreground hover:text-primary relative',
             activePath === route.path ||
               (route.path !== '/' && activePath.startsWith(route.path))
-              ? 'text-primary'
-              : '',
+              ? 'text-primary dark:text-blue-300'
+              : showBackground
+              ? 'text-foreground'
+              : 'text-foreground',
+            fromSheet && 'text-foreground',
           )}
         >
-          <Link href={route.path}>{route.label}</Link>
-          <span
-            className={cn(
-              'absolute left-0 bottom-0 w-full h-1 bg-primary',
-              activePath === route.path ||
-                (route.path !== '/' && activePath.startsWith(route.path))
-                ? 'scale-0 md:scale-100'
-                : 'scale-0',
-            )}
-          />
+          <Link
+            href={route.path}
+            scroll={true}
+          >
+            {route.label}
+          </Link>{' '}
         </li>
       ))}
     </>
   )
 
-  const renderAuthButtons = () =>
+  const renderAuthButtons = (fromSheet: boolean) =>
     !user ? (
-      <>
+      <div
+        className={cn(
+          'hidden sm:flex space-x-3',
+          fromSheet && 'flex-col space-y-3',
+        )}
+      >
         <Button
           variant="ghost"
           asChild
@@ -64,51 +96,71 @@ export function Navbar({ user }: NavbarProps) {
         <Button asChild>
           <Link href="/auth/join">Join Now</Link>
         </Button>
-      </>
+      </div>
     ) : (
       <Logout />
     )
 
   return (
-    <nav className="fixed top-0 z-50 bg-background w-full shadow-sm py-5 md:py-0">
-      <div className="items-center px-4 max-w-screen-xl mx-auto md:flex md:px-8">
-        <div className="flex items-center justify-between md:block">
-          <Link
-            href="/"
-            className="inline-flex space-x-1 items-center"
+    <nav
+      className={cn(
+        'fixed top-0 z-50 w-full transition-all duration-300',
+        showNavbar ? 'top-0 opacity-100' : '-top-20 opacity-0',
+        showBackground ? 'bg-background shadow-lg py-3' : 'bg-transparent py-6',
+      )}
+    >
+      <div className="container mx-auto flex items-center justify-between px-6 2xl:px-0">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="inline-flex items-center space-x-2"
+        >
+          <RiUserSearchFill
+            className={cn('text-2xl', !showBackground && 'text-foreground')}
+          />
+          <h1
+            className={cn(
+              'text-xl font-bold',
+              !showBackground && 'text-foreground',
+            )}
           >
-            <RiUserSearchFill className="size-6 fill-primary" />
-            <h1 className="text-xl font-bold text-primary">Task Grabber</h1>
-          </Link>
-          <div className="md:hidden flex items-center space-x-2">
-            <div className="flex space-x-2">{renderAuthButtons()}</div>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline">
-                  <Menu />
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle className="inline-flex space-x-1 items-center">
-                    <RiUserSearchFill className="size-6 fill-primary" />
-                    <h1 className="text-xl font-bold text-primary">
-                      Task Grabber
-                    </h1>
-                  </SheetTitle>
-                </SheetHeader>
-                <ul className="space-y-5 mt-8">
-                  {renderNavbarLinks()}
-                  <li className="w-fit mx-auto">{renderAuthButtons()}</li>
-                </ul>
-              </SheetContent>
-            </Sheet>
-          </div>
+            Task Grabber
+          </h1>
+        </Link>
+
+        {/* Desktop Links */}
+        <div className="hidden md:flex space-x-6">
+          <ul className="flex space-x-6">{renderNavbarLinks(false)}</ul>
         </div>
-        <div className="hidden md:flex flex-1 justify-center space-x-6">
-          <ul className="flex space-x-6">{renderNavbarLinks()}</ul>
+
+        {/* Desktop Auth Buttons */}
+        <div className="hidden md:flex space-x-2">
+          {renderAuthButtons(false)}
         </div>
-        <div className="hidden md:flex space-x-2">{renderAuthButtons()}</div>
+
+        {/* Mobile Menu */}
+        <div className="md:hidden flex items-center space-x-2">
+          {renderAuthButtons(false)}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline">
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <SheetHeader>
+                <SheetTitle className="inline-flex items-center space-x-1">
+                  <RiUserSearchFill className="text-primary text-2xl" />
+                  <h1 className="text-xl font-bold text-primary">
+                    Task Grabber
+                  </h1>
+                </SheetTitle>
+              </SheetHeader>
+              <ul className="space-y-5 mt-8">{renderNavbarLinks(true)}</ul>
+              <div className="mt-6">{renderAuthButtons(true)}</div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </nav>
   )

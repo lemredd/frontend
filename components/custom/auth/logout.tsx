@@ -21,6 +21,7 @@ const Logout = () => {
     <Button
       onClick={handleLogout}
       variant="destructive"
+      className="w-full"
     >
       Logout
     </Button>

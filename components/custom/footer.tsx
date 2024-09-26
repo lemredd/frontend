@@ -10,7 +10,7 @@ export const Footer = ({ role }: FooterProps) => {
   const navbarRoutes = useNavbarRoutes(role)
   console.log(navbarRoutes)
   return (
-    <footer className="w-full pt-8 bg-background text-foreground">
+    <footer className="w-full px-6 2xl:px-0 pt-10 text-foreground">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* About */}
         <div>
@@ -40,9 +40,8 @@ export const Footer = ({ role }: FooterProps) => {
           <p>Email: support@taskgrabber.com</p>
           <p>Phone: +123 456 7890</p>
         </div>
-      </div>
-
-      <div className="mt-8 text-sm bg-foreground text-background py-4 text-center">
+      </div>{' '}
+      <div className="mt-8 text-sm py-4 text-center">
         <p>
           &copy; {new Date().getFullYear()} Task Grabber. All rights reserved.
         </p>
