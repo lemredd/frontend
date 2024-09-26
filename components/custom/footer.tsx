@@ -17,8 +17,8 @@ export const Footer = ({ role }: FooterProps) => {
           <h3 className="text-xl font-bold mb-4">Task Grabber</h3>
           <p>
             a go-to platform for posting tasks and finding opportunities.
-            Whether you're looking to get help or offer your skills, we've got
-            you covered.
+            Whether you&apos;re looking to get help or offer your skills,
+            we&apos;ve got you covered.
           </p>
         </div>
 

@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import useNavbarRoutes from '@/hooks/useNavbarRoutes'
 import { ContactUsSchema } from '@/schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useTransition } from 'react'
@@ -20,7 +19,6 @@ import { z } from 'zod'
 
 const ContactUs = () => {
   const [isPending, startTransition] = useTransition()
-  const navbarRoutes = useNavbarRoutes()
   const [error, setError] = useState<string | undefined>('')
 
   const form = useForm<z.infer<typeof ContactUsSchema>>({
@@ -34,6 +32,7 @@ const ContactUs = () => {
 
   const onSubmit = (values: z.infer<typeof ContactUsSchema>) => {
     startTransition(() => {
+      setError('')
       console.log(values)
     })
   }
