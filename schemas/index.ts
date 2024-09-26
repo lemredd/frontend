@@ -92,6 +92,7 @@ export const DescriptionSchema = z.object({
     message: 'Description is required',
   }),
 })
+
 export const ContactUsSchema = z.object({
   name: z.string().min(1, {
     message: 'Name is required',

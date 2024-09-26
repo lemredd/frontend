@@ -1,4 +1,4 @@
-export type UserRole = 'seeker' | 'provider' | 'admin' | undefined
+export type UserRole = 'SKR' | 'PDR' | 'ADMIN' | undefined
 
 export type TNavbarRoute = {
   icon?: any
