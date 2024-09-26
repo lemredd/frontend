@@ -59,7 +59,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     switch (role_code) {
-      case 'seeker':
+      case 'SKR':
         if (!request.nextUrl.pathname.startsWith('/skr')) {
           return Redirect('/skr')
         }
@@ -67,7 +67,7 @@ export async function updateSession(request: NextRequest) {
           !profile?.is_completed &&
           !request.nextUrl.pathname.startsWith('/skr/setup')
         ) {
-          return Redirect('/skr/setup/skills')
+          return Redirect('/skr/setup')
         }
         if (
           profile?.is_completed &&
@@ -78,8 +78,20 @@ export async function updateSession(request: NextRequest) {
         break
 
       // TODO: ADD FOR PROVIDER
-      case 'provider':
+      case 'PDR':
         if (!request.nextUrl.pathname.startsWith('/pdr')) {
+          return Redirect('/pdr')
+        }
+        if (
+          !profile?.is_completed &&
+          !request.nextUrl.pathname.startsWith('/pdr/setup')
+        ) {
+          return Redirect('/pdr/setup')
+        }
+        if (
+          profile?.is_completed &&
+          request.nextUrl.pathname.startsWith('/pdr/setup')
+        ) {
           return Redirect('/pdr')
         }
         break

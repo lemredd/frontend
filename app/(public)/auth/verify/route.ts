@@ -6,23 +6,21 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? '/'
   const redirectTo = request.nextUrl.clone()
-  redirectTo.pathname = next
-
-  if (token_hash && type) {
-    const supabase = createClient()
-
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
-    if (!error) {
-      return NextResponse.redirect(redirectTo)
-    }
-  }
-
-  // return the user to an error page with some instructions
   redirectTo.pathname = '/auth/verify/error'
+
+  if (!(token_hash && type)) return NextResponse.redirect(redirectTo)
+
+  const supabase = createClient()
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    type,
+    token_hash,
+  })
+  if (error) return NextResponse.redirect(redirectTo)
+
+  const roleCode = String(data?.user?.user_metadata?.role_code).toLocaleLowerCase()
+  redirectTo.pathname = `/${roleCode}/setup`
+
   return NextResponse.redirect(redirectTo)
 }

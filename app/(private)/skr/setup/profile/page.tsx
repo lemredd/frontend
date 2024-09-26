@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { DescriptionSchema } from "@/schemas";
 import { Button } from "@/components/ui/button";
-import { describe } from "@/actions/description";
+import { editProfile } from "@/actions/skr/profile";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormError } from "@/components/custom/form-error";
@@ -26,7 +26,7 @@ export default function UserDescriptionPage() {
 
   function onSubmit() {
     startTransition(() => {
-      describe(form.getValues()).then(data => {
+      editProfile(form.getValues()).then(data => {
         if (data?.error) return setError(data?.error)
       })
     })

@@ -19,11 +19,19 @@ export const addSkills = async (values: z.infer<typeof SkillsSchema>) => {
   const { data: { user } } = await supabase.auth.getUser()
   const { data: profile } = await supabase.from('profiles').select('id').eq('user_id', user!.id).single()
 
-  const { error } = await supabase
+  const { error: profileSkillsError } = await supabase
     .from('profile_skills')
     .insert(validatedFields.data.skillIds.map((id) => ({ profile_id: profile!.id, skill_id: id })))
-  if (error) return { error: error.code }
+  if (profileSkillsError) return { error: profileSkillsError.message }
+
+  const { error: onboardingError } = await supabase
+    .from('profiles')
+    .update({
+      is_completed: true // TODO: make into supabase trigger instead
+    })
+    .eq('id', profile!.id)
+  if (onboardingError) return { error: onboardingError.message }
 
   revalidatePath('/', 'layout')
-  redirect('/skr/setup/description')
+  redirect('/')
 }
