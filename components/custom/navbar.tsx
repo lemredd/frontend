@@ -1,6 +1,7 @@
 'use client'
 
 import Logout from '@/components/custom/auth/logout'
+import { ModeToggle } from '@/components/custom/toggle-dark'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -96,6 +97,7 @@ export function Navbar({ user }: NavbarProps) {
         <Button asChild>
           <Link href="/auth/join">Join Now</Link>
         </Button>
+        <ModeToggle />
       </div>
     ) : (
       <Logout />
