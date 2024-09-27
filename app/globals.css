@@ -92,6 +92,10 @@
       -webkit-text-fill-color: transparent;
     }
 
+  .gradient-bg{
+    background: var(--gradient-text);
+  }
+
   .glass {
     background: var(--glass-background);
     border-radius: 16px;

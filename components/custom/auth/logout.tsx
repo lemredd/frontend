@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/AuthStore'
 import { useRouter } from 'next/navigation'
 
-const Logout = () => {
+const Logout = ({ className }: { className?: string }) => {
   const router = useRouter()
   const logout = useAuthStore((state) => state.logout)
 
@@ -23,7 +23,7 @@ const Logout = () => {
     <Button
       onClick={handleLogout}
       variant="destructive"
-      className="w-full"
+      className={className}
     >
       Logout
     </Button>

@@ -13,17 +13,15 @@ import {
 import useActivePath from '@/hooks/useActivePath'
 import useNavbarRoutes from '@/hooks/useNavbarRoutes'
 import { cn } from '@/lib/utils'
-import { User } from '@supabase/supabase-js'
+import { useAuthStore } from '@/store/AuthStore'
 import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { RiUserSearchFill } from 'react-icons/ri'
 
-interface NavbarProps {
-  user: User | null
-}
-
-export function Navbar({ user }: NavbarProps) {
+export function Navbar() {
+  const user = useAuthStore((state) => state.user)
+  const isLoading = useAuthStore((state) => state.isLoading)
   const navbarRoutes = useNavbarRoutes(user?.user_metadata?.role_code)
   const activePath = useActivePath()
   const [showBackground, setShowBackground] = useState<boolean>(false)
@@ -100,8 +98,13 @@ export function Navbar({ user }: NavbarProps) {
         <ModeToggle />
       </div>
     ) : (
-      <Logout />
+      <div className="hidden sm:flex space-x-3">
+        <Logout className={fromSheet ? 'w-full' : ''} />
+        <ModeToggle />
+      </div>
     )
+
+  if (isLoading) return null
 
   return (
     <nav

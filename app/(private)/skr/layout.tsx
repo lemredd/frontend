@@ -1,8 +1,8 @@
 'use client'
 
-import withProviderProtection from '@/hoc/withProviderProtection'
+import withSeekerProtection from '@/hoc/withSeekerProtection'
 
-const ProviderLayout = ({
+const SeekerLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode
@@ -14,4 +14,4 @@ const ProviderLayout = ({
   )
 }
 
-export default withProviderProtection(ProviderLayout)
+export default withSeekerProtection(SeekerLayout)
