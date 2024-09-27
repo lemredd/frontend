@@ -82,7 +82,7 @@ export function Navbar() {
     !user ? (
       <div
         className={cn(
-          'hidden sm:flex space-x-3',
+          'hidden md:flex space-x-3',
           fromSheet && 'flex-col space-y-3',
         )}
       >
@@ -98,9 +98,9 @@ export function Navbar() {
         <ModeToggle />
       </div>
     ) : (
-      <div className="hidden sm:flex space-x-3">
-        <Logout className={fromSheet ? 'w-full' : ''} />
-        <ModeToggle />
+      <div className={cn('space-x-3 flex')}>
+        <Logout className={fromSheet ? 'w-full' : 'hidden md:flex'} />
+        <ModeToggle className={fromSheet ? 'hidden' : ''} />
       </div>
     )
 
