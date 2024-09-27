@@ -28,11 +28,11 @@ const Features = () => {
       className="w-full py-10 md:py-20 px-4 xl:px-0 text-foreground"
       id="features"
     >
-      <Card className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto text-center">
+      <Card className="p-6 flex flex-wrap justify-evenly items-center  max-w-5xl mx-auto text-center">
         {features.map((feature, index) => (
           <Card
             key={index}
-            className="p-6 border-0 shadow-none"
+            className="p-6 border-0 shadow-none w-full sm:w-1/3 flex flex-col items-center"
           >
             {feature.icon}
             <h3 className="text-2xl font-semibold mt-4">{feature.title}</h3>
