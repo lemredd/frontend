@@ -82,23 +82,36 @@ export function Navbar() {
     !user ? (
       <div
         className={cn(
-          'hidden md:flex space-x-3',
-          fromSheet && 'flex-col space-y-3',
+          'flex',
+          fromSheet
+            ? 'flex-col space-y-3 items-center justify-center'
+            : 'space-x-3 ',
         )}
       >
         <Button
           variant="ghost"
           asChild
+          className={fromSheet ? 'w-full' : 'hidden md:flex'}
         >
           <Link href="/auth/login">Login</Link>
         </Button>
-        <Button asChild>
+        <Button
+          asChild
+          className={fromSheet ? 'w-full' : 'hidden md:flex'}
+        >
           <Link href="/auth/join">Join Now</Link>
         </Button>
-        <ModeToggle />
+        <ModeToggle className={fromSheet ? 'hidden' : ''} />
       </div>
     ) : (
-      <div className={cn('space-x-3 flex')}>
+      <div
+        className={cn(
+          'flex',
+          fromSheet
+            ? 'flex-col space-y-3 items-center justify-center'
+            : 'space-x-3',
+        )}
+      >
         <Logout className={fromSheet ? 'w-full' : 'hidden md:flex'} />
         <ModeToggle className={fromSheet ? 'hidden' : ''} />
       </div>
@@ -125,7 +138,7 @@ export function Navbar() {
           />
           <h1
             className={cn(
-              'text-xl font-bold',
+              'text-xl font-bold hidden md:block',
               !showBackground && 'text-foreground',
             )}
           >
