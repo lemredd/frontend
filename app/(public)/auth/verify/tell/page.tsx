@@ -21,7 +21,7 @@ export default function VerifyPage() {
           </p>
           <p className="text-sm text-gray-500">
             If you haven&apos;t received the email, check your spam folder or
-            <span className="text-blue-500">`&apos;` resend</span> the email.
+            <span className="text-blue-500"> resend</span> the email.
           </p>
           {/* ADD RESEND */}
           <Button className="mt-6 w-full">Resend Verification Email</Button>

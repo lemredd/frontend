@@ -1,14 +1,13 @@
-import { TNavbarRoute } from '@/constants/types'
+import { TNavbarRoute, UserRole } from '@/constants/types'
 import { useMemo } from 'react'
 
-type UserRole = 'SKR' | 'PDR' | 'ADMIN' | null
-
-const useNavbarRoutes = (role: UserRole): TNavbarRoute[] => {
+const useNavbarRoutes = (role?: UserRole): TNavbarRoute[] => {
   const NavbarRoutes: TNavbarRoute[] = useMemo(() => {
     // Routes for unauthenticated users
     const publicRoutes: TNavbarRoute[] = [
-      { label: 'Home', path: '/' },
-      { label: 'About', path: '/about' },
+      { label: 'Home', path: '/#' },
+      { label: 'About', path: '/#about' },
+      { label: 'Contact Us', path: '/#contact-us' },
     ]
 
     // Routes for SKRs

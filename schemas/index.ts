@@ -102,10 +102,26 @@ export const AddressSchema = z.object({
   postal_code: z.string().min(1, { message: 'Postal code is required' }).optional(),
 })
 
+export const ContactUsSchema = z.object({
+  name: z.string().min(1, {
+    message: 'Name is required',
+  }),
+  email: z.string().email({
+    message: 'Email is required',
+  }),
+  message: z.string().min(1, {
+    message: 'Message is required',
+  }),
+})
+
 export const JobSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
   description: z.string().min(10, { message: 'description is required' }),
-  price: z.string().refine(value => Number(value)).transform(value => Number(value)).optional(),
+  price: z
+    .string()
+    .refine((value) => Number(value))
+    .transform((value) => Number(value))
+    .optional(),
   province: z.string().min(1, { message: 'province is required' }),
   city_muni: z.string().min(1, { message: 'city_muni is required' }),
   barangay: z.string().min(1, { message: 'barangay is required' }),

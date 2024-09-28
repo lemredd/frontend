@@ -21,7 +21,7 @@ export const CardWrapper = ({
   showSocial,
 }: CardWrapperProps) => {
   return (
-    <Card className=" w-11/12 max-w-[500px] shadow-md">
+    <Card className="z-10 w-11/12 max-w-[500px] shadow-md !glass border-0 p-3">
       <CardHeader>
         <Header label={headerLabel} />
       </CardHeader>

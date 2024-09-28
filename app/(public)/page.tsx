@@ -1,13 +1,22 @@
-// import Image from 'next/image'
+'use client'
+import AboutUs from '@/components/custom/sections/about-us'
+import ContactUs from '@/components/custom/sections/contact-us'
+import Features from '@/components/custom/sections/features'
+import Hero from '@/components/custom/sections/hero'
 export default function Home() {
   return (
-    <main className="h-screen w-full relative ">
-      {/* <Image
-        className="object-top object-cover"
-        src="/images/ideas.jpg"
-        alt="asd"
-        fill
-      /> */}
-    </main>
+    <>
+      {/* Hero Section */}
+      <Hero />
+
+      {/* Features */}
+      <Features />
+
+      {/* About Us Section */}
+      <AboutUs />
+
+      {/* Contact Us Section */}
+      <ContactUs />
+    </>
   )
 }
