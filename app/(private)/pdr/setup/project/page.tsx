@@ -16,10 +16,8 @@ export default function ProviderSetupPage() {
             Tell us what needs to be <strong>done.</strong>
           </CardTitle>
           <CardDescription>
-            <p>
-              {"We'll"} guide you to create the perfect brief. The more detail
-              the better.
-            </p>
+            {"We'll"} guide you to create the perfect brief. The more detail the
+            better.
           </CardDescription>
         </CardHeader>
         <CardContent>
