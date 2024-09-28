@@ -1,6 +1,6 @@
 'use client'
 
-import Logout from '@/components/custom/auth/logout'
+import AccountMenu from '@/components/custom/account-menu'
 import { ModeToggle } from '@/components/custom/toggle-dark'
 import { Button } from '@/components/ui/button'
 import {
@@ -89,7 +89,7 @@ export function Navbar() {
         )}
       >
         <Button
-          variant="ghost"
+          variant="outline"
           asChild
           className={fromSheet ? 'w-full' : 'hidden md:flex'}
         >
@@ -112,8 +112,8 @@ export function Navbar() {
             : 'space-x-3',
         )}
       >
-        <Logout className={fromSheet ? 'w-full' : 'hidden md:flex'} />
         <ModeToggle className={fromSheet ? 'hidden' : ''} />
+        <AccountMenu className={fromSheet ? 'hidden' : ''} />
       </div>
     )
 
