@@ -35,8 +35,8 @@ export function AddressForm() {
   }
   return (
     <Form {...form}>
-      <form>
-        <div className="flex justify-between [&>*]:basis-1/3 gap-x-6">
+      <form className="space-y-6">
+        <div className="flex justify-between flex-wrap gap-6 [&>*]:basis-[calc(50%-1.5rem)]">
           <FormField
             control={form.control}
             name="province"
@@ -76,7 +76,46 @@ export function AddressForm() {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="postal_code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Postal Code</FormLabel>
+                <FormControl>
+                  <Input placeholder="Postal Code" inputMode="numeric" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+        <FormField
+          control={form.control}
+          name="address_1"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address 1</FormLabel>
+              <FormControl>
+                <Input placeholder="Building No., Street, Subdivision, etc." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address_2"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address 2</FormLabel>
+              <FormControl>
+                <Input placeholder="Building No., Street, Subdivision, etc." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormError message={error} />
         <Button type="submit" disabled={isPending} onClick={onSubmit}>Save</Button>
       </form>
