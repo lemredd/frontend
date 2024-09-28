@@ -118,7 +118,7 @@ export const ContactUsSchema = z.object({
 
 export const JobSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
-  description: z.string().min(10, { message: 'description is required' }),
+  description: z.string().min(1, { message: 'description is required' }),
   price: z
     .string()
     .refine((value) => Number(value))
