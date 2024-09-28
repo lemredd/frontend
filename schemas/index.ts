@@ -124,8 +124,8 @@ export const JobSchema = z.object({
     .refine((value) => Number(value))
     .transform((value) => Number(value))
     .optional(),
-  province: z.string().min(1, { message: 'province is required' }),
-  city_muni: z.string().min(1, { message: 'city_muni is required' }),
-  barangay: z.string().min(1, { message: 'barangay is required' }),
+  province: z.string().min(1, { message: 'province is required' }).transform(transformPSGCField),
+  city_muni: z.string().min(1, { message: 'city_muni is required' }).transform(transformPSGCField),
+  barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
   skill_ids: z.array(z.string().min(1, { message: 'skill is required' })),
 })
