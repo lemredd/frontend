@@ -1,7 +1,13 @@
+"use client"
+
+import JobList from "@/components/custom/job-list";
 import SeekerTaskSearchBar from "@/components/custom/seeker-task-search-bar";
 
 export default function SeekerTasksPage() {
   return (
-    <SeekerTaskSearchBar />
+    <section className="space-y-8">
+      <SeekerTaskSearchBar />
+      <JobList />
+    </section>
   )
 }
