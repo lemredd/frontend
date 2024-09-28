@@ -1,15 +1,18 @@
 "use client"
 
-import { makeAddress } from "@/actions/skr/address";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { AddressSchema } from "@/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FormError } from "./form-error";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { useForm } from "react-hook-form";
+import { useEffect, useState, useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { AddressSchema } from "@/schemas";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ComboboxItem } from "@/constants/types";
+import { makeAddress } from "@/actions/skr/address";
+import { FormError } from "@/components/custom/form-error";
+import { AsyncStrictCombobox } from "@/components/custom/combobox";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 export function AddressForm() {
   const [isPending, startTransition] = useTransition()
@@ -33,18 +36,69 @@ export function AddressForm() {
       })
     })
   }
+
+  const [provinces, setProvinces] = useState<ComboboxItem[]>([])
+  function getProvinces() {
+    fetch("https://psgc.gitlab.io/api/provinces").then(
+      response => response.json()
+    ).then(response => {
+      setProvinces(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
+    })
+  }
+
+  const [cityMunicipalities, setCityMunicipalities] = useState<ComboboxItem[]>([])
+  function getCityMunicipalities(province?: string) {
+    if (!province) return
+    province = province.split("|")[0]
+
+    fetch(`https://psgc.gitlab.io/api/provinces/${province}/cities-municipalities`).then(
+      response => response.json()
+    ).then(response => {
+      setCityMunicipalities(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
+    })
+  }
+
+  const [barangays, setBarangays] = useState<ComboboxItem[]>([])
+  function getBarangays(cityMuni?: string) {
+    if (!cityMuni) return
+    cityMuni = cityMuni.split("|")[0]
+
+    fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityMuni}/barangays`).then(
+      response => response.json()
+    ).then(response => {
+      setBarangays(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
+    })
+  }
+
+  useEffect(() => {
+    getProvinces()
+
+    const subscription = form.watch(() => {
+      getCityMunicipalities(form.watch("province", undefined))
+      getBarangays(form.watch("city_muni", undefined))
+    })
+
+    return () => subscription?.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch])
+
   return (
     <Form {...form}>
       <form className="space-y-6">
-        <div className="flex justify-between flex-wrap gap-6 [&>*]:basis-[calc(50%-1.5rem)]">
+        <div className="flex justify-between flex-wrap gap-4 items-center">
           <FormField
             control={form.control}
             name="province"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Province</FormLabel>
+                <FormLabel className="block">Province</FormLabel>
                 <FormControl>
-                  <Input placeholder="Province" {...field} />
+                  <AsyncStrictCombobox
+                    items={provinces}
+                    placeholder="Select province"
+                    value={field.value}
+                    onValueChange={value => form.setValue("province", value)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -55,22 +109,33 @@ export function AddressForm() {
             name="city_muni"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>City/Municipality</FormLabel>
+                <FormLabel className="block">City/Municipality</FormLabel>
                 <FormControl>
-                  <Input placeholder="City/Municipality" {...field} />
+                  <AsyncStrictCombobox
+                    items={cityMunicipalities}
+                    placeholder="Select city/municipality"
+                    value={field.value}
+                    onValueChange={value => form.setValue("city_muni", value)}
+                    disabled={!form.watch("province")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />
-          <FormField
+          /><FormField
             control={form.control}
             name="barangay"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Barangay</FormLabel>
+                <FormLabel className="block">Barangay</FormLabel>
                 <FormControl>
-                  <Input placeholder="barangay" {...field} />
+                  <AsyncStrictCombobox
+                    items={barangays}
+                    placeholder="Select barangay"
+                    value={field.value}
+                    onValueChange={value => form.setValue("barangay", value)}
+                    disabled={!form.watch("city_muni")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
