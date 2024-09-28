@@ -13,17 +13,15 @@ import {
 import useActivePath from '@/hooks/useActivePath'
 import useNavbarRoutes from '@/hooks/useNavbarRoutes'
 import { cn } from '@/lib/utils'
-import { User } from '@supabase/supabase-js'
+import { useAuthStore } from '@/store/AuthStore'
 import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { RiUserSearchFill } from 'react-icons/ri'
 
-interface NavbarProps {
-  user: User | null
-}
-
-export function Navbar({ user }: NavbarProps) {
+export function Navbar() {
+  const user = useAuthStore((state) => state.user)
+  const isLoading = useAuthStore((state) => state.isLoading)
   const navbarRoutes = useNavbarRoutes(user?.user_metadata?.role_code)
   const activePath = useActivePath()
   const [showBackground, setShowBackground] = useState<boolean>(false)
@@ -84,24 +82,42 @@ export function Navbar({ user }: NavbarProps) {
     !user ? (
       <div
         className={cn(
-          'hidden sm:flex space-x-3',
-          fromSheet && 'flex-col space-y-3',
+          'flex',
+          fromSheet
+            ? 'flex-col space-y-3 items-center justify-center'
+            : 'space-x-3 ',
         )}
       >
         <Button
           variant="ghost"
           asChild
+          className={fromSheet ? 'w-full' : 'hidden md:flex'}
         >
           <Link href="/auth/login">Login</Link>
         </Button>
-        <Button asChild>
+        <Button
+          asChild
+          className={fromSheet ? 'w-full' : 'hidden md:flex'}
+        >
           <Link href="/auth/join">Join Now</Link>
         </Button>
-        <ModeToggle />
+        <ModeToggle className={fromSheet ? 'hidden' : ''} />
       </div>
     ) : (
-      <Logout />
+      <div
+        className={cn(
+          'flex',
+          fromSheet
+            ? 'flex-col space-y-3 items-center justify-center'
+            : 'space-x-3',
+        )}
+      >
+        <Logout className={fromSheet ? 'w-full' : 'hidden md:flex'} />
+        <ModeToggle className={fromSheet ? 'hidden' : ''} />
+      </div>
     )
+
+  if (isLoading) return null
 
   return (
     <nav
@@ -122,7 +138,7 @@ export function Navbar({ user }: NavbarProps) {
           />
           <h1
             className={cn(
-              'text-xl font-bold',
+              'text-xl font-bold hidden md:block',
               !showBackground && 'text-foreground',
             )}
           >

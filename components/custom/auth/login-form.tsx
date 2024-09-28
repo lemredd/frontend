@@ -1,5 +1,5 @@
 'use client'
-import { login } from '@/actions/login'
+
 import { CardWrapper } from '@/components/custom/auth/card-wrapper'
 import { FormError } from '@/components/custom/form-error'
 import { Button } from '@/components/ui/button'
@@ -13,14 +13,18 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { LoginSchema } from '@/schemas'
+import { useAuthStore } from '@/store/AuthStore'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 export const LoginForm = () => {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>('')
+  const login = useAuthStore((state) => state.login)
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -32,9 +36,27 @@ export const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     startTransition(() => {
-      login(values).then((data) => {
-        if (data?.error) return setError(data?.error)
-      })
+      login(values)
+        .then(() => {
+          const role_code = useAuthStore.getState().role_code
+
+          switch (role_code) {
+            case 'ADMIN':
+              router.push('/admin')
+              break
+            case 'SKR':
+              router.push('/skr')
+              break
+            case 'PDR':
+              router.push('/pdr')
+              break
+            default:
+              break
+          }
+        })
+        .catch((error: any) => {
+          if (error) setError(error.message)
+        })
     })
   }
 

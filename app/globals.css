@@ -29,7 +29,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --glass-background: rgba(255, 255, 255, 0.18);
+    --glass-background: rgba(255, 255, 255, 0.641);
     --gradient-text: linear-gradient(
       to right,#0056b3 0%, #0073e6 25%, #00aaff 75%, #0056b3 100%
     );
@@ -91,6 +91,10 @@
       color: transparent;
       -webkit-text-fill-color: transparent;
     }
+
+  .gradient-bg{
+    background: var(--gradient-text);
+  }
 
   .glass {
     background: var(--glass-background);
