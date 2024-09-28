@@ -61,7 +61,7 @@ export function AddressForm() {
   return (
     <Form {...form}>
       <form className="space-y-6">
-        <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex justify-between flex-wrap gap-6 [&>*]:basis-[calc(50%-1.5rem)] items-center">
           <FormField
             control={form.control}
             name="province"
