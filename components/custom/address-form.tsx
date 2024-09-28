@@ -58,6 +58,12 @@ export function AddressForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch])
 
+  function setProvince(value: string) {
+    form.setValue("province", value)
+    form.setValue("city_muni", "")
+    form.setValue("barangay", "")
+  }
+
   return (
     <Form {...form}>
       <form className="space-y-6">
@@ -73,7 +79,7 @@ export function AddressForm() {
                     items={provinces}
                     placeholder="Select province"
                     value={field.value}
-                    onValueChange={value => form.setValue("province", value)}
+                    onValueChange={setProvince}
                   />
                 </FormControl>
                 <FormMessage />

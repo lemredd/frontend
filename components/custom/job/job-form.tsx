@@ -94,7 +94,9 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
 
   useEffect(() => {
     getProvinces()
-    const subscription = form.watch(({ province, city_muni }) => {
+    const subscription = form.watch(({ province, city_muni }, { name }) => {
+      if (!["province", "city_muni", "barangay"].includes(name!)) return
+
       if (province) getCityMunicipalities(province)
       if (city_muni) getBarangays(city_muni)
     })
@@ -102,6 +104,12 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
     return () => subscription.unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch])
+
+  function setProvince(value: string) {
+    form.setValue("province", value)
+    form.setValue("city_muni", "")
+    form.setValue("barangay", "")
+  }
 
   return (
     <>
@@ -118,7 +126,7 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
                   items={provinces}
                   placeholder="Select province"
                   value={field.value}
-                  onValueChange={value => form.setValue("province", value)}
+                  onValueChange={setProvince}
                 />
               </FormControl>
               <FormMessage />

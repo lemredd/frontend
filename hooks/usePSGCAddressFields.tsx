@@ -21,6 +21,7 @@ export default function usePSGCAddressFields() {
       response => response.json()
     ).then(response => {
       setCityMunicipalities(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
+      if (barangays.length) setBarangays([])
     })
   }
 
