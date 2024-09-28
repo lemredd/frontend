@@ -50,7 +50,7 @@ export function AsyncStrictCombobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-full justify-between"
         >
           {value
             ? items.find(item => item.value === value)?.label
