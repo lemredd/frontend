@@ -20,6 +20,9 @@ import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
+import DrawerDialog from '@/components/custom/drawer-dialog'
+import PrivacyPolicy from '@/components/custom/privacy-policy'
+import UserAgreement from '@/components/custom/user-agreement'
 import ProviderSVG from '@/public/svgs/provider.svg'
 import SeekerSVG from '@/public/svgs/seeker.svg'
 import { ChevronLeft } from 'lucide-react'
@@ -200,24 +203,24 @@ export const RegisterForm = () => {
                       />
                     </FormControl>
                     {/* TODO: ADD AGREEMENT AND PRIVACY POLICY */}
-                    <FormLabel className="cursor-pointer">
+                    <span className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       I agree to the Task Grabber{' '}
-                      <a
-                        href="#"
-                        target="_blank"
-                        className="text-primary underline"
-                      >
-                        Agreement
-                      </a>{' '}
+                      <DrawerDialog
+                        trigger="Agreement"
+                        title="Agreement"
+                        content={<UserAgreement />}
+                        triggerClass="text-primary underline"
+                        closeText="Accept"
+                      />{' '}
                       and{' '}
-                      <a
-                        href="#"
-                        target="_blank"
-                        className="text-primary underline"
-                      >
-                        Privacy Policy
-                      </a>
-                    </FormLabel>
+                      <DrawerDialog
+                        trigger="Privacy Policy"
+                        title="Privacy Policy"
+                        content={<PrivacyPolicy />}
+                        triggerClass="text-primary underline"
+                        closeText="Accept"
+                      />{' '}
+                    </span>
                   </FormItem>
                 )}
               />

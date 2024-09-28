@@ -103,4 +103,8 @@
     backdrop-filter: blur(14.5px);
     -webkit-backdrop-filter: blur(14.5px);
   }
+
+  .bg-glass-color {
+     background: var(--glass-background);
+  }
 }
