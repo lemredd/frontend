@@ -84,13 +84,24 @@ export const SkillsSchema = z.object({
   skillIds: z.array(z.string().min(1, { message: 'skill is required' })),
 })
 
-export const DescriptionSchema = z.object({
+export const ProfileDescriptionSchema = z.object({
   shortDescription: z.string().min(1, {
     message: 'Description is required',
   }),
   longDescription: z.string().min(1, {
     message: 'Description is required',
   }),
+})
+
+const transformPSGCField = (value: string) => value.split('|')[1]
+
+export const AddressSchema = z.object({
+  province: z.string().min(1, { message: 'province is required' }).transform(transformPSGCField),
+  city_muni: z.string().min(1, { message: 'City/Municipality is required' }).transform(transformPSGCField),
+  barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
+  address_1: z.string().optional(),
+  address_2: z.string().optional(),
+  postal_code: z.string().min(1, { message: 'Postal code is required' }),
 })
 
 export const ContactUsSchema = z.object({
@@ -107,14 +118,14 @@ export const ContactUsSchema = z.object({
 
 export const JobSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
-  description: z.string().min(10, { message: 'description is required' }),
+  description: z.string().min(1, { message: 'description is required' }),
   price: z
     .string()
     .refine((value) => Number(value))
     .transform((value) => Number(value))
     .optional(),
-  province: z.string().min(1, { message: 'province is required' }),
-  city_muni: z.string().min(1, { message: 'city_muni is required' }),
-  barangay: z.string().min(1, { message: 'barangay is required' }),
+  province: z.string().min(1, { message: 'province is required' }).transform(transformPSGCField),
+  city_muni: z.string().min(1, { message: 'city_muni is required' }).transform(transformPSGCField),
+  barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
   skill_ids: z.array(z.string().min(1, { message: 'skill is required' })),
 })

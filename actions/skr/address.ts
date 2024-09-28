@@ -4,12 +4,12 @@ import * as z from 'zod'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
-import { ProfileDescriptionSchema } from '@/schemas'
+import { AddressSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 
-export const editProfile = async (values: z.infer<typeof ProfileDescriptionSchema>) => {
+export const makeAddress = async (values: z.infer<typeof AddressSchema>) => {
   const supabase = createClient()
-  const validatedFields = ProfileDescriptionSchema.safeParse(values)
+  const validatedFields = AddressSchema.safeParse(values)
 
   if (!validatedFields.success) {
     return {
@@ -25,14 +25,14 @@ export const editProfile = async (values: z.infer<typeof ProfileDescriptionSchem
     .single()
 
   const { error } = await supabase
-    .from('profiles')
-    .update({
-      short_desc: values.shortDescription,
-      long_desc: values.longDescription,
-    })
-    .eq('id', profile!.id)
+    .from('addresses')
+    .insert<z.infer<typeof AddressSchema> & { profile_id: string }>(({
+      ...validatedFields.data,
+      profile_id: profile!.id,
+    }))
   if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
-  redirect('/skr/setup/address')
+  redirect('/skr/setup/skills')
 }
+

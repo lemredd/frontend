@@ -36,12 +36,12 @@ const nextConfig = {
 
   redirects: async () => [
     {
-      source: '/skr/setup',
+      source: '/skr/setup/',
       destination: '/skr/setup/profile',
       permanent: true,
     },
     {
-      source: '/pdr/setup',
+      source: '/pdr/setup/',
       destination: '/pdr/setup/project',
       permanent: true,
     }

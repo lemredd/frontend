@@ -1,27 +1,30 @@
-"use client"
+'use client'
 
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useState, useEffect, useTransition } from "react"
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState, useTransition } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { EditIcon, PlusIcon, XIcon } from "lucide-react"
-import { JobSchema } from "@/schemas"
-import { postJob } from "@/actions/pdr/job"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { FormError } from "@/components/custom/form-error"
+import { postJob } from '@/actions/pdr/job'
+import { FormError } from '@/components/custom/form-error'
+import { Button } from '@/components/ui/button'
+import { Chip } from '@/components/ui/chip'
 import {
   Form,
+  FormControl,
+  FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-  FormField
-} from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
-import { createClient } from "@/utils/supabase/client"
-import { Chip } from "@/components/ui/chip"
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { ComboboxItem } from '@/constants/types'
+import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
+import { JobSchema } from '@/schemas'
+import { createClient } from '@/utils/supabase/client'
+import { EditIcon, XIcon } from 'lucide-react'
+import { AsyncStrictCombobox } from '../combobox'
 
 type JobForm = z.infer<typeof JobSchema>
 interface PartialFieldsProps {
@@ -29,17 +32,12 @@ interface PartialFieldsProps {
   setStep: React.Dispatch<React.SetStateAction<number>>
 }
 
-function NameAndDescriptionFields({
-  form,
-  setStep
-}: PartialFieldsProps) {
-  const isJobNameAndDescriptionFilled = (
-    !!form.getValues().name
-    && !form.getFieldState('name').invalid
-  ) && (
-      !!form.getValues().description
-      && !form.getFieldState('description').invalid
-    )
+function NameAndDescriptionFields({ form, setStep }: PartialFieldsProps) {
+  const isJobNameAndDescriptionFilled =
+    !!form.getValues().name &&
+    !form.getFieldState('name').invalid &&
+    !!form.getValues().description &&
+    !form.getFieldState('description').invalid
   return (
     <>
       <FormField
@@ -49,7 +47,10 @@ function NameAndDescriptionFields({
           <FormItem>
             <FormLabel>Job Name</FormLabel>
             <FormControl>
-              <Input placeholder="Job Name" {...field} />
+              <Input
+                placeholder="Job Name"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -62,13 +63,22 @@ function NameAndDescriptionFields({
           <FormItem>
             <FormLabel>Job Description</FormLabel>
             <FormControl>
-              <Textarea placeholder="Job description goes here" {...field} />
+              <Textarea
+                placeholder="Job description goes here"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-      <Button type="button" disabled={!isJobNameAndDescriptionFilled} onClick={() => setStep(1)}>Next</Button>
+      <Button
+        type="button"
+        disabled={!isJobNameAndDescriptionFilled}
+        onClick={() => setStep(1)}
+      >
+        Next
+      </Button>
     </>
   )
 }
@@ -78,10 +88,39 @@ interface AddressFieldsProps extends PartialFieldsProps {
 }
 
 function AddressFields({ form, step, setStep }: AddressFieldsProps) {
-  // TODO: make and use `Autocomplete` component
-  // TODO: fetch from https://psgc.gitlab.io/api/
+  const canProceed =
+    !!form.getValues().province &&
+    !!form.getValues().city_muni &&
+    !!form.getValues().barangay
 
-  const canProceed = !!form.getValues().province && !!form.getValues().city_muni && !!form.getValues().barangay
+  const {
+    provinces,
+    cityMunicipalities,
+    barangays,
+    getProvinces,
+    getCityMunicipalities,
+    getBarangays,
+  } = usePSGCAddressFields()
+
+  useEffect(() => {
+    getProvinces()
+    const subscription = form.watch(({ province, city_muni }, { name }) => {
+      if (!['province', 'city_muni', 'barangay'].includes(name!)) return
+
+      if (province) getCityMunicipalities(province)
+      if (city_muni) getBarangays(city_muni)
+    })
+
+    return () => subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch])
+
+  function setProvince(value: string) {
+    form.setValue('province', value)
+    form.setValue('city_muni', '')
+    form.setValue('barangay', '')
+  }
+
   return (
     <>
       <h3 className="text-xl mt-2">Where will the job be done?</h3>
@@ -91,9 +130,14 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
           name="province"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Province</FormLabel>
+              <FormLabel className="block">Province</FormLabel>
               <FormControl>
-                <Input placeholder="Province" {...field} />
+                <AsyncStrictCombobox
+                  items={provinces}
+                  placeholder="Select province"
+                  value={field.value}
+                  onValueChange={setProvince}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,9 +148,15 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
           name="city_muni"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City/Municipality</FormLabel>
+              <FormLabel className="block">City/Municipality</FormLabel>
               <FormControl>
-                <Input placeholder="City/Municipality" {...field} />
+                <AsyncStrictCombobox
+                  items={cityMunicipalities}
+                  placeholder="Select city/municipality"
+                  value={field.value}
+                  onValueChange={(value) => form.setValue('city_muni', value)}
+                  disabled={!form.watch('province')}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -117,9 +167,15 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
           name="barangay"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Barangay</FormLabel>
+              <FormLabel className="block">Barangay</FormLabel>
               <FormControl>
-                <Input placeholder="City/Municipality" {...field} />
+                <AsyncStrictCombobox
+                  items={barangays}
+                  placeholder="Select barangay"
+                  value={field.value}
+                  onValueChange={(value) => form.setValue('barangay', value)}
+                  disabled={!form.watch('city_muni')}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -127,7 +183,13 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
         />
       </div>
       {step === 1 && (
-        <Button type="button" onClick={() => setStep(2)} disabled={!canProceed}>Next</Button>
+        <Button
+          type="button"
+          onClick={() => setStep(2)}
+          disabled={!canProceed}
+        >
+          Next
+        </Button>
       )}
     </>
   )
@@ -136,48 +198,95 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
 function SkillsField({ form, setStep }: PartialFieldsProps) {
   // TODO: make and use `Autocomplete` component to search skills
   const supabase = createClient()
-  const [skills, setSkills] = useState<Record<string, string>[]>([])
+  const [skills, setSkills] = useState<ComboboxItem[]>([])
+  const [isFetching, setIsFetching] = useState<boolean>(false)
+  const [selectedSkills, setSelectedSkills] = useState<
+    Record<string, string>[]
+  >([])
+  const [search, setSearch] = useState('')
 
-  function addOrRemoveSkill(id: string) {
+  function addSkill(value: ComboboxItem['value']) {
+    const [id] = value.split('|')
+    form.setValue('skill_ids', [...form.getValues().skill_ids, id])
+    setStep(3)
+
+    setSearch('')
+  }
+  function removeSkill(id: string) {
     const skillIds = form.getValues().skill_ids
-    if (skillIds.includes(id)) {
-      form.setValue('skill_ids', skillIds.filter(skillId => skillId !== id))
-      if (skillIds.length === 1) setStep(2)
-    } else {
-      form.setValue('skill_ids', [...skillIds, id])
-      setStep(3)
-    }
+    form.setValue(
+      'skill_ids',
+      skillIds.filter((skillId) => skillId !== id),
+    )
+    if (skillIds.length === 1) setStep(2)
+
+    setSearch('')
   }
 
   useEffect(() => {
+    const addedSkillIds = form.getValues().skill_ids
+    setIsFetching(true)
     supabase
       .from('skills')
       .select('id,name')
       .order('name', { ascending: true })
       .range(0, 5)
-      .then(({ data }) => setSkills(data || []))
+      .then(({ data }) => {
+        if (!data) return
+
+        setSkills(
+          data
+            .filter(({ id }) => !addedSkillIds.includes(id.toString()))
+            .map(({ id, name }) => ({ value: `${id}|${name}`, label: name })),
+        )
+        setIsFetching(false)
+      })
+  }, [form.getValues().skill_ids])
+
+  useEffect(() => {
+    const subscription = form.watch(({ skill_ids }, { name }) => {
+      if (!skill_ids) return
+      if (name !== 'skill_ids') return
+
+      supabase
+        .from('skills')
+        .select('id,name')
+        .in('id', skill_ids)
+        .then(({ data }) => setSelectedSkills(data!))
+    })
+
+    return () => subscription.unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [form.watch])
+
   return (
     <>
       <h3 className="text-xl mt-2">What skills will be required?</h3>
-      <div className="flex gap-x-2">
-        {skills.map(({ id, name }) => (
-          <Chip
-            key={id}
-            content={name}
-            afterContent={
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => addOrRemoveSkill(id)}
-              >
-                {form.getValues().skill_ids.includes(id) ? <XIcon /> : <PlusIcon />}
-              </Button>
-            }
-          />
-        ))}
+      <AsyncStrictCombobox
+        items={skills}
+        placeholder="Search skills"
+        value={search}
+        onValueChange={addSkill}
+      />
+      <div className="flex items-center gap-x-2">
+        {!!selectedSkills.length &&
+          selectedSkills.map(({ id, name }) => (
+            <Chip
+              key={id}
+              content={name}
+              afterContent={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="!p-0 size-5"
+                  onClick={() => removeSkill(id)}
+                >
+                  <XIcon className="size-3" />
+                </Button>
+              }
+            />
+          ))}
       </div>
     </>
   )
@@ -194,7 +303,11 @@ function PriceField({ form }: Pick<PartialFieldsProps, 'form'>) {
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input inputMode="numeric" placeholder="Leave empty if TBD" {...field} />
+              <Input
+                inputMode="numeric"
+                placeholder="Leave empty if TBD"
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -220,15 +333,15 @@ export function JobForm() {
       city_muni: '',
       barangay: '',
       skill_ids: [],
-    }
+    },
   })
-  const canPost = Object.values(form.getValues()).every(value => (
-    value instanceof Array ? !!value.length : !!value
-  ))
+  const canPost = Object.values(form.getValues()).every((value) =>
+    value instanceof Array ? !!value.length : !!value,
+  )
 
   function onSubmit() {
     startTransition(() => {
-      postJob(form.getValues(), true).then(data => {
+      postJob(form.getValues(), true).then((data) => {
         if (data?.error) setError(data.error)
       })
     })
@@ -248,23 +361,34 @@ export function JobForm() {
         ) : (
           <div className="flex justify-between w-full">
             <h3 className="font-bold text-gray-500">{form.getValues().name}</h3>
-            <Button size="icon" variant="ghost" onClick={() => setStep(0)}><EditIcon /></Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setStep(0)}
+            >
+              <EditIcon />
+            </Button>
           </div>
         )}
         {step > 0 && (
-          <AddressFields form={form} step={step} setStep={setStep} />
+          <AddressFields
+            form={form}
+            step={step}
+            setStep={setStep}
+          />
         )}
         {step > 1 && (
-          <SkillsField form={form} setStep={setStep} />
+          <SkillsField
+            form={form}
+            setStep={setStep}
+          />
         )}
-        {step > 2 && (
-          <PriceField form={form} />
-        )}
+        {step > 2 && <PriceField form={form} />}
         <FormError message={error} />
         {step >= 3 && (
           <Button disabled={isPending || !canPost}>Post Job</Button>
         )}
-      </form >
-    </Form >
+      </form>
+    </Form>
   )
 }
