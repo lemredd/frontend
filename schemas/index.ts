@@ -93,10 +93,12 @@ export const ProfileDescriptionSchema = z.object({
   }),
 })
 
+const transformPSGCField = (value: string) => value.split('|')[1]
+
 export const AddressSchema = z.object({
-  province: z.string().min(1, { message: 'province is required' }),
-  city_muni: z.string().min(1, { message: 'City/Municipality is required' }),
-  barangay: z.string().min(1, { message: 'barangay is required' }),
+  province: z.string().min(1, { message: 'province is required' }).transform(transformPSGCField),
+  city_muni: z.string().min(1, { message: 'City/Municipality is required' }).transform(transformPSGCField),
+  barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
   address_1: z.string().optional(),
   address_2: z.string().optional(),
   postal_code: z.string().min(1, { message: 'Postal code is required' }),
