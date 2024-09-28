@@ -7,23 +7,42 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { SkillsSchema } from "@/schemas"
 import { Chip } from '@/components/ui/chip'
+import { useEffect, useState } from 'react'
+import { createClient } from '@/utils/supabase/client'
 
-interface Props<S = Record<string, string>> {
+interface Props {
   form: UseFormReturn<z.infer<typeof SkillsSchema>>
-  skills: S[]
 }
 
-export function SelectedSkills({ form, skills }: Props) {
-  const selectedSkills = skills.filter(skill => form.watch("skillIds").includes(skill.id))
+export function SelectedSkills({ form }: Props) {
+  const supabase = createClient()
+  const [selectedSkills, setSelectedSkills] = useState<Record<string, string>[]>([])
   function removeSkill(id: string) {
     form.setValue("skillIds", form.watch("skillIds").filter((skillId: string) => skillId !== id))
   }
+
+  useEffect(() => {
+    const subscription = form.watch(({ skillIds }) => {
+      if (!skillIds) return
+
+      supabase
+        .from('skills')
+        .select('id,name')
+        .in('id', skillIds)
+        .then(({ data }) => {
+          setSelectedSkills(data!)
+        })
+    })
+
+    return () => subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch])
 
   return (
     <Card className="shadow-none">
       <CardHeader><h3 className="text-lg">{selectedSkills.length} skills selected</h3></CardHeader>
       <CardContent className="flex flex-wrap gap-4">
-        {selectedSkills.map(({ name, id }) => (
+        {!!selectedSkills.length && selectedSkills.map(({ name, id }) => (
           <Chip
             key={id}
             content={name}

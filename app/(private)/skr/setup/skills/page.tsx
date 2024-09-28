@@ -33,7 +33,7 @@ export default function UserSetupPage() {
         <SkillsForm selectedCategory={selectedCategory} form={form} skills={skills} setSkills={setSkills} />
 
         {/* Selected Skills */}
-        <SelectedSkills form={form} skills={skills} />
+        <SelectedSkills form={form} />
       </div>
     </main >
   )
