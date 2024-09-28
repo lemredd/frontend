@@ -5,10 +5,10 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Input } from "@/components/ui/input";
-import { DescriptionSchema } from "@/schemas";
 import { Button } from "@/components/ui/button";
 import { editProfile } from "@/actions/skr/profile";
 import { Textarea } from "@/components/ui/textarea";
+import { ProfileDescriptionSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormError } from "@/components/custom/form-error";
 import { Form, FormItem, FormField, FormLabel } from "@/components/ui/form";
@@ -16,8 +16,8 @@ import { Form, FormItem, FormField, FormLabel } from "@/components/ui/form";
 export default function UserDescriptionPage() {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string>()
-  const form = useForm<z.infer<typeof DescriptionSchema>>({
-    resolver: zodResolver(DescriptionSchema),
+  const form = useForm<z.infer<typeof ProfileDescriptionSchema>>({
+    resolver: zodResolver(ProfileDescriptionSchema),
     defaultValues: {
       shortDescription: "",
       longDescription: "",
