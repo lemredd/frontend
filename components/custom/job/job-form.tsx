@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState, useEffect, useTransition } from "react"
 
-import { EditIcon, PlusIcon, XIcon } from "lucide-react"
+import { EditIcon, XIcon } from "lucide-react"
 import { JobSchema } from "@/schemas"
 import { postJob } from "@/actions/pdr/job"
 import { Input } from "@/components/ui/input"
@@ -24,6 +24,7 @@ import { createClient } from "@/utils/supabase/client"
 import { Chip } from "@/components/ui/chip"
 import usePSGCAddressFields from "@/hooks/usePSGCAddressFields"
 import { AsyncStrictCombobox } from "../combobox"
+import { ComboboxItem } from "@/constants/types"
 
 type JobForm = z.infer<typeof JobSchema>
 interface PartialFieldsProps {
@@ -172,17 +173,23 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
 function SkillsField({ form, setStep }: PartialFieldsProps) {
   // TODO: make and use `Autocomplete` component to search skills
   const supabase = createClient()
-  const [skills, setSkills] = useState<Record<string, string>[]>([])
+  const [skills, setSkills] = useState<ComboboxItem[]>([])
+  const [selectedSkills, setSelectedSkills] = useState<Record<string, string>[]>([])
+  const [search, setSearch] = useState("")
 
-  function addOrRemoveSkill(id: string) {
+  function addSkill(value: ComboboxItem['value']) {
+    const [id] = value.split("|")
+    form.setValue('skill_ids', [...form.getValues().skill_ids, id])
+    setStep(3)
+
+    setSearch("")
+  }
+  function removeSkill(id: string) {
     const skillIds = form.getValues().skill_ids
-    if (skillIds.includes(id)) {
-      form.setValue('skill_ids', skillIds.filter(skillId => skillId !== id))
-      if (skillIds.length === 1) setStep(2)
-    } else {
-      form.setValue('skill_ids', [...skillIds, id])
-      setStep(3)
-    }
+    form.setValue('skill_ids', skillIds.filter(skillId => skillId !== id))
+    if (skillIds.length === 1) setStep(2)
+
+    setSearch("")
   }
 
   useEffect(() => {
@@ -191,14 +198,43 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
       .select('id,name')
       .order('name', { ascending: true })
       .range(0, 5)
-      .then(({ data }) => setSkills(data || []))
+      .then(({ data }) => {
+        if (!data) return;
+
+        setSkills(
+          data.map(({ id, name }) => ({ value: `${id}|${name}`, label: name }))
+        )
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    const subscription = form.watch(({ skill_ids }, { name }) => {
+      if (!skill_ids) return
+      if (name !== "skill_ids") return
+
+      supabase
+        .from('skills')
+        .select('id,name')
+        .in('id', skill_ids)
+        .then(({ data }) => setSelectedSkills(data!))
+    })
+
+    return () => subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch])
+
   return (
     <>
       <h3 className="text-xl mt-2">What skills will be required?</h3>
+      <AsyncStrictCombobox
+        items={skills}
+        placeholder="Search skills"
+        value={search}
+        onValueChange={addSkill}
+      />
       <div className="flex gap-x-2">
-        {skills.map(({ id, name }) => (
+        {!!selectedSkills.length && selectedSkills.map(({ id, name }) => (
           <Chip
             key={id}
             content={name}
@@ -207,9 +243,9 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => addOrRemoveSkill(id)}
+                onClick={() => removeSkill(id)}
               >
-                {form.getValues().skill_ids.includes(id) ? <XIcon /> : <PlusIcon />}
+                <XIcon />
               </Button>
             }
           />
