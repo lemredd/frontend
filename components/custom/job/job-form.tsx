@@ -22,6 +22,8 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { createClient } from "@/utils/supabase/client"
 import { Chip } from "@/components/ui/chip"
+import usePSGCAddressFields from "@/hooks/usePSGCAddressFields"
+import { AsyncStrictCombobox } from "../combobox"
 
 type JobForm = z.infer<typeof JobSchema>
 interface PartialFieldsProps {
@@ -78,10 +80,28 @@ interface AddressFieldsProps extends PartialFieldsProps {
 }
 
 function AddressFields({ form, step, setStep }: AddressFieldsProps) {
-  // TODO: make and use `Autocomplete` component
-  // TODO: fetch from https://psgc.gitlab.io/api/
-
   const canProceed = !!form.getValues().province && !!form.getValues().city_muni && !!form.getValues().barangay
+
+  const {
+    provinces,
+    cityMunicipalities,
+    barangays,
+    getProvinces,
+    getCityMunicipalities,
+    getBarangays
+  } = usePSGCAddressFields()
+
+  useEffect(() => {
+    getProvinces()
+    const subscription = form.watch(({ province, city_muni }) => {
+      if (province) getCityMunicipalities(province)
+      if (city_muni) getBarangays(city_muni)
+    })
+
+    return () => subscription.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch])
+
   return (
     <>
       <h3 className="text-xl mt-2">Where will the job be done?</h3>
@@ -91,9 +111,14 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
           name="province"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Province</FormLabel>
+              <FormLabel className="block">Province</FormLabel>
               <FormControl>
-                <Input placeholder="Province" {...field} />
+                <AsyncStrictCombobox
+                  items={provinces}
+                  placeholder="Select province"
+                  value={field.value}
+                  onValueChange={value => form.setValue("province", value)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,22 +129,33 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
           name="city_muni"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City/Municipality</FormLabel>
+              <FormLabel className="block">City/Municipality</FormLabel>
               <FormControl>
-                <Input placeholder="City/Municipality" {...field} />
+                <AsyncStrictCombobox
+                  items={cityMunicipalities}
+                  placeholder="Select city/municipality"
+                  value={field.value}
+                  onValueChange={value => form.setValue("city_muni", value)}
+                  disabled={!form.watch("province")}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
-        />
-        <FormField
+        /><FormField
           control={form.control}
           name="barangay"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Barangay</FormLabel>
+              <FormLabel className="block">Barangay</FormLabel>
               <FormControl>
-                <Input placeholder="City/Municipality" {...field} />
+                <AsyncStrictCombobox
+                  items={barangays}
+                  placeholder="Select barangay"
+                  value={field.value}
+                  onValueChange={value => form.setValue("barangay", value)}
+                  disabled={!form.watch("city_muni")}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

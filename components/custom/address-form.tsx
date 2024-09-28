@@ -8,11 +8,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AddressSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ComboboxItem } from "@/constants/types";
 import { makeAddress } from "@/actions/skr/address";
 import { FormError } from "@/components/custom/form-error";
 import { AsyncStrictCombobox } from "@/components/custom/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import usePSGCAddressFields from "@/hooks/usePSGCAddressFields";
 
 export function AddressForm() {
   const [isPending, startTransition] = useTransition()
@@ -37,38 +37,14 @@ export function AddressForm() {
     })
   }
 
-  const [provinces, setProvinces] = useState<ComboboxItem[]>([])
-  function getProvinces() {
-    fetch("https://psgc.gitlab.io/api/provinces").then(
-      response => response.json()
-    ).then(response => {
-      setProvinces(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
-    })
-  }
-
-  const [cityMunicipalities, setCityMunicipalities] = useState<ComboboxItem[]>([])
-  function getCityMunicipalities(province?: string) {
-    if (!province) return
-    province = province.split("|")[0]
-
-    fetch(`https://psgc.gitlab.io/api/provinces/${province}/cities-municipalities`).then(
-      response => response.json()
-    ).then(response => {
-      setCityMunicipalities(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
-    })
-  }
-
-  const [barangays, setBarangays] = useState<ComboboxItem[]>([])
-  function getBarangays(cityMuni?: string) {
-    if (!cityMuni) return
-    cityMuni = cityMuni.split("|")[0]
-
-    fetch(`https://psgc.gitlab.io/api/cities-municipalities/${cityMuni}/barangays`).then(
-      response => response.json()
-    ).then(response => {
-      setBarangays(response.map((item: { name: string, code: string }) => ({ value: `${item.code}|${item.name}`, label: item.name })))
-    })
-  }
+  const {
+    provinces,
+    cityMunicipalities,
+    barangays,
+    getProvinces,
+    getCityMunicipalities,
+    getBarangays
+  } = usePSGCAddressFields()
 
   useEffect(() => {
     getProvinces()
