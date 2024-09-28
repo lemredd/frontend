@@ -1,10 +1,11 @@
 import { login } from '@/actions/login'
 import { logout } from '@/actions/logout'
+import { User } from '@supabase/supabase-js'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface AuthState {
-  user: any | null
+  user: User | null
   role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined
   isAuthenticated: boolean
   isLoading: boolean
