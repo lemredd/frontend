@@ -5,3 +5,8 @@ export type TNavbarRoute = {
   label: string
   path: string
 }
+
+export type ComboboxItem = {
+  value: string
+  label: string
+}
