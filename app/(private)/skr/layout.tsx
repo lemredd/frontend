@@ -8,7 +8,7 @@ const SeekerLayout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <main className="container mx-auto flex h-screen flex-col justify-center">
+    <main className="container mx-auto flex h-screen flex-col mt-24">
       {children}
     </main>
   )
