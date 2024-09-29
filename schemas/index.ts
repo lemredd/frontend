@@ -129,3 +129,14 @@ export const JobSchema = z.object({
   barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
   skill_ids: z.array(z.string().min(1, { message: 'skill is required' })),
 })
+
+// Separate schema for checking and applying. One of them might change later.
+export const ApplyJobSchema = z.object({
+  job_id: z.string().min(1, { message: 'job_id is required' }),
+  user_id: z.string().min(1, { message: 'user_id is required' }),
+})
+
+export const CheckJobApplicationSchema = z.object({
+  job_id: z.string().min(1, { message: 'job_id is required' }),
+  user_id: z.string().min(1, { message: 'user_id is required' }),
+})

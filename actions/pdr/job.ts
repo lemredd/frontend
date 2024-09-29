@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
 
-import { JobSchema } from '@/schemas'
+import { ApplyJobSchema, CheckJobApplicationSchema, JobSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 
 export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: boolean) {
@@ -58,4 +58,59 @@ export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: b
   }
 
   return { success: "Job posted" }
+}
+
+export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
+  const validatedFields = ApplyJobSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+    }
+  }
+
+  const supabase = createClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select<string, { id: string }>('id')
+    .eq('user_id', validatedFields.data.user_id)
+    .single()
+
+  const { data: application, error } = await supabase
+    .from('job_applicants')
+    .insert({
+      job_id: validatedFields.data.job_id,
+      profile_id: profile!.id,
+    })
+    .select()
+
+  if (error) return { error: error.message }
+
+  return { application: application![0] }
+}
+
+export async function checkJobApplication(values: z.infer<typeof CheckJobApplicationSchema>) {
+  const validatedFields = CheckJobApplicationSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+    }
+  }
+
+  const supabase = createClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select<string, { id: string }>('id')
+    .eq('user_id', validatedFields.data.user_id)
+    .single()
+
+  const { data: application, error } = await supabase
+    .from('job_applicants')
+    .select('status')
+    .eq('profile_id', profile!.id)
+    .eq('job_id', validatedFields.data.job_id)
+
+  if (error) return { error: error.message }
+
+  if (application.length) return { application: application[0] }
+  return { application: undefined }
 }
