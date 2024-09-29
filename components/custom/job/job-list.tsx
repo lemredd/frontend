@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/AuthStore";
 import { createClient } from "@/utils/supabase/client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import JobListItem from "./job-list-item";
 
 export default function JobList() {
   const { user } = useAuthStore()
@@ -19,7 +20,7 @@ export default function JobList() {
 
     const query = supabase
       .from("jobs")
-      .select("id, name, description, price")
+      .select("id, created_at, name, description, price")
       .order("created_at", { ascending: false })
       .range(start, end)
 
@@ -37,16 +38,13 @@ export default function JobList() {
         if (data) setJobs(data)
         if (error) console.error(error)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams])
 
   return (
     <div className="space-y-4">
       {jobs.map((job) => (
-        <div key={job.id} className="border p-2">
-          <p>{job.name}</p>
-          <p>{job.description}</p>
-          <p>{job.price}</p>
-        </div>
+        <JobListItem key={job.id} job={job} />
       ))}
     </div>
   )
