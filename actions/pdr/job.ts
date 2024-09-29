@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
 
-import { JobSchema } from '@/schemas'
+import { ApplyJobSchema, JobSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 
 export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: boolean) {
@@ -58,4 +58,32 @@ export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: b
   }
 
   return { success: "Job posted" }
+}
+
+export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
+  const validatedFields = ApplyJobSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+    }
+  }
+
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select<string, { id: string }>('id')
+    .eq('user_id', user!.id)
+    .single()
+
+  const { error } = await supabase
+    .from('job_applicants')
+    .insert({
+      ...validatedFields.data,
+      profile_id: profile!.id,
+    })
+
+  if (error) return { error: error.message }
+
+  return { success: "Job applied" }
 }
