@@ -52,7 +52,7 @@ export default function JobDetailsHeader({ job }: Props) {
           <Button onClick={apply} disabled={isPending}>{isPending ? 'Please wait...' : 'Apply'}</Button>
         )}
         {!!application && (
-          <Button>Application Status</Button>
+          <Button disabled>{application.status as string}</Button>
         )}
         <Share2 />
         <Bookmark />

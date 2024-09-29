@@ -105,7 +105,7 @@ export async function checkJobApplication(values: z.infer<typeof CheckJobApplica
 
   const { data: application, error } = await supabase
     .from('job_applicants')
-    .select('*')
+    .select('status')
     .eq('profile_id', profile!.id)
     .eq('job_id', validatedFields.data.job_id)
 
