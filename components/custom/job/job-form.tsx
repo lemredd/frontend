@@ -199,7 +199,6 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
   // TODO: make and use `Autocomplete` component to search skills
   const supabase = createClient()
   const [skills, setSkills] = useState<ComboboxItem[]>([])
-  const [isFetching, setIsFetching] = useState<boolean>(false)
   const [selectedSkills, setSelectedSkills] = useState<
     Record<string, string>[]
   >([])
@@ -225,7 +224,6 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
 
   useEffect(() => {
     const addedSkillIds = form.getValues().skill_ids
-    setIsFetching(true)
     supabase
       .from('skills')
       .select('id,name')
@@ -239,7 +237,6 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
             .filter(({ id }) => !addedSkillIds.includes(id.toString()))
             .map(({ id, name }) => ({ value: `${id}|${name}`, label: name })),
         )
-        setIsFetching(false)
       })
   }, [form.getValues().skill_ids])
 

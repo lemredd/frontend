@@ -13,7 +13,7 @@ const Logout = ({ className }: { className?: string }) => {
       .then(() => {
         router.push('/auth/login')
       })
-      .catch((error: any) => {
+      .catch((error: Error) => {
         //  if (error) setError(error.message)
         console.log(error)
       })

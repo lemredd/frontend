@@ -30,8 +30,10 @@ const ContactUs = () => {
     },
   })
 
+  // TODO ADD CONTACT US
   const onSubmit = (values: z.infer<typeof ContactUsSchema>) => {
     startTransition(() => {
+      console.log(values)
       setError('')
     })
   }

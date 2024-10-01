@@ -54,7 +54,7 @@ export const LoginForm = () => {
               break
           }
         })
-        .catch((error: any) => {
+        .catch((error: Error) => {
           if (error) setError(error.message)
         })
     })
