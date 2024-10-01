@@ -17,7 +17,12 @@ export function ProviderHeader() {
     e.preventDefault()
     const { value } = e.currentTarget.search
 
-    router.push(`./?${searchParams.toString()}&search=${value}`)
+    const newSearchParams = new URLSearchParams(searchParams.toString())
+
+    if (!value) newSearchParams.delete("search")
+    else newSearchParams.set("search", value)
+
+    router.push(`./?${newSearchParams.toString()}`)
   }
 
   function buildLink(status: string) {
