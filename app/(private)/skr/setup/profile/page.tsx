@@ -1,17 +1,17 @@
-"use client";
+'use client'
 
-import * as z from "zod";
-import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useTransition } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { editProfile } from "@/actions/skr/profile";
-import { Textarea } from "@/components/ui/textarea";
-import { ProfileDescriptionSchema } from "@/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormError } from "@/components/custom/form-error";
-import { Form, FormItem, FormField, FormLabel } from "@/components/ui/form";
+import { editProfile } from '@/actions/skr/profile'
+import { FormError } from '@/components/custom/form-error'
+import { Button } from '@/components/ui/button'
+import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { ProfileDescriptionSchema } from '@/lib/schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 export default function UserDescriptionPage() {
   const [isPending, startTransition] = useTransition()
@@ -19,14 +19,14 @@ export default function UserDescriptionPage() {
   const form = useForm<z.infer<typeof ProfileDescriptionSchema>>({
     resolver: zodResolver(ProfileDescriptionSchema),
     defaultValues: {
-      shortDescription: "",
-      longDescription: "",
-    }
+      shortDescription: '',
+      longDescription: '',
+    },
   })
 
   function onSubmit() {
     startTransition(() => {
-      editProfile(form.getValues()).then(data => {
+      editProfile(form.getValues()).then((data) => {
         if (data?.error) return setError(data?.error)
       })
     })
@@ -39,7 +39,10 @@ export default function UserDescriptionPage() {
       </header>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
           {/* Short description */}
           <FormField
             control={form.control}
@@ -48,9 +51,14 @@ export default function UserDescriptionPage() {
               <FormItem>
                 <FormLabel className="space-y-2">
                   <h2 className="text-xl font-semibold">What do you do?</h2>
-                  <p className="text-sm text-muted-foreground">Write a one line description about yourself.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Write a one line description about yourself.
+                  </p>
                 </FormLabel>
-                <Input placeholder="I'm..." {...field} />
+                <Input
+                  placeholder="I'm..."
+                  {...field}
+                />
               </FormItem>
             )}
           />
@@ -64,16 +72,25 @@ export default function UserDescriptionPage() {
                 <FormLabel className="space-y-2">
                   <h2 className="text-xl font-semibold">Describe yourself</h2>
                 </FormLabel>
-                <Textarea rows={10} placeholder="Write a long description" {...field}></Textarea>
+                <Textarea
+                  rows={10}
+                  placeholder="Write a long description"
+                  {...field}
+                ></Textarea>
               </FormItem>
             )}
           />
 
           <FormError message={error} />
-          <Button type="submit" disabled={isPending} className="ml-auto mt-4 w-max block">Submit</Button>
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="ml-auto mt-4 w-max block"
+          >
+            Submit
+          </Button>
         </form>
       </Form>
-
     </section>
   )
 }

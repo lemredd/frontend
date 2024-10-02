@@ -1,10 +1,10 @@
 'use server'
 
-import * as z from 'zod'
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import * as z from 'zod'
 
-import { AddressSchema } from '@/schemas'
+import { AddressSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
 
 export const makeAddress = async (values: z.infer<typeof AddressSchema>) => {
@@ -17,7 +17,9 @@ export const makeAddress = async (values: z.infer<typeof AddressSchema>) => {
     }
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')
@@ -26,13 +28,12 @@ export const makeAddress = async (values: z.infer<typeof AddressSchema>) => {
 
   const { error } = await supabase
     .from('addresses')
-    .insert<z.infer<typeof AddressSchema> & { profile_id: string }>(({
+    .insert<z.infer<typeof AddressSchema> & { profile_id: string }>({
       ...validatedFields.data,
       profile_id: profile!.id,
-    }))
+    })
   if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
   redirect('/skr/setup/skills')
 }
-

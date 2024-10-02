@@ -1,12 +1,19 @@
-"use server"
+'use server'
 
-import { z } from 'zod'
 import { redirect } from 'next/navigation'
+import { z } from 'zod'
 
-import { ApplyJobSchema, CheckJobApplicationSchema, JobSchema } from '@/schemas'
+import {
+  ApplyJobSchema,
+  CheckJobApplicationSchema,
+  JobSchema,
+} from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
 
-export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: boolean) {
+export async function postJob(
+  values: z.infer<typeof JobSchema>,
+  isOnboarding: boolean,
+) {
   const validatedFields = JobSchema.safeParse(values)
   if (!validatedFields.success) {
     return {
@@ -16,7 +23,9 @@ export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: b
 
   const supabase = createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { data: profile } = await supabase
     .from('profiles')
     .select<string, { id: string }>('id')
@@ -37,7 +46,7 @@ export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: b
     .select()
   if (error) return { error: error.message }
 
-  const jobSkills = validatedFields.data.skill_ids.map(id => ({
+  const jobSkills = validatedFields.data.skill_ids.map((id) => ({
     job_id: job![0].id,
     skill_id: id,
   }))
@@ -57,7 +66,7 @@ export async function postJob(values: z.infer<typeof JobSchema>, isOnboarding: b
     redirect('/')
   }
 
-  return { success: "Job posted" }
+  return { success: 'Job posted' }
 }
 
 export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
@@ -88,7 +97,9 @@ export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
   return { application: application![0] }
 }
 
-export async function checkJobApplication(values: z.infer<typeof CheckJobApplicationSchema>) {
+export async function checkJobApplication(
+  values: z.infer<typeof CheckJobApplicationSchema>,
+) {
   const validatedFields = CheckJobApplicationSchema.safeParse(values)
   if (!validatedFields.success) {
     return {

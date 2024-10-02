@@ -1,13 +1,15 @@
 'use server'
 
-import * as z from 'zod'
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import * as z from 'zod'
 
-import { ProfileDescriptionSchema } from '@/schemas'
+import { ProfileDescriptionSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
 
-export const editProfile = async (values: z.infer<typeof ProfileDescriptionSchema>) => {
+export const editProfile = async (
+  values: z.infer<typeof ProfileDescriptionSchema>,
+) => {
   const supabase = createClient()
   const validatedFields = ProfileDescriptionSchema.safeParse(values)
 
@@ -17,7 +19,9 @@ export const editProfile = async (values: z.infer<typeof ProfileDescriptionSchem
     }
   }
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')

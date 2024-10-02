@@ -1,7 +1,7 @@
 'use client'
 
-import { UserRole } from '@/constants/types'
 import useNavbarRoutes from '@/hooks/useNavbarRoutes'
+import { UserRole } from '@/lib/types'
 import { useAuthStore } from '@/store/AuthStore'
 import Link from 'next/link'
 

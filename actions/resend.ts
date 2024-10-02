@@ -1,22 +1,13 @@
 'use server'
 
-import { RegisterSchema, RegisterWithRoleSchema } from '@/lib/schema'
+import { RegisterWithRoleSchema } from '@/lib/schema'
 import { formatErrorMessage } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import * as z from 'zod'
 
-export const register = async (values: z.infer<typeof RegisterSchema>) => {
-  const validatedFields = RegisterSchema.safeParse(values)
-  if (!validatedFields.success) {
-    return {
-      error: 'Invalid fields!',
-    }
-  }
-}
-
-export const registerWithRole = async (
+export const resendEmail = async (
   values: z.infer<typeof RegisterWithRoleSchema>,
 ) => {
   const validatedFields = RegisterWithRoleSchema.safeParse(values)

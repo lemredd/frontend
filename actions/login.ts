@@ -1,7 +1,7 @@
 'use server'
 
+import { LoginSchema } from '@/lib/schema'
 import { formatErrorMessage } from '@/lib/utils'
-import { LoginSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 import * as z from 'zod'
 
