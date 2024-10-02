@@ -43,5 +43,5 @@ export const registerWithRole = async (
   if (error) return { error: formatErrorMessage(error.message) }
 
   revalidatePath('/', 'layout')
-  redirect('/auth/verify/tell')
+  redirect(`/auth/verify/tell?email=${values.email}`)
 }

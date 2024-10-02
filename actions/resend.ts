@@ -1,38 +1,21 @@
 'use server'
 
-import { RegisterWithRoleSchema } from '@/lib/schema'
 import { formatErrorMessage } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/server'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import * as z from 'zod'
 
-export const resendEmail = async (
-  values: z.infer<typeof RegisterWithRoleSchema>,
-) => {
-  const validatedFields = RegisterWithRoleSchema.safeParse(values)
-  if (!validatedFields.success) {
+export const resendEmail = async (email: string) => {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.auth.resend({
+    type: 'signup',
+    email: email,
+  })
+
+  if (error) {
     return {
-      error: 'Invalid fields!',
+      error: formatErrorMessage(error.code || 'Something went wrong'),
     }
   }
 
-  const supabase = createClient()
-
-  const { error } = await supabase.auth.signUp({
-    email: values.email,
-    password: values.password,
-    options: {
-      data: {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        role_code: values.roleCode,
-      },
-    },
-  })
-
-  if (error) return { error: formatErrorMessage(error.message) }
-
-  revalidatePath('/', 'layout')
-  redirect('/auth/verify/tell')
+  return { data }
 }
