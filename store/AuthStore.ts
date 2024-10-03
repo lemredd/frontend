@@ -1,5 +1,6 @@
 import { login } from '@/actions/login'
 import { logout } from '@/actions/logout'
+import { resendEmail } from '@/actions/resend'
 import { User } from '@supabase/supabase-js'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -11,6 +12,7 @@ interface AuthState {
   isLoading: boolean
   login: (values: { email: string; password: string }) => Promise<void>
   logout: () => Promise<void>
+  resend: (email: string) => Promise<void>
   setIsLoading: (isLoading: boolean) => void
   setUser: (user: any) => void
   setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) => void
@@ -57,6 +59,14 @@ export const useAuthStore = create<AuthState>()(
           role_code: undefined,
           isAuthenticated: false,
         })
+      },
+      resend: async (email: string) => {
+        const response = await resendEmail(email)
+
+        if (response.error) {
+          const { error } = await response
+          throw new Error(error)
+        }
       },
     }),
     {

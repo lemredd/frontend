@@ -1,7 +1,7 @@
 'use server'
 
+import { RegisterSchema, RegisterWithRoleSchema } from '@/lib/schema'
 import { formatErrorMessage } from '@/lib/utils'
-import { RegisterSchema, RegisterWithRoleSchema } from '@/schemas'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -43,5 +43,5 @@ export const registerWithRole = async (
   if (error) return { error: formatErrorMessage(error.message) }
 
   revalidatePath('/', 'layout')
-  redirect('/auth/verify/tell')
+  redirect(`/auth/verify/tell?email=${values.email}`)
 }

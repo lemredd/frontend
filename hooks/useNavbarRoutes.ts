@@ -1,4 +1,4 @@
-import { TNavbarRoute, UserRole } from '@/constants/types'
+import { TNavbarRoute, UserRole } from '@/lib/types'
 import { useMemo } from 'react'
 
 const useNavbarRoutes = (role?: UserRole): TNavbarRoute[] => {

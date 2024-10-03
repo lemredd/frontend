@@ -1,18 +1,25 @@
-"use client"
+'use client'
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { useEffect, useState, useTransition } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState, useTransition } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-import { AddressSchema } from "@/schemas";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { makeAddress } from "@/actions/skr/address";
-import { FormError } from "@/components/custom/form-error";
-import { AsyncStrictCombobox } from "@/components/custom/combobox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import usePSGCAddressFields from "@/hooks/usePSGCAddressFields";
+import { makeAddress } from '@/actions/skr/address'
+import { AsyncStrictCombobox } from '@/components/custom/combobox'
+import { FormError } from '@/components/custom/form-error'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
+import { AddressSchema } from '@/lib/schema'
 
 export function AddressForm() {
   const [isPending, startTransition] = useTransition()
@@ -20,13 +27,13 @@ export function AddressForm() {
   const form = useForm<z.infer<typeof AddressSchema>>({
     resolver: zodResolver(AddressSchema),
     defaultValues: {
-      province: "",
-      city_muni: "",
-      barangay: "",
-      address_1: "",
-      address_2: "",
-      postal_code: "",
-    }
+      province: '',
+      city_muni: '',
+      barangay: '',
+      address_1: '',
+      address_2: '',
+      postal_code: '',
+    },
   })
 
   function onSubmit() {
@@ -43,15 +50,15 @@ export function AddressForm() {
     barangays,
     getProvinces,
     getCityMunicipalities,
-    getBarangays
+    getBarangays,
   } = usePSGCAddressFields()
 
   useEffect(() => {
     getProvinces()
 
     const subscription = form.watch(() => {
-      getCityMunicipalities(form.watch("province", undefined))
-      getBarangays(form.watch("city_muni", undefined))
+      getCityMunicipalities(form.watch('province', undefined))
+      getBarangays(form.watch('city_muni', undefined))
     })
 
     return () => subscription?.unsubscribe()
@@ -59,9 +66,9 @@ export function AddressForm() {
   }, [form.watch])
 
   function setProvince(value: string) {
-    form.setValue("province", value)
-    form.setValue("city_muni", "")
-    form.setValue("barangay", "")
+    form.setValue('province', value)
+    form.setValue('city_muni', '')
+    form.setValue('barangay', '')
   }
 
   return (
@@ -97,14 +104,15 @@ export function AddressForm() {
                     items={cityMunicipalities}
                     placeholder="Select city/municipality"
                     value={field.value}
-                    onValueChange={value => form.setValue("city_muni", value)}
-                    disabled={!form.watch("province")}
+                    onValueChange={(value) => form.setValue('city_muni', value)}
+                    disabled={!form.watch('province')}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          /><FormField
+          />
+          <FormField
             control={form.control}
             name="barangay"
             render={({ field }) => (
@@ -115,8 +123,8 @@ export function AddressForm() {
                     items={barangays}
                     placeholder="Select barangay"
                     value={field.value}
-                    onValueChange={value => form.setValue("barangay", value)}
-                    disabled={!form.watch("city_muni")}
+                    onValueChange={(value) => form.setValue('barangay', value)}
+                    disabled={!form.watch('city_muni')}
                   />
                 </FormControl>
                 <FormMessage />
@@ -130,7 +138,11 @@ export function AddressForm() {
               <FormItem>
                 <FormLabel>Postal Code</FormLabel>
                 <FormControl>
-                  <Input placeholder="Postal Code" inputMode="numeric" {...field} />
+                  <Input
+                    placeholder="Postal Code"
+                    inputMode="numeric"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -144,7 +156,10 @@ export function AddressForm() {
             <FormItem>
               <FormLabel>Address 1</FormLabel>
               <FormControl>
-                <Input placeholder="Building No., Street, Subdivision, etc." {...field} />
+                <Input
+                  placeholder="Building No., Street, Subdivision, etc."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -157,14 +172,23 @@ export function AddressForm() {
             <FormItem>
               <FormLabel>Address 2</FormLabel>
               <FormControl>
-                <Input placeholder="Building No., Street, Subdivision, etc." {...field} />
+                <Input
+                  placeholder="Building No., Street, Subdivision, etc."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormError message={error} />
-        <Button type="submit" disabled={isPending} onClick={onSubmit}>Save</Button>
+        <Button
+          type="submit"
+          disabled={isPending}
+          onClick={onSubmit}
+        >
+          Save
+        </Button>
       </form>
     </Form>
   )

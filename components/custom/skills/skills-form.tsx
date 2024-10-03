@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form'
 
 import { addSkills } from '@/actions/skr/skills'
-import { SkillsSchema } from '@/schemas'
+import { SkillsSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/client'
 
 interface Props<S = Record<string, string>> {

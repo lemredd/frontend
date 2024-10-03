@@ -96,9 +96,18 @@ export const ProfileDescriptionSchema = z.object({
 const transformPSGCField = (value: string) => value.split('|')[1]
 
 export const AddressSchema = z.object({
-  province: z.string().min(1, { message: 'province is required' }).transform(transformPSGCField),
-  city_muni: z.string().min(1, { message: 'City/Municipality is required' }).transform(transformPSGCField),
-  barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
+  province: z
+    .string()
+    .min(1, { message: 'province is required' })
+    .transform(transformPSGCField),
+  city_muni: z
+    .string()
+    .min(1, { message: 'City/Municipality is required' })
+    .transform(transformPSGCField),
+  barangay: z
+    .string()
+    .min(1, { message: 'barangay is required' })
+    .transform(transformPSGCField),
   address_1: z.string().optional(),
   address_2: z.string().optional(),
   postal_code: z.string().min(1, { message: 'Postal code is required' }),
@@ -124,9 +133,18 @@ export const JobSchema = z.object({
     .refine((value) => Number(value))
     .transform((value) => Number(value))
     .optional(),
-  province: z.string().min(1, { message: 'province is required' }).transform(transformPSGCField),
-  city_muni: z.string().min(1, { message: 'city_muni is required' }).transform(transformPSGCField),
-  barangay: z.string().min(1, { message: 'barangay is required' }).transform(transformPSGCField),
+  province: z
+    .string()
+    .min(1, { message: 'province is required' })
+    .transform(transformPSGCField),
+  city_muni: z
+    .string()
+    .min(1, { message: 'city_muni is required' })
+    .transform(transformPSGCField),
+  barangay: z
+    .string()
+    .min(1, { message: 'barangay is required' })
+    .transform(transformPSGCField),
   skill_ids: z.array(z.string().min(1, { message: 'skill is required' })),
 })
 

@@ -1,10 +1,9 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -12,13 +11,14 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from '@/components/ui/command'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { ComboboxItem } from "@/constants/types"
+} from '@/components/ui/popover'
+import { ComboboxItem } from '@/lib/types'
+import { cn } from '@/lib/utils'
 
 export interface ComboboxProps<TValue = string> {
   items: ComboboxItem[]
@@ -32,20 +32,26 @@ export interface ComboboxProps<TValue = string> {
  * - Combobox (Not strict)
  * - AsyncCombobox (Not strict)
  * - StrictCombobox
-*/
+ */
 
 export function AsyncStrictCombobox({
   items,
   placeholder,
   value,
   onValueChange,
-  disabled
+  disabled,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild disabled={disabled}>
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <PopoverTrigger
+        asChild
+        disabled={disabled}
+      >
         <Button
           variant="outline"
           role="combobox"
@@ -53,8 +59,9 @@ export function AsyncStrictCombobox({
           className="w-full justify-between"
         >
           {value
-            ? items.find(item => item.value === value)?.label || "Select one..."
-            : "Select one..."}
+            ? items.find((item) => item.value === value)?.label ||
+              'Select one...'
+            : 'Select one...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -65,24 +72,25 @@ export function AsyncStrictCombobox({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {!items.length && <CommandItem disabled>Loading...</CommandItem>}
-              {!!items.length && items.map((item) => (
-                <CommandItem
-                  key={item.value}
-                  value={item.value}
-                  onSelect={(currentValue) => {
-                    onValueChange(currentValue === value ? "" : currentValue)
-                    setOpen(false)
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === item.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {item.label}
-                </CommandItem>
-              ))}
+              {!!items.length &&
+                items.map((item) => (
+                  <CommandItem
+                    key={item.value}
+                    value={item.value}
+                    onSelect={(currentValue) => {
+                      onValueChange(currentValue === value ? '' : currentValue)
+                      setOpen(false)
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        value === item.value ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    {item.label}
+                  </CommandItem>
+                ))}
             </CommandGroup>
           </CommandList>
         </Command>
