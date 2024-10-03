@@ -23,6 +23,7 @@ export default function ProviderTaskPage({ params: { id } }: Props) {
       .from("jobs")
       .select<string, typeof job>(`
         id, name, description, price, status, profile_id,
+        province, city_muni, barangay,
         job_skills (
           skills (id, name)
         )
