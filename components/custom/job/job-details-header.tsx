@@ -11,17 +11,16 @@ import Link from "next/link"
 import { Chip } from "@/components/ui/chip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
+import { useJobStore } from "@/store/JobStore"
+import { useParams } from "next/navigation"
 
-interface Props {
-  job?: Record<string, unknown>
-}
-
-interface ProviderJobDetailsHeaderProps extends Props {
-  isOwned: boolean
-}
-
-export function ProviderJobDetailsHeader({ isOwned, job }: ProviderJobDetailsHeaderProps) {
+export function ProviderJobDetailsHeader() {
+  const { job, isOwned } = useJobStore()
   const TABS = ["details", "applicants"]
+  const { id } = useParams()
+
+  const buildHref = (tab: string) => `/pdr/tasks/${id}/${tab === "details" ? "" : "applicants"}`
+
   return (
     <header className="grid grid-flow-row gap-4 grid-cols-[1fr_auto] grid-rows-2">
       <h1 className="flex items-center gap-x-2 text-2xl font-semibold capitalize">
@@ -34,7 +33,7 @@ export function ProviderJobDetailsHeader({ isOwned, job }: ProviderJobDetailsHea
           <TabsList>
             {TABS.map(tab => (
               <TabsTrigger key={tab} value={tab} asChild>
-                <Link href={tab === "details" ? "./" : "./applicants"}>
+                <Link href={buildHref(tab)}>
                   <span className="capitalize">{tab}</span>
                 </Link>
               </TabsTrigger>
@@ -59,6 +58,10 @@ export function ProviderJobDetailsHeader({ isOwned, job }: ProviderJobDetailsHea
       </div>
     </header>
   )
+}
+
+interface Props {
+  job: Record<string, unknown>
 }
 
 export default function JobDetailsHeader({ job }: Props) {

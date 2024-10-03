@@ -19,12 +19,10 @@ import {
 } from '@/components/ui/form'
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useJobStore } from "@/store/JobStore"
 
-interface ProviderJobDetailsFormProps {
-  job?: Record<string, unknown>
-  isOwned: boolean
-}
-export function JobDetailsForm({ isOwned, job }: ProviderJobDetailsFormProps) {
+export function JobDetailsForm() {
+  const { job, isOwned } = useJobStore()
   const [isPending, startTransition] = useTransition()
   const [editing, setEditing] = useState(false)
 
