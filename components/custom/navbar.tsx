@@ -14,6 +14,7 @@ import useActivePath from '@/hooks/useActivePath'
 import useNavbarRoutes from '@/hooks/useNavbarRoutes'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/AuthStore'
+import { motion } from 'framer-motion'
 import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -21,24 +22,18 @@ import { RiUserSearchFill } from 'react-icons/ri'
 
 export function Navbar() {
   const user = useAuthStore((state) => state.user)
+  const profile = useAuthStore((state) => state.profile)
   const isLoading = useAuthStore((state) => state.isLoading)
   const navbarRoutes = useNavbarRoutes(user?.user_metadata?.role_code)
   const activePath = useActivePath()
   const [showBackground, setShowBackground] = useState<boolean>(false)
-  const [showNavbar, setShowNavbar] = useState<boolean>(true)
   const [prevScrollPos, setPrevScrollPos] = useState<number>(0)
+  const [currentLink, setCurrentLink] = useState(0)
 
   const TOP_OFFSET = 50
 
   const handleScroll = useCallback(() => {
     const currentScrollPos = window.scrollY
-    if (currentScrollPos <= TOP_OFFSET) {
-      setShowNavbar(true)
-    } else if (currentScrollPos > prevScrollPos) {
-      setShowNavbar(false)
-    } else {
-      setShowNavbar(true)
-    }
 
     setShowBackground(currentScrollPos >= TOP_OFFSET)
     setPrevScrollPos(currentScrollPos)
@@ -51,31 +46,32 @@ export function Navbar() {
     }
   }, [handleScroll])
 
-  const renderNavbarLinks = (fromSheet: boolean) => (
-    <>
-      {navbarRoutes.map((route, idx) => (
-        <li
-          key={idx}
-          className={cn(
-            'text-foreground hover:text-primary relative',
-            activePath === route.path ||
-              (route.path !== '/' && activePath.startsWith(route.path))
-              ? 'text-primary dark:text-blue-300'
-              : showBackground
-              ? 'text-foreground'
-              : 'text-foreground',
-            fromSheet && 'text-foreground',
-          )}
-        >
-          <Link
-            href={route.path}
-            scroll={true}
-          >
-            {route.label}
-          </Link>{' '}
-        </li>
-      ))}
-    </>
+  // Liquid link rendering function
+  const renderLiquidLinks = (links: { path: string; label: string }[]) => (
+    <motion.ul
+      style={{
+        filter: 'url(#goo)', // Apply liquid effect
+      }}
+      layout
+      className="h-7 flex"
+    >
+      {user && !profile?.is_completed
+        ? null
+        : links.map((route, index) => (
+            <motion.li
+              key={index}
+              onClick={() => setCurrentLink(index)}
+              className={cn(
+                'bg-background/50 text-foreground px-3 h-full items-center mx-0 transition-all duration-500 cursor-pointer justify-center flex capitalize font-bold',
+                user
+                  ? activePath === route.path && 'bg-primary text-white mx-6'
+                  : currentLink === index && 'bg-primary text-white mx-6',
+              )}
+            >
+              <Link href={route.path}>{route.label}</Link>
+            </motion.li>
+          ))}
+    </motion.ul>
   )
 
   const renderAuthButtons = (fromSheet: boolean) =>
@@ -123,7 +119,6 @@ export function Navbar() {
     <nav
       className={cn(
         'fixed top-0 z-50 w-full transition-all duration-300',
-        showNavbar ? 'top-0 opacity-100' : '-top-20 opacity-0',
         showBackground ? 'bg-background shadow-lg py-3' : 'bg-transparent py-6',
       )}
     >
@@ -133,22 +128,15 @@ export function Navbar() {
           href="/"
           className="inline-flex items-center space-x-2"
         >
-          <RiUserSearchFill
-            className={cn('text-2xl', !showBackground && 'text-foreground')}
-          />
-          <h1
-            className={cn(
-              'text-xl font-bold hidden md:block',
-              !showBackground && 'text-foreground',
-            )}
-          >
+          <RiUserSearchFill className="text-2xl" />
+          <h1 className={cn('text-xl font-bold hidden md:block')}>
             Task Grabber
           </h1>
         </Link>
 
-        {/* Desktop Links */}
+        {/* Desktop Links with Liquid Effect */}
         <div className="hidden md:flex space-x-6">
-          <ul className="flex space-x-6">{renderNavbarLinks(false)}</ul>
+          {renderLiquidLinks(navbarRoutes)}
         </div>
 
         {/* Desktop Auth Buttons */}
@@ -174,7 +162,9 @@ export function Navbar() {
                   </h1>
                 </SheetTitle>
               </SheetHeader>
-              <ul className="space-y-5 mt-8">{renderNavbarLinks(true)}</ul>
+              <ul className="space-y-5 mt-8">
+                {renderLiquidLinks(navbarRoutes)}
+              </ul>
               <div className="mt-6">{renderAuthButtons(true)}</div>
             </SheetContent>
           </Sheet>

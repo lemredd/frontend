@@ -23,5 +23,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
   }
 
-  return { data }
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', data.user.id)
+    .single()
+
+  return { data: { user: data.user, profile } }
 }

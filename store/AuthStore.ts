@@ -5,8 +5,15 @@ import { User } from '@supabase/supabase-js'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface Profile extends Record<string, any> {
+  id: string
+  user_id: string
+}
+
 interface AuthState {
   user: User | null
+  profile: Profile | null
   role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined
   isAuthenticated: boolean
   isLoading: boolean
@@ -22,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      profile: null,
       role_code: undefined,
       isAuthenticated: false,
       isLoading: true,
@@ -42,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
 
         set({
           user,
+          profile: data?.profile as Profile,
           role_code: user?.user_metadata?.role_code || undefined,
           isAuthenticated: true,
         })
@@ -56,6 +65,7 @@ export const useAuthStore = create<AuthState>()(
 
         set({
           user: null,
+          profile: null,
           role_code: undefined,
           isAuthenticated: false,
         })
