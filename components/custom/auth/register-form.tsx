@@ -23,6 +23,7 @@ import * as z from 'zod'
 import DrawerDialog from '@/components/custom/drawer-dialog'
 import PrivacyPolicy from '@/components/custom/privacy-policy'
 import UserAgreement from '@/components/custom/user-agreement'
+import PasswordStrength from '@/components/ui/password-strength'
 import ProviderSVG from '@/public/svgs/provider.svg'
 import SeekerSVG from '@/public/svgs/seeker.svg'
 import { ChevronLeft } from 'lucide-react'
@@ -161,14 +162,12 @@ export const RegisterForm = () => {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
+                      <PasswordStrength
                         {...field}
                         disabled={isPending}
-                        type="password"
                         placeholder="********"
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -180,10 +179,9 @@ export const RegisterForm = () => {
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input
+                      <PasswordStrength
                         {...field}
                         disabled={isPending}
-                        type="password"
                         placeholder="********"
                       />
                     </FormControl>
