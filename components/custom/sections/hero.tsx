@@ -1,3 +1,4 @@
+import SecondBrain from '@/components/ui/second-brain'
 import Link from 'next/link'
 
 const Hero = () => {
@@ -19,12 +20,9 @@ const Hero = () => {
           Whether you need help or want to offer your expertise, our platform is
           designed for you.
         </p>
-        <Link
-          href="/auth/join"
-          className="inline-block bg-primary text-white py-3 px-6 rounded-md shadow-lg transition-transform transform hover:scale-105"
-        >
-          Get Started
-        </Link>
+        <SecondBrain>
+          <Link href="/auth/join">Get Started</Link>
+        </SecondBrain>
       </div>
     </div>
   )
