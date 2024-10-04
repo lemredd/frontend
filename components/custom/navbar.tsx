@@ -28,7 +28,6 @@ export function Navbar() {
   const activePath = useActivePath()
   const [showBackground, setShowBackground] = useState<boolean>(false)
   const [prevScrollPos, setPrevScrollPos] = useState<number>(0)
-  const [currentLink, setCurrentLink] = useState(0)
 
   const TOP_OFFSET = 50
 
@@ -60,12 +59,10 @@ export function Navbar() {
         : links.map((route, index) => (
             <motion.li
               key={index}
-              onClick={() => setCurrentLink(index)}
               className={cn(
-                'bg-background/50 text-foreground px-3 h-full items-center mx-0 transition-all duration-500 cursor-pointer justify-center flex capitalize font-bold',
-                user
-                  ? activePath === route.path && 'bg-primary text-white mx-6'
-                  : currentLink === index && 'bg-primary text-white mx-6',
+                'px-3 h-full items-center mx-0 transition-all duration-500 cursor-pointer justify-center flex capitalize font-bold',
+                user && 'bg-background/50 text-foreground',
+                activePath === route.path && 'bg-primary text-white mx-6',
               )}
             >
               <Link href={route.path}>{route.label}</Link>
