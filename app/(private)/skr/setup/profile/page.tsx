@@ -6,6 +6,7 @@ import * as z from 'zod'
 
 import { editProfile } from '@/actions/skr/profile'
 import { FormError } from '@/components/custom/form-error'
+import SetupWrapper from '@/components/custom/setup-wrapper'
 import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -32,12 +33,10 @@ export default function UserDescriptionPage() {
     })
   }
   return (
-    <section className="mx-auto container lg:max-w-5xl flex h-full flex-col justify-center">
-      <header className="mb-8 space-y-2">
-        <h1 className="text-3xl font-bold">Tell us about yourself</h1>
-        <p>Fill out the following descriptions</p>
-      </header>
-
+    <SetupWrapper
+      title="Tell us about yourself"
+      description="Fill out the following descriptions"
+    >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -91,6 +90,6 @@ export default function UserDescriptionPage() {
           </Button>
         </form>
       </Form>
-    </section>
+    </SetupWrapper>
   )
 }

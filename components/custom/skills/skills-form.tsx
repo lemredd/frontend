@@ -4,7 +4,7 @@ import * as z from 'zod'
 
 import { FormError } from '@/components/custom/form-error'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
@@ -75,9 +75,9 @@ export function SkillsForm({
 
   return (
     <>
-      <Card>
+      <Card className="border">
         <CardHeader>
-          <h3 className="text-lg">Select skills</h3>
+          <CardTitle className="text-lg">Select skills</CardTitle>
         </CardHeader>
         <Form {...form}>
           <form
