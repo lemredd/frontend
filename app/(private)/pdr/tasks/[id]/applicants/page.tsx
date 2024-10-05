@@ -1,13 +1,10 @@
 "use client"
 
-import { CollapsibleDesc } from "@/components/custom/collapsible-desc"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Chip } from "@/components/ui/chip"
-import usePaginationSearchParams from "@/hooks/usePaginationSearchParams"
-import { createClient } from "@/utils/supabase/client"
-import { MapPin } from "lucide-react"
 import { useEffect, useState } from "react"
+
+import { createClient } from "@/utils/supabase/client"
+import usePaginationSearchParams from "@/hooks/usePaginationSearchParams"
+import { ApplicantListItem } from "@/components/custom/job/applicant-list-item"
 
 interface Props {
   params: {
@@ -52,28 +49,7 @@ export default function TaskApplicantsPage({ params: { id } }: Props) {
       <h2 className="text-xl">Task Applicants ({totalApplicants})</h2>
 
       {!!applicants.length && applicants.map(applicant => (
-        <Card key={applicant.id as string}>
-          <CardHeader>
-            <h3 className="text-lg font-bold">
-              {applicant.profiles.first_name as string}
-            </h3>
-            <p>{applicant.profiles.short_desc}</p>
-
-            <Chip
-              beforeContent={<MapPin size={16} />}
-              content={Object.values(applicant.profiles.addresses[0]).join(", ")}
-              className="w-max"
-              contentClassName="max-w-[unset]"
-            />
-          </CardHeader>
-          <CardContent>
-            <CollapsibleDesc content={applicant.proposal} />
-          </CardContent>
-          <CardFooter className="justify-end gap-x-4">
-            <Button variant="destructive">Reject</Button>
-            <Button>Approve</Button>
-          </CardFooter>
-        </Card>
+        <ApplicantListItem key={applicant.id} applicant={applicant} />
       ))}
     </div>
   )
