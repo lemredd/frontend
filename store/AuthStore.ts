@@ -1,12 +1,14 @@
+
 import { fetchProfile } from '@/actions/fetchProfile'
 import { login } from '@/actions/login'
 import { logout } from '@/actions/logout'
 import { resendEmail } from '@/actions/resend'
+import { refreshUser } from '@/actions/user'
 import { User } from '@supabase/supabase-js'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Profile extends Record<string, any> {
   id: string
   user_id: string
@@ -23,6 +25,7 @@ interface AuthState {
   resend: (email: string) => Promise<void>
   setIsLoading: (isLoading: boolean) => void
   setUser: (user: any) => void
+  refreshUser: () => void
   setProfile: (profile: Profile | null) => void
   setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) => void
   refetchProfile: (user_id: string) => void
@@ -38,6 +41,10 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       setIsLoading: (isLoading: boolean) => set({ isLoading }),
       setUser: (user) => set({ user, isAuthenticated: !!user }),
+      refreshUser: () => {
+        refreshUser().then(({ user }) =>
+          !!user && set({ user, isAuthenticated: !!user }))
+      },
       setProfile: (profile) => set({ profile }),
       setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) =>
         set({ role_code }),
