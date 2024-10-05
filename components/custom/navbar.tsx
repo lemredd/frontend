@@ -56,18 +56,33 @@ export function Navbar() {
     >
       {user && !profile?.is_completed
         ? null
-        : links.map((route, index) => (
-            <motion.li
-              key={index}
-              className={cn(
-                'px-3 h-full items-center mx-0 transition-all duration-500 cursor-pointer justify-center flex capitalize font-bold',
-                user && 'bg-background/50 text-foreground',
-                activePath === route.path && 'bg-primary text-white mx-6',
-              )}
-            >
-              <Link href={route.path}>{route.label}</Link>
-            </motion.li>
-          ))}
+        : links.map((route, index) => {
+            // Check if the current route is exactly the home path
+            const isExactHomeMatch = route.path === activePath
+
+            // Check if it's a valid subpath but not the exact home
+            const isSubPath =
+              activePath.startsWith(route.path) &&
+              activePath !== route.path &&
+              route.path !== '/skr/' && // Avoid making /skr/ always true
+              route.path !== '/pdr/' // Avoid making /pdr/ always true
+
+            // Set the active state if it's an exact match or subpath
+            const isActive = isExactHomeMatch || isSubPath
+
+            return (
+              <motion.li
+                key={index}
+                className={cn(
+                  'px-3 h-full items-center mx-0 transition-all duration-500 cursor-pointer justify-center flex capitalize font-bold',
+                  user && 'bg-background/50 text-foreground',
+                  isActive && 'bg-primary text-white mx-6',
+                )}
+              >
+                <Link href={route.path}>{route.label}</Link>
+              </motion.li>
+            )
+          })}
     </motion.ul>
   )
 

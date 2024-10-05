@@ -12,23 +12,21 @@ const useNavbarRoutes = (role?: UserRole): TNavbarRoute[] => {
 
     // Routes for SKRs
     const seekerRoutes: TNavbarRoute[] = [
-      { label: 'Home', path: '/skr' },
-      { label: 'Grab Tasks', path: '/skr/tasks' },
-      { label: 'Profile', path: '/skr/profile' },
+      { label: 'Home', path: '/skr/' },
+      { label: 'Grab Tasks', path: '/skr/tasks/' },
     ]
 
     // Routes for PDRs
     const providerRoutes: TNavbarRoute[] = [
-      { label: 'Home', path: '/pdr' },
-      { label: 'Post Tasks', path: '/pdr/tasks/post' },
-      { label: 'Profile', path: '/pdr/profile' },
+      { label: 'Home', path: '/pdr/' },
+      { label: 'Post Tasks', path: '/pdr/tasks/post/' },
     ]
 
     // Routes for admin
     const adminRoutes: TNavbarRoute[] = [
-      { label: 'Dashboard', path: '/admin/dashboard' },
-      { label: 'Manage Users', path: '/admin/users' },
-      { label: 'Settings', path: '/admin/settings' },
+      { label: 'Dashboard', path: '/admin/dashboard/' },
+      { label: 'Manage Users', path: '/admin/users/' },
+      { label: 'Settings', path: '/admin/settings/' },
     ]
 
     // Return different routes based on the role
