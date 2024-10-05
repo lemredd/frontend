@@ -90,6 +90,7 @@ export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
     .insert({
       job_id: validatedFields.data.job_id,
       profile_id: profile!.id,
+      proposal: validatedFields.data.proposal
     })
     .select()
 
