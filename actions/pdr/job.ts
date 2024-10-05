@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import {
   ApplyJobSchema,
+  ApproveApplicantSchema,
   CheckJobApplicationSchema,
   JobSchema,
 } from '@/lib/schema'
@@ -89,6 +90,7 @@ export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
     .insert({
       job_id: validatedFields.data.job_id,
       profile_id: profile!.id,
+      proposal: validatedFields.data.proposal
     })
     .select()
 
@@ -124,4 +126,26 @@ export async function checkJobApplication(
 
   if (application.length) return { application: application[0] }
   return { application: undefined }
+}
+
+export async function approveApplicant(values: z.infer<typeof ApproveApplicantSchema>) {
+  const validatedFields = ApproveApplicantSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: {
+        message: 'Invalid fields!',
+        errors: validatedFields.error.errors
+      },
+    }
+  }
+
+  const supabase = createClient()
+  const { error } = await supabase
+    .from('job_applicants')
+    .update({ status: "accepted" })
+    .eq('id', validatedFields.data.job_applicant_id)
+
+  if (error) return { error: error.message }
+
+  return { success: 'Applicant approved' }
 }

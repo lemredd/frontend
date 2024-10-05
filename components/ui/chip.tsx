@@ -2,10 +2,11 @@ import { cn } from "@/lib/utils"
 
 interface ChipProps extends React.HTMLAttributes<HTMLDivElement> {
   content: string
+  beforeContent?: React.ReactNode,
   afterContent?: React.ReactNode,
   contentClassName?: React.HTMLAttributes<HTMLSpanElement>["className"]
 }
-export function Chip({ className, contentClassName, content, afterContent }: ChipProps) {
+export function Chip({ className, contentClassName, beforeContent, content, afterContent }: ChipProps) {
   return (
     <div
       className={cn(
@@ -14,6 +15,7 @@ export function Chip({ className, contentClassName, content, afterContent }: Chi
       )}
       title={content}
     >
+      {beforeContent}
       <span className={cn(
         "text-sm max-w-[100px] truncate",
         contentClassName
