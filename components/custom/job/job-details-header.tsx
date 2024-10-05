@@ -12,12 +12,24 @@ import { Chip } from "@/components/ui/chip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
 import { useJobStore } from "@/store/JobStore"
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 
 export function ProviderJobDetailsHeader() {
   const { job, isOwned } = useJobStore()
   const TABS = ["details", "applicants"]
   const { id } = useParams()
+  const currentTab = usePathname().split("/").filter(Boolean).slice(-1)[0]
 
   const buildHref = (tab: string) => `/pdr/tasks/${id}/${tab === "details" ? "" : "applicants"}`
 
@@ -29,7 +41,7 @@ export function ProviderJobDetailsHeader() {
       </h1>
       <h3 className="text-lg self-center">₱{job?.price as string} PHP</h3>
       <div className="flex gap-x-4">
-        <Tabs defaultValue={TABS[0]}>
+        <Tabs defaultValue={TABS.find(tab => tab === currentTab) || TABS[0]}>
           <TabsList>
             {TABS.map(tab => (
               <TabsTrigger key={tab} value={tab} asChild>
@@ -65,16 +77,19 @@ interface Props {
 }
 
 export default function JobDetailsHeader({ job }: Props) {
+
   const { user } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [application, setApplication] = useState<Record<string, unknown>>()
+  const [proposal, setProposal] = useState("")
 
   function apply() {
     if (!user) return
     startTransition(() => {
       applyJob({
         job_id: job?.id as string,
-        user_id: user.id
+        user_id: user.id,
+        proposal
       }).then(({ error, application }) => {
         if (error) return console.error(error)
         setApplication(application)
@@ -101,7 +116,25 @@ export default function JobDetailsHeader({ job }: Props) {
       <h3 className="text-lg">₱{job?.price as string} PHP</h3>
       <div className="row-span-2 self-center items-center justify-end flex gap-x-2">
         {!application && (
-          <Button onClick={apply} disabled={isPending}>{isPending ? 'Please wait...' : 'Apply'}</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Apply</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Tell us why you want this job</DialogTitle>
+                <DialogDescription>
+                  Stand out among other applicants by explaining why the client should choose you for this job.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <Textarea value={proposal} onChange={e => setProposal(e.target.value)} />
+              </div>
+              <DialogFooter>
+                <Button type="submit" onClick={apply} disabled={isPending}>Submit</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         )}
         {!!application && (
           <Button disabled>{application.status as string}</Button>

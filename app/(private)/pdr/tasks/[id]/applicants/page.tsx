@@ -54,13 +54,16 @@ export default function TaskApplicantsPage({ params: { id } }: Props) {
         <SelectedSeeker applicant={applicants.find(({ status }) => status === "accepted")} />
       )}
       <div className="space-y-4">
-        {!isJobOpen() && (
+        {!isJobOpen() && !!totalApplicants && (
           <h2 className="text-xl">Previous Applicants ({totalApplicants})</h2>
         )}
-
         {!!applicants.length && applicants.map(applicant => (
           <ApplicantListItem key={applicant.id} applicant={applicant} />
         ))}
+
+        {!totalApplicants && (
+          <h1 className="text-2xl text-center">No applicants</h1>
+        )}
       </div>
     </>
   )
