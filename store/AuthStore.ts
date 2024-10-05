@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       refreshUser: () => {
         refreshUser().then(({ user }) =>
-          !!user && set({ user, isAuthenticated: !!user }))
+          set({ user, isAuthenticated: !!user }))
       },
       setProfile: (profile) => set({ profile }),
       setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) =>
