@@ -5,6 +5,8 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import usePaginationSearchParams from "@/hooks/usePaginationSearchParams"
 import { ApplicantListItem } from "@/components/custom/job/applicant-list-item"
+import { SelectedSeeker } from "@/components/custom/job/selected-seeker"
+import { useJobStore } from "@/store/JobStore"
 
 interface Props {
   params: {
@@ -24,8 +26,10 @@ const JOB_APPLICANT_FIELDS = `
   )
 `
 export default function TaskApplicantsPage({ params: { id } }: Props) {
+  const { isJobOpen } = useJobStore()
   const supabase = createClient()
   const { start, end } = usePaginationSearchParams()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [applicants, setApplicants] = useState<any[]>([])
   const [totalApplicants, setTotalApplicants] = useState(0)
 
@@ -45,12 +49,19 @@ export default function TaskApplicantsPage({ params: { id } }: Props) {
   }, [])
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl">Task Applicants ({totalApplicants})</h2>
+    <>
+      {!isJobOpen() && (
+        <SelectedSeeker applicant={applicants.find(({ status }) => status === "accepted")} />
+      )}
+      <div className="space-y-4">
+        {!isJobOpen() && (
+          <h2 className="text-xl">Previous Applicants ({totalApplicants})</h2>
+        )}
 
-      {!!applicants.length && applicants.map(applicant => (
-        <ApplicantListItem key={applicant.id} applicant={applicant} />
-      ))}
-    </div>
+        {!!applicants.length && applicants.map(applicant => (
+          <ApplicantListItem key={applicant.id} applicant={applicant} />
+        ))}
+      </div>
+    </>
   )
 }
