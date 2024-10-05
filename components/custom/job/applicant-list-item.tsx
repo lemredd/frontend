@@ -7,6 +7,7 @@ import { CollapsibleDesc } from "@/components/custom/collapsible-desc"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { useTransition } from "react"
 import { approveApplicant } from "@/actions/pdr/job"
+import { useJobStore } from "@/store/JobStore"
 
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function ApplicantListItem({ applicant }: Props) {
+  const { isJobOpen } = useJobStore()
   const [isPending, startTransition] = useTransition()
 
   function approve() {
@@ -28,6 +30,7 @@ export function ApplicantListItem({ applicant }: Props) {
     <Card>
       <CardHeader>
         <h3 className="text-lg font-bold">
+          {/* TODO: link to seeker profile */}
           {applicant.profiles.first_name as string}
         </h3>
         <p>{applicant.profiles.short_desc}</p>
@@ -41,9 +44,11 @@ export function ApplicantListItem({ applicant }: Props) {
       <CardContent>
         <CollapsibleDesc content={applicant.proposal} />
       </CardContent>
-      <CardFooter className="justify-end">
-        <Button disabled={isPending} onClick={approve}>Approve</Button>
-      </CardFooter>
+      {isJobOpen() && (
+        <CardFooter className="justify-end">
+          <Button disabled={isPending} onClick={approve}>Approve</Button>
+        </CardFooter>
+      )}
     </Card>
   )
 }
