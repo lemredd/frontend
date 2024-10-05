@@ -1,8 +1,12 @@
 "use client"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { CollapsibleDesc } from "@/components/custom/collapsible-desc"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Chip } from "@/components/ui/chip"
 import usePaginationSearchParams from "@/hooks/usePaginationSearchParams"
 import { createClient } from "@/utils/supabase/client"
+import { MapPin } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface Props {
@@ -10,17 +14,28 @@ interface Props {
     id: string
   }
 }
+const JOB_APPLICANT_FIELDS = `
+  *,
+  profiles (
+    id,
+    first_name,
+    last_name,
+    short_desc,
+    addresses (
+      barangay, city_muni, province
+    )
+  )
+`
 export default function TaskApplicantsPage({ params: { id } }: Props) {
   const supabase = createClient()
   const { start, end } = usePaginationSearchParams()
-  const [applicants, setApplicants] = useState<Record<string, unknown>[]>([])
+  const [applicants, setApplicants] = useState<any[]>([])
   const [totalApplicants, setTotalApplicants] = useState(0)
 
   useEffect(() => {
-    const fields = "*, profiles (id, first_name, last_name, profile_skills(skills(id,name)))"
     supabase
       .from("job_applicants")
-      .select<string, typeof applicants[number]>(fields, { count: "exact" })
+      .select(JOB_APPLICANT_FIELDS, { count: "exact" })
       .eq("job_id", id)
       .order("created_at", { ascending: false })
       .range(start, end)
@@ -39,13 +54,25 @@ export default function TaskApplicantsPage({ params: { id } }: Props) {
       {!!applicants.length && applicants.map(applicant => (
         <Card key={applicant.id as string}>
           <CardHeader>
-            <h3 className="text-lg">
-              {(applicant.profiles as Record<string, unknown>).first_name as string}
+            <h3 className="text-lg font-bold">
+              {applicant.profiles.first_name as string}
             </h3>
+            <p>{applicant.profiles.short_desc}</p>
+
+            <Chip
+              beforeContent={<MapPin size={16} />}
+              content={Object.values(applicant.profiles.addresses[0]).join(", ")}
+              className="w-max"
+              contentClassName="max-w-[unset]"
+            />
           </CardHeader>
           <CardContent>
-            <pre>{JSON.stringify(applicant, null, 2)}</pre>
+            <CollapsibleDesc content={applicant.proposal} />
           </CardContent>
+          <CardFooter className="justify-end gap-x-4">
+            <Button variant="destructive">Reject</Button>
+            <Button>Approve</Button>
+          </CardFooter>
         </Card>
       ))}
     </div>
