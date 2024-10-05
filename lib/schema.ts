@@ -142,6 +142,7 @@ export const JobSchema = z.object({
 export const ApplyJobSchema = z.object({
   job_id: z.string().min(1, { message: 'job_id is required' }),
   user_id: z.string().min(1, { message: 'user_id is required' }),
+  proposal: z.string().min(1, { message: 'proposal is required' }),
 })
 
 export const CheckJobApplicationSchema = z.object({
