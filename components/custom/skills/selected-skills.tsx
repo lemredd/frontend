@@ -18,11 +18,13 @@ export function SelectedSkills({ form }: Props) {
   const [selectedSkills, setSelectedSkills] = useState<
     Record<string, string>[]
   >([])
+
   function removeSkill(id: string) {
     form.setValue(
       'skillIds',
       form.watch('skillIds').filter((skillId: string) => skillId !== id),
     )
+    form.trigger('skillIds')
   }
 
   useEffect(() => {
@@ -39,31 +41,35 @@ export function SelectedSkills({ form }: Props) {
     })
 
     return () => subscription.unsubscribe()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.watch])
+  }, [form])
 
   return (
-    <Card className="shadow-none">
+    <Card className="shadow-none border">
       <CardHeader>
-        <h3 className="text-lg">{selectedSkills.length} skills selected</h3>
+        <h3 className="text-lg">{selectedSkills.length} Skills Selected</h3>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-4">
-        {!!selectedSkills.length &&
-          selectedSkills.map(({ name, id }) => (
-            <Chip
-              key={id}
-              content={name}
-              afterContent={
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="size-6 rounded-full"
-                >
-                  <CloseIcon onClick={() => removeSkill(id)} />
-                </Button>
-              }
-            />
-          ))}
+        {selectedSkills.length === 0 && <p>No skills selected yet</p>}
+        {selectedSkills.map(({ name, id }) => (
+          <Chip
+            key={id}
+            content={name}
+            afterContent={
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  removeSkill(id)
+                }}
+                variant="destructive"
+                size="icon"
+                className="size-4 rounded-full"
+              >
+                <CloseIcon />
+              </Button>
+            }
+          />
+        ))}
       </CardContent>
     </Card>
   )

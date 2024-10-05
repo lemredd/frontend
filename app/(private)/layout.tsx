@@ -3,5 +3,5 @@ export default function PrivateLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <section className="my-24">{children}</section>
+  return <section className="mt-28 mb-16">{children}</section>
 }

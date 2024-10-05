@@ -1,9 +1,8 @@
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useState } from 'react'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 import * as z from 'zod'
 
-import { FormError } from '@/components/custom/form-error'
-import { Button } from '@/components/ui/button'
+import Spinner from '@/components/custom/spinner'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -13,8 +12,6 @@ import {
   FormItem,
   FormLabel,
 } from '@/components/ui/form'
-
-import { addSkills } from '@/actions/skr/skills'
 import { SkillsSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/client'
 
@@ -23,19 +20,23 @@ interface Props<S = Record<string, string>> {
   form: UseFormReturn<z.infer<typeof SkillsSchema>>
   skills: S[]
   setSkills: React.Dispatch<React.SetStateAction<S[]>>
+  onSubmit: () => void
 }
+
 export function SkillsForm({
   selectedCategory,
   form,
   skills,
   setSkills,
+  onSubmit,
 }: Props) {
   const supabase = createClient()
-
-  const [error, setError] = useState<string | undefined>('')
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     if (!selectedCategory) return
+
+    setLoading(true)
 
     supabase
       .from('skills')
@@ -43,8 +44,8 @@ export function SkillsForm({
       .eq('skill_category_id', selectedCategory)
       .then(({ data }) => {
         setSkills(data!)
+        setLoading(false)
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory])
 
   function addSkill(
@@ -63,78 +64,55 @@ export function SkillsForm({
     )
   }
 
-  const [isPending, startTransition] = useTransition()
-
-  const onSubmit = () => {
-    startTransition(() => {
-      addSkills({ ...form.getValues() }).then((data) => {
-        if (data?.error) return setError(data?.error)
-      })
-    })
-  }
-
   return (
-    <>
-      <Card className="border">
-        <CardHeader>
-          <CardTitle className="text-lg">Select skills</CardTitle>
-        </CardHeader>
-        <Form {...form}>
-          <form
-            id="skills-form"
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-          >
-            <CardContent className="space-y-4">
-              {!!(skills && skills.length) &&
-                skills.map((skill) => (
-                  <FormField
-                    key={skill.id}
-                    control={form.control}
-                    name="skillIds"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row space-x-2 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value.includes(skill.id)}
-                            onCheckedChange={(checked) => {
-                              checked
-                                ? addSkill(field, skill)
-                                : removeSkill(field, skill)
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="cursor-pointer">
-                          {skill.name}
-                        </FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              {!selectedCategory && (
-                <p className="text-sm text-slate-500">
-                  Select a category to see available skills
-                </p>
-              )}
-              {selectedCategory && !skills.length && (
-                <p className="text-sm text-slate-500">
-                  This category has no skills yet.
-                </p>
-              )}
-            </CardContent>
-            <FormError message={error} />
-            {/* <FormSuccess message={success} /> */}
-          </form>
-          <Button
-            form="skills-form"
-            type="submit"
-            disabled={isPending}
-            className="w-max absolute -bottom-16 right-0"
-          >
-            Proceed
-          </Button>
-        </Form>
-      </Card>
-    </>
+    <Card className="border">
+      <CardHeader>
+        <CardTitle className="text-lg">2. Select skills</CardTitle>
+      </CardHeader>
+      <Form {...form}>
+        <form
+          id="skills-form"
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
+          <CardContent className="space-y-4">
+            {loading ? (
+              <Spinner size="sm" />
+            ) : skills.length > 0 ? (
+              skills.map((skill) => (
+                <FormField
+                  key={skill.id}
+                  control={form.control}
+                  name="skillIds"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value.includes(skill.id)}
+                          onCheckedChange={(checked) => {
+                            checked
+                              ? addSkill(field, skill)
+                              : removeSkill(field, skill)
+                          }}
+                        />
+                      </FormControl>
+                      <FormLabel className="cursor-pointer">
+                        {skill.name}
+                      </FormLabel>
+                    </FormItem>
+                  )}
+                />
+              ))
+            ) : (
+              <p className="text-sm text-slate-500">
+                {selectedCategory
+                  ? 'No skills available in this category'
+                  : 'Select a category to view skills'}
+              </p>
+            )}
+          </CardContent>
+        </form>
+      </Form>
+    </Card>
   )
 }
