@@ -13,11 +13,14 @@ import { SkillsForm } from '@/components/custom/skills/skills-form'
 import { Button } from '@/components/ui/button'
 import { SkillsSchema } from '@/lib/schema'
 import { cn } from '@/lib/utils' // utility for conditionally applying classNames
+import { useAuthStore } from '@/store/AuthStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 export default function UserSetupPage() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [skills, setSkills] = useState<Record<string, string>[]>([])
+  const refetchProfile = useAuthStore((state) => state.refetchProfile)
+  const user = useAuthStore((state) => state.user)
 
   const form = useForm<z.infer<typeof SkillsSchema>>({
     resolver: zodResolver(SkillsSchema),
@@ -33,7 +36,11 @@ export default function UserSetupPage() {
   const onSubmit = () => {
     startTransition(() => {
       addSkills({ ...form.getValues() }).then((data) => {
-        if (data?.error) return setError(data?.error)
+        if (data?.error) {
+          setError(data?.error)
+        } else {
+          refetchProfile(String(user?.id || ''))
+        }
       })
     })
   }

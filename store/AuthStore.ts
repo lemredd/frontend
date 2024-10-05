@@ -1,3 +1,4 @@
+import { fetchProfile } from '@/actions/fetchProfile'
 import { login } from '@/actions/login'
 import { logout } from '@/actions/logout'
 import { resendEmail } from '@/actions/resend'
@@ -22,7 +23,9 @@ interface AuthState {
   resend: (email: string) => Promise<void>
   setIsLoading: (isLoading: boolean) => void
   setUser: (user: any) => void
+  setProfile: (profile: Profile | null) => void
   setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) => void
+  refetchProfile: (user_id: string) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -35,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       setIsLoading: (isLoading: boolean) => set({ isLoading }),
       setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setProfile: (profile) => set({ profile }),
       setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) =>
         set({ role_code }),
       login: async (values: { email: string; password: string }) => {
@@ -77,6 +81,20 @@ export const useAuthStore = create<AuthState>()(
           const { error } = await response
           throw new Error(error)
         }
+      },
+      refetchProfile: async (user_id: string) => {
+        const response = await fetchProfile(user_id)
+
+        if (response.error) {
+          const { error } = await response
+          throw new Error(error)
+        }
+
+        const { data } = await response
+
+        set({
+          profile: data as Profile,
+        })
       },
     }),
     {
