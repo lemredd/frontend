@@ -21,7 +21,9 @@ export function ApplicantListItem({ applicant }: Props) {
   function approve() {
     startTransition(() => {
       approveApplicant({ job_applicant_id: applicant.id }).then(({ error }) => {
-        if (error) console.error(error)
+        if (error) return console.error(error)
+
+        location.reload()
       })
     })
   }
