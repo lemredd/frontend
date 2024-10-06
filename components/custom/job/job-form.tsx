@@ -196,7 +196,6 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
 }
 
 function SkillsField({ form, setStep }: PartialFieldsProps) {
-  // TODO: make and use `Autocomplete` component to search skills
   const supabase = createClient()
   const [skills, setSkills] = useState<ComboboxItem[]>([])
   const [selectedSkills, setSelectedSkills] = useState<

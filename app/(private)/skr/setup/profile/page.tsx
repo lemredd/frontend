@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
@@ -13,8 +13,10 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ProfileDescriptionSchema } from '@/lib/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useAuthStore } from '@/store/AuthStore'
 
 export default function UserDescriptionPage() {
+  const { refreshUser } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string>()
   const form = useForm<z.infer<typeof ProfileDescriptionSchema>>({
@@ -24,6 +26,10 @@ export default function UserDescriptionPage() {
       longDescription: '',
     },
   })
+
+  // Refresh user from store. User is redirected to this page after confirming email
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => refreshUser(), [])
 
   function onSubmit() {
     startTransition(() => {
