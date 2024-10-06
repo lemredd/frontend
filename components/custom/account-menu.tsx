@@ -23,14 +23,17 @@ interface AccountMenuProps {
 
 export default function AccountMenu({ className }: AccountMenuProps) {
   const user = useAuthStore((state) => state.user) as User
-  const { first_name, last_name, email } = user?.user_metadata || {}
+  const profile = useAuthStore((state) => state.profile)
+  const { first_name, last_name, email, role_code } = user?.user_metadata || {}
 
   const fullName = `${first_name ?? ''} ${last_name ?? ''}`.trim()
   const avatarFallback = `${getInitialLetter(first_name)}${getInitialLetter(
     last_name,
   )}`
 
-  const dropdownItems = [{ label: 'Profile', href: '#' }]
+  const dropdownItems = [
+    { label: 'Profile', href: `/${role_code.toLowerCase()}/profile/` },
+  ]
 
   return (
     <DropdownMenu>
@@ -41,6 +44,7 @@ export default function AccountMenu({ className }: AccountMenuProps) {
           className={cn('relative rounded-full', className)}
         >
           <Avatar className="size-full">
+            {/* TODO: ADD AVATAR IMAGE */}
             <AvatarImage
               src="#"
               alt="avatar"
@@ -71,7 +75,12 @@ export default function AccountMenu({ className }: AccountMenuProps) {
               key={index}
               className="cursor-pointer"
             >
-              <Link href={item.href}>{item.label}</Link>
+              <Link
+                href={item.href}
+                className="w-full"
+              >
+                {item.label}
+              </Link>
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
