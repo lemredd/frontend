@@ -1,9 +1,8 @@
 import { Avatar } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Chip } from "@/components/ui/chip"
 import { useAuthStore } from "@/store/AuthStore"
 import { AvatarImage } from "@radix-ui/react-avatar"
-import { Edit, MapPin, Share2, Star } from "lucide-react"
+import { Edit, Share2, Star } from "lucide-react"
 import { CollapsibleDesc } from "@/components/custom/collapsible-desc"
 import {
   Dialog,
@@ -11,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { EditForm } from "./edit-form"
-
+import { EditAddressForm } from "./edit-address-form"
 
 export function OwnProfileHeader() {
   const { profile } = useAuthStore()
@@ -36,11 +35,7 @@ export function OwnProfileHeader() {
         </div>
         <h2 className="text-lg font-bold">{profile?.short_desc}</h2>
         <div className="flex gap-x-2 items-center">
-          <Chip
-            beforeContent={<MapPin size={16} />}
-            content="foo"
-            className="w-max"
-          />
+          <EditAddressForm address={profile?.addresses[0]} />
           <span className="font-bold">·</span>
           <span>Joined {joinedDate}</span>
         </div>
