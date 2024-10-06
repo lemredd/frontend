@@ -52,7 +52,7 @@ export function Navbar() {
         filter: 'url(#goo)', // Apply liquid effect
       }}
       layout
-      className="h-7 flex"
+      className="h-7 flex flex-col md:flex-row gap-2"
     >
       {user && !profile?.is_completed
         ? null
