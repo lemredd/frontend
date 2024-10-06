@@ -42,8 +42,8 @@ export const useAuthStore = create<AuthState>()(
       setIsLoading: (isLoading: boolean) => set({ isLoading }),
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       refreshUser: () => {
-        refreshUser().then(({ user }) =>
-          set({ user, isAuthenticated: !!user }))
+        refreshUser().then(({ user, profile }) =>
+          set({ user, profile, isAuthenticated: !!user }))
       },
       setProfile: (profile) => set({ profile }),
       setRoleCode: (role_code: 'SKR' | 'PDR' | 'ADMIN' | undefined) =>
