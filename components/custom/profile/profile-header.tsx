@@ -1,3 +1,5 @@
+"use client"
+
 import { Avatar } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/store/AuthStore"
@@ -11,6 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { EditForm } from "./edit-form"
 import { EditAddressForm } from "./edit-address-form"
+import { VerificationList } from "./verification-list"
 
 export function OwnProfileHeader() {
   const { profile } = useAuthStore()
@@ -53,6 +56,7 @@ export function OwnProfileHeader() {
             </DialogContent>
           </Dialog>
         </div>
+        <VerificationList />
       </section>
     </header>
   )
