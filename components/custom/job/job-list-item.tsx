@@ -1,35 +1,16 @@
+import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
-import { formatDescription, getRecency } from '@/lib/utils'
-import { MapPin } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { getRecency } from '@/lib/utils'
+import { Clock, MapPin, PhilippinePesoIcon } from 'lucide-react'
+import Link from 'next/link'
 
 interface Props {
   job: Record<string, string>
 }
 
 export default function JobListItem({ job }: Props) {
-  const [collapsed, setCollapsed] = useState(true)
-  const [isOverflowing, setIsOverflowing] = useState(false)
-  const descriptionRef = useRef<HTMLParagraphElement>(null)
-
-  // Check if the text content overflows
-  useEffect(() => {
-    const element = descriptionRef.current
-    if (element) {
-      setIsOverflowing(element.scrollHeight > element.clientHeight)
-    }
-  }, [job.description])
-
-  const descriptionClassName = () =>
-    `whitespace-pre-line ${collapsed ? 'line-clamp-3' : ''}`
-
   function getAddress({ province, city_muni, barangay }: Props['job']) {
     let address = ''
     if (barangay) address += `${barangay}, `
@@ -40,47 +21,56 @@ export default function JobListItem({ job }: Props) {
   }
 
   return (
-    <Card className="shadow-none border rounded-lg hover:shadow-md transition-all bg-transparent max-w-4xl mx-auto">
-      <CardHeader className="pb-3 flex flex-col items-start space-y-4">
-        <a
-          href={`${job.id}`}
-          className="no-underline"
-        >
-          <h3 className="text-xl font-bold  hover:text-primary transition-colors">
+    <Card className="bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border border-gray-700 rounded-lg hover:shadow-2xl transition-shadow duration-300 max-w-4xl mx-auto p-6 space-y-6">
+      {/* Job Header */}
+      <CardHeader className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div className="space-y-1">
+          <h3 className="text-3xl font-extrabold text-white hover:text-primary transition-colors duration-200 ease-in-out">
             {job.name}
           </h3>
-        </a>
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Clock
+              size={18}
+              className="text-gray-500"
+            />
+            <span>Posted {getRecency(job.created_at)}</span>
+          </div>
+        </div>
+
+        {/* Job Location */}
         <Chip
-          beforeContent={<MapPin size={16} />}
+          beforeContent={<MapPin size={18} />}
           content={getAddress(job)}
-          className="w-max mt-2 bg-primary/10 text-primary text-sm rounded-full px-3 py-1 shadow-sm"
-          contentClassName="max-w-[unset]"
+          className="bg-primary text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+          contentClassName="whitespace-nowrap max-w-[unset]"
         />
       </CardHeader>
-      <CardContent className="space-y-4">
-        <CardDescription
-          ref={descriptionRef}
-          className={descriptionClassName() + ' text-gray-600 leading-relaxed'}
-          dangerouslySetInnerHTML={{
-            __html: formatDescription(job.description as string),
-          }}
+
+      {/* Job Content */}
+      <CardContent className="space-y-4 ">
+        <CollapsibleDesc
+          content={job.description as string}
+          className="leading-relaxed text-gray-300"
         />
-        {isOverflowing && (
-          <Button
-            variant="link"
-            className="text-primary font-medium hover:underline p-0 !mt-2"
-            onClick={() => setCollapsed(!collapsed)}
-          >
-            See {collapsed ? 'more' : 'less'}
+
+        {/* Job Footer */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          <div className="flex items-center gap-4 text-2xl font-semibold text-white">
+            <PhilippinePesoIcon
+              size={22}
+              className="text-green-400"
+            />
+            <span>PHP {Number(job.price).toFixed(2)}</span>
+          </div>
+
+          <Button asChild>
+            <Link
+              href={`${job.id}`}
+              className="no-underline"
+            >
+              View
+            </Link>
           </Button>
-        )}
-        <div className="flex items-center justify-between pt-4">
-          <p className="text-lg font-semibold text-primary">
-            PHP {Number(job.price).toFixed(2)}
-          </p>
-          <small className="text-gray-500">
-            Posted {getRecency(job.created_at)}
-          </small>
         </div>
       </CardContent>
     </Card>
