@@ -1,7 +1,7 @@
 import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
+import SecondBrain from '@/components/ui/second-brain'
 import { getRecency } from '@/lib/utils'
 import { Clock, MapPin, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -21,16 +21,14 @@ export default function JobListItem({ job }: Props) {
   }
 
   return (
-    <Card className="bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border border-gray-700 rounded-lg hover:shadow-2xl transition-shadow duration-300 max-w-4xl mx-auto p-6 space-y-6">
+    <Card className="bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto p-6 space-y-6 ">
       {/* Job Header */}
       <CardHeader className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="space-y-1">
-          <h3 className="text-3xl font-extrabold text-white hover:text-primary transition-colors duration-200 ease-in-out">
-            {job.name}
-          </h3>
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <h3 className="text-3xl font-extrabold text-white ">{job.name}</h3>
+          <div className="flex items-center gap-2 text-xs text-gray-400">
             <Clock
-              size={18}
+              size={16}
               className="text-gray-500"
             />
             <span>Posted {getRecency(job.created_at)}</span>
@@ -63,14 +61,14 @@ export default function JobListItem({ job }: Props) {
             <span>PHP {Number(job.price).toFixed(2)}</span>
           </div>
 
-          <Button asChild>
+          <SecondBrain size="sm">
             <Link
               href={`${job.id}`}
-              className="no-underline"
+              className="text-white"
             >
-              View
+              View Details
             </Link>
-          </Button>
+          </SecondBrain>
         </div>
       </CardContent>
     </Card>

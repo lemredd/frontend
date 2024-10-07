@@ -20,7 +20,7 @@ const Hero = () => {
           Whether you need help or want to offer your expertise, our platform is
           designed for you.
         </p>
-        <SecondBrain>
+        <SecondBrain withSparkles>
           <Link href="/auth/join">Get Started</Link>
         </SecondBrain>
       </div>
