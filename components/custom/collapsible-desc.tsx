@@ -1,26 +1,50 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
+import { CardDescription } from '@/components/ui/card'
+import { cn, formatDescription } from '@/lib/utils'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
+  className?: string
   content: React.ReactNode
 }
 
-export function CollapsibleDesc({ content }: Props) {
+export function CollapsibleDesc({ className, content }: Props) {
   const [collapsed, setCollapsed] = useState(true)
-  const descriptionClassName = () => (
-    `whitespace-pre-line ${collapsed
-      ? 'line-clamp-3'
-      : 'line-clamp-0'}
-    `
-  )
+  const [isOverflowing, setIsOverflowing] = useState(false)
+  const descriptionRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    const element = descriptionRef.current
+    if (element) {
+      setIsOverflowing(element.scrollHeight > element.clientHeight)
+    }
+  }, [content])
 
   return (
-    <div>
-      <p className={descriptionClassName()}>{content}</p>
-      <Button variant="link" className="p-0 -mt-2" onClick={() => setCollapsed(!collapsed)}>See {collapsed ? 'more' : 'less'}</Button>
-    </div>
+    <>
+      <CardDescription
+        ref={descriptionRef}
+        className={cn(
+          `whitespace-pre-line leading-relaxed text-gray-600 transition-all duration-300 ${
+            collapsed ? 'line-clamp-3' : 'line-clamp-none'
+          }`,
+          className,
+        )}
+        dangerouslySetInnerHTML={{
+          __html: formatDescription(content as string),
+        }}
+      />
+      {isOverflowing && (
+        <Button
+          variant="link"
+          className="text-primary font-medium hover:underline p-0 mt-2"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          See {collapsed ? 'more' : 'less'}
+        </Button>
+      )}
+    </>
   )
 }

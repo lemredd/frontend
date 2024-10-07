@@ -1,23 +1,30 @@
-import { User } from "@supabase/supabase-js"
-import { Phone, Mail } from "lucide-react"
+import { User } from '@supabase/supabase-js'
+import { Mail, Phone } from 'lucide-react'
 
-import { Button } from "@/components/ui/button"
-import { useAuthStore } from "@/store/AuthStore"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { useAuthStore } from '@/store/AuthStore'
 
 const VERIFICATIONS = [
   {
-    name: "Phone",
+    name: 'Phone',
     icon: Phone,
-    check: (user: User | null) => !!user && !!user.phone && !!user.phone_confirmed_at,
-    get: (user: User | null) => user?.phone || "Unverified",
+    check: (user: User | null) =>
+      !!user && !!user.phone && !!user.phone_confirmed_at,
+    get: (user: User | null) => user?.phone || 'Unverified',
   },
   {
-    name: "Email",
+    name: 'Email',
     icon: Mail,
-    check: (user: User | null) => !!user && !!user.email && !!user.email_confirmed_at,
-    get: (user: User | null) => user?.email || "Unverified",
+    check: (user: User | null) =>
+      !!user && !!user.email && !!user.email_confirmed_at,
+    get: (user: User | null) => user?.email || 'Unverified',
   },
 ]
 
@@ -25,24 +32,48 @@ export function VerificationList() {
   const { user } = useAuthStore()
 
   return (
-    <Card className="row-span-4 h-max">
-      <CardHeader>
-        <h3>Verifications</h3>
+    <Card className="shadow-lg rounded-md">
+      <CardHeader className="pb-4">
+        <h3 className="text-lg font-semibold">Account Verifications</h3>
+        <p className="text-sm text-muted-foreground">
+          Verify your account for additional security
+        </p>
       </CardHeader>
-      <CardContent>
-        <ul className="flex gap-x-2 items-center">
-          {VERIFICATIONS.map(verification => (
-            <li key={verification.name as string}>
+      <CardContent className="space-y-4">
+        <ul className="space-y-4">
+          {VERIFICATIONS.map((verification) => (
+            <li
+              key={verification.name}
+              className="flex items-center justify-between"
+            >
+              <div className="flex items-center gap-x-3">
+                <verification.icon
+                  className={`w-6 h-6 ${
+                    verification.check(user)
+                      ? 'text-green-500'
+                      : 'text-gray-400'
+                  }`}
+                />
+                <span className="text-base font-medium">
+                  {verification.name}
+                </span>
+              </div>
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <verification.icon color={verification.check(user) ? "green" : "gray"} />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={`${
+                        verification.check(user)
+                          ? 'border-green-500'
+                          : 'border-gray-400'
+                      }`}
+                    >
+                      {verification.check(user) ? 'Verified' : 'Unverified'}
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>
-                    {verification.get(user)}
-                  </TooltipContent>
+                  <TooltipContent>{verification.get(user)}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </li>
