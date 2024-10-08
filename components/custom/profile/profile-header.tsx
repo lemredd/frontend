@@ -72,7 +72,7 @@ export function OwnProfileHeader() {
             <h2 className="text-lg sm:text-xl font-semibold text-primary">
               {profile?.short_desc || 'No short description available'}
             </h2>
-            <EditAddressForm address={profile?.addresses[0]} />
+            <EditAddressForm address={profile?.addresses?.[0] || null} />
             <div className="text-gray-500 text-sm">
               <span>Joined {joinedDate}</span>
             </div>
