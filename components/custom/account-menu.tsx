@@ -23,7 +23,7 @@ interface AccountMenuProps {
 
 export default function AccountMenu({ className }: AccountMenuProps) {
   const user = useAuthStore((state) => state.user) as User
-  const profile = useAuthStore((state) => state.profile)
+  // const profile = useAuthStore((state) => state.profile)
   const { first_name, last_name, email, role_code } = user?.user_metadata || {}
 
   const fullName = `${first_name ?? ''} ${last_name ?? ''}`.trim()

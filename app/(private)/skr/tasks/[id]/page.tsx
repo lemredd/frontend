@@ -12,7 +12,6 @@ import {
 import { formatDescription, getRecency } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/client'
 import { Clock } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
 
 interface Props {
@@ -23,7 +22,6 @@ export default function JobDetailsPage({ params: { id } }: Props) {
   const [isPending, startTransition] = useTransition()
   const supabase = createClient()
   const [job, setJob] = useState<Record<string, unknown>>()
-  const router = useRouter()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -64,15 +62,16 @@ export default function JobDetailsPage({ params: { id } }: Props) {
     })
   }, [id])
 
-  const getAddress = (job: Record<string, any>) => {
-    const { province, city_muni, barangay } = job
-    let address = ''
-    if (barangay) address += `${barangay}, `
-    if (city_muni) address += `${city_muni}, `
-    if (province) address += `${province}`
+  // TODO: USE GET ADDRESS
+  // const getAddress = (job: Record<string, string>) => {
+  //   const { province, city_muni, barangay } = job
+  //   let address = ''
+  //   if (barangay) address += `${barangay}, `
+  //   if (city_muni) address += `${city_muni}, `
+  //   if (province) address += `${province}`
 
-    return address
-  }
+  //   return address
+  // }
 
   if (loading) {
     return <Spinner />

@@ -1,7 +1,9 @@
+import { IconType } from 'react-icons/lib'
+
 export type UserRole = 'SKR' | 'PDR' | 'ADMIN' | undefined
 
 export type TNavbarRoute = {
-  icon?: any
+  icon?: IconType
   label: string
   path: string
 }

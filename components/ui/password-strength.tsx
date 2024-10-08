@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { motion, useAnimationControls } from 'framer-motion'
 import { LucideEye, LucideEyeOff } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { z } from 'zod'
+import { z, ZodError } from 'zod'
 
 // Zod schema for password validation, now including uppercase letter check
 const passwordSchema = z
@@ -17,7 +17,7 @@ const passwordSchema = z
   .regex(/[\W_]/, 'Password must contain at least one special character')
 
 const PasswordStrength = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, value, onChange, placeholder, ...props }, ref) => {
+  ({ value, onChange, placeholder, ...props }, ref) => {
     const [inputValue, setInputValue] = useState<string>(
       typeof value === 'string' ? value : '',
     )
@@ -55,8 +55,12 @@ const PasswordStrength = React.forwardRef<HTMLInputElement, InputProps>(
       try {
         passwordSchema.parse(inputValue)
         setValidationError(null)
-      } catch (err: any) {
-        setValidationError(err.errors[0].message)
+      } catch (err: unknown) {
+        if (err instanceof ZodError) {
+          setValidationError(err.errors[0].message)
+        } else {
+          setValidationError('An unexpected error occurred')
+        }
       }
 
       if (progress === 100 && !hasScaled) {
@@ -121,5 +125,7 @@ const PasswordStrength = React.forwardRef<HTMLInputElement, InputProps>(
     )
   },
 )
+
+PasswordStrength.displayName = 'PasswordStrength'
 
 export default PasswordStrength
