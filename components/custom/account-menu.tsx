@@ -85,7 +85,7 @@ export default function AccountMenu({ className }: AccountMenuProps) {
           ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem className="p-0">
           <Logout className="w-full" />
         </DropdownMenuItem>
       </DropdownMenuContent>
