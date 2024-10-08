@@ -49,9 +49,9 @@ export function OwnProfileHeader() {
               <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
                 {profile?.first_name} {profile?.last_name}
               </h1>
-              <span className="text-md text-gray-500">
+              {/* <span className="text-md text-gray-500">
                 @{profile?.username}
-              </span>
+              </span> */}
             </div>
             {/* Rating Section */}
             <div className="flex justify-center sm:justify-start items-center space-x-2 mt-3">
