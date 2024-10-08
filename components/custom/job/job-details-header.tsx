@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuthStore } from '@/store/AuthStore'
 import { useJobStore } from '@/store/JobStore'
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu'
-import { Bookmark, PhilippinePesoIcon, Share2 } from 'lucide-react'
+import { Bookmark, Clock, PhilippinePesoIcon, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dialog'
 import SecondBrain from '@/components/ui/second-brain'
 import { Textarea } from '@/components/ui/textarea'
+import { getRecency } from '@/lib/utils'
 
 export function ProviderJobDetailsHeader() {
   const { job, isOwned } = useJobStore()
@@ -137,22 +138,34 @@ export default function JobDetailsHeader({ job }: Props) {
   }
 
   return (
-    <header className="grid grid-flow-col grid-cols-2 grid-rows-2">
-      <h1 className="text-3xl font-extrabold capitalize">
-        {job?.name as string}
-      </h1>
+    <header className="w-full flex flex-col sm:flex-row  justify-center sm:justify-between items-center gap-2 text-center">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-extrabold capitalize">
+          {job?.name as string}
+        </h1>
 
-      <div className="flex items-center gap-4 text-2xl font-semibold">
-        <PhilippinePesoIcon
-          size={22}
-          className="text-green-400"
-        />
-        <span>{Number(job.price).toFixed(2)}</span>
+        <div className="flex items-center gap-2 justify-center sm:justify-start text-2xl font-semibold ">
+          <PhilippinePesoIcon
+            size={22}
+            className="text-green-400"
+          />
+          <span>{Number(job.price).toFixed(2)}</span>
+        </div>
+
+        <div className="text-sm dark:text-gray-400 sm:hidden items-center gap-2 flex">
+          <Clock
+            size={18}
+            className="dark:text-gray-500"
+          />
+          <span>Posted {getRecency(job.created_at as string)}</span>
+        </div>
       </div>
 
-      <div className="row-span-2 self-center items-center justify-end flex gap-x-2">
-        <Share2 />
-        <Bookmark />
+      <div className="items-center flex flex-col sm:flex-row gap-2">
+        <div className="sm:flex gap-2 hidden">
+          <Share2 />
+          <Bookmark />
+        </div>
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
