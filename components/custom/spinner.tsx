@@ -15,12 +15,12 @@ function Spinner({ size = 'md' }: SpinnerProps) {
   return (
     <div
       role="status"
-      className="flex justify-center my-5"
+      className="flex justify-center items-center"
     >
       <svg
         aria-hidden="true"
         className={cn(
-          'mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 dark:fill-white',
+          'text-gray-200 animate-spin dark:text-gray-600 fill-blue-600 dark:fill-white',
           spinnerSizeVariants[size],
         )}
         viewBox="0 0 100 101"

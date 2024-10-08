@@ -21,15 +21,15 @@ export default function JobListItem({ job }: Props) {
   }
 
   return (
-    <Card className="bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto p-6 space-y-6 ">
+    <Card className="bg-white dark:bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border dark:border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto space-y-6 ">
       {/* Job Header */}
       <CardHeader className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="space-y-1">
-          <h3 className="text-3xl font-extrabold text-white ">{job.name}</h3>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <h3 className="text-3xl font-extrabold ">{job.name}</h3>
+          <div className="flex items-center gap-2 text-xs dark:text-gray-400">
             <Clock
               size={16}
-              className="text-gray-500"
+              className="dark:text-gray-500"
             />
             <span>Posted {getRecency(job.created_at)}</span>
           </div>
@@ -48,12 +48,12 @@ export default function JobListItem({ job }: Props) {
       <CardContent className="space-y-4 ">
         <CollapsibleDesc
           content={job.description as string}
-          className="leading-relaxed text-gray-300"
+          className="leading-relaxed dark:text-gray-300"
         />
 
         {/* Job Footer */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-          <div className="flex items-center gap-4 text-2xl font-semibold text-white">
+          <div className="flex items-center gap-4 text-2xl font-semibold">
             <PhilippinePesoIcon
               size={22}
               className="text-green-400"

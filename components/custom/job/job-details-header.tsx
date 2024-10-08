@@ -28,7 +28,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import SecondBrain from '@/components/ui/second-brain'
 import { Textarea } from '@/components/ui/textarea'
 import { getRecency } from '@/lib/utils'
 
@@ -138,7 +137,7 @@ export default function JobDetailsHeader({ job }: Props) {
   }
 
   return (
-    <header className="w-full flex flex-col sm:flex-row  justify-center sm:justify-between items-center gap-2 text-center">
+    <header className="w-full flex flex-col sm:flex-row  justify-center sm:justify-between items-center gap-2 text-center sm:text-left">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-extrabold capitalize">
           {job?.name as string}
@@ -169,14 +168,10 @@ export default function JobDetailsHeader({ job }: Props) {
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
-              {/* Show loader if pending */}
-              <SecondBrain size="sm">
-                {isPending ? (
-                  <Spinner size="sm" /> // Loading spinner
-                ) : (
-                  'Apply Now'
-                )}
-              </SecondBrain>
+              <Button>
+                {/* Show loader if pending */}
+                {isPending ? <Spinner size="sm" /> : 'Apply Now'}
+              </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -189,6 +184,7 @@ export default function JobDetailsHeader({ job }: Props) {
               <div className="grid gap-4 py-4">
                 <Textarea
                   value={proposal}
+                  className="resize-none"
                   onChange={(e) => setProposal(e.target.value)}
                 />
               </div>
