@@ -58,7 +58,7 @@ export default function JobListItem({ job }: Props) {
               size={22}
               className="text-green-400"
             />
-            <span>PHP {Number(job.price).toFixed(2)}</span>
+            <span>{Number(job.price).toFixed(2)}</span>
           </div>
 
           <SecondBrain size="sm">
