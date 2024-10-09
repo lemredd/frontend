@@ -20,10 +20,10 @@ export default function SeekerTaskSearchBar() {
 
   return (
     <form
-      className="w-full flex flex-col md:flex-row items-center justify-center gap-y-2"
+      className="w-full flex flex-col md:flex-row items-center justify-center gap-y-2 max-w-4xl mx-auto"
       onSubmit={search}
     >
-      <div className="flex items-center border md:border-r-0 md:rounded-l-md py-2 px-4 gap-x-2 w-full sm:w-auto">
+      <div className="flex items-center border md:border-r-0 md:rounded-l-md py-2 px-4 gap-x-2 w-full">
         <Search />
         <input
           defaultValue={searchParams.get('search') ?? ''}
@@ -32,7 +32,7 @@ export default function SeekerTaskSearchBar() {
           className="focus:ring-0 focus:outline-none w-full bg-transparent"
         />
       </div>
-      <div className="flex items-center border md:border-r-0 py-2 px-4 gap-x-2 w-full sm:w-auto">
+      <div className="flex items-center border md:border-r-0 py-2 px-4 gap-x-2 w-full">
         <MapPin />
         <input
           defaultValue={searchParams.get('location') ?? ''}
@@ -44,7 +44,7 @@ export default function SeekerTaskSearchBar() {
 
       <Button
         size="lg"
-        className="md:rounded-[unset] md:rounded-r-md w-full sm:w-auto"
+        className="md:rounded-[unset] md:rounded-r-md w-full md:flex-1"
       >
         Search
       </Button>
