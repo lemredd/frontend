@@ -40,7 +40,6 @@ const Breadcrumb = () => {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery('(min-width: 768px)')
 
-  console.log(user)
   return (
     <BCrumb>
       <BreadcrumbList>

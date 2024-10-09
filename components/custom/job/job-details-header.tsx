@@ -168,8 +168,7 @@ export default function JobDetailsHeader({ job }: Props) {
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
-              <Button>
-                {/* Show loader if pending */}
+              <Button disabled={isPending}>
                 {isPending ? <Spinner size="sm" /> : 'Apply Now'}
               </Button>
             </DialogTrigger>

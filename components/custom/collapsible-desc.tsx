@@ -7,10 +7,15 @@ import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   className?: string
+  buttonClassName?: string
   content: React.ReactNode
 }
 
-export function CollapsibleDesc({ className, content }: Props) {
+export function CollapsibleDesc({
+  className,
+  buttonClassName,
+  content,
+}: Props) {
   const [collapsed, setCollapsed] = useState(true)
   const [isOverflowing, setIsOverflowing] = useState(false)
   const descriptionRef = useRef<HTMLParagraphElement>(null)
@@ -28,7 +33,7 @@ export function CollapsibleDesc({ className, content }: Props) {
         ref={descriptionRef}
         className={cn(
           `whitespace-pre-line leading-relaxed text-gray-600 transition-all duration-300 ${
-            collapsed ? 'line-clamp-3' : 'line-clamp-none'
+            collapsed ? 'line-clamp-3' : ''
           }`,
           className,
         )}
@@ -39,7 +44,10 @@ export function CollapsibleDesc({ className, content }: Props) {
       {isOverflowing && (
         <Button
           variant="link"
-          className="text-primary font-medium hover:underline p-0 mt-2"
+          className={cn(
+            'text-primary font-medium hover:underline p-0 mt-2',
+            buttonClassName,
+          )}
           onClick={() => setCollapsed(!collapsed)}
         >
           See {collapsed ? 'more' : 'less'}
