@@ -42,3 +42,18 @@ export const formatDescription = (description: string) => {
     '<strong className="text-lg">$1</strong>',
   )
 }
+
+export function getAddress(job: Record<string, unknown>) {
+  const { province, city_muni, barangay } = job as {
+    province: string
+    city_muni: string
+    barangay: string
+  }
+
+  let address = ''
+  if (barangay) address += `${barangay}, `
+  if (city_muni) address += `${city_muni}, `
+  if (province) address += `${province}`
+
+  return address
+}

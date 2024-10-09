@@ -2,7 +2,7 @@ import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import SecondBrain from '@/components/ui/second-brain'
-import { getRecency } from '@/lib/utils'
+import { getAddress, getRecency } from '@/lib/utils'
 import { Clock, MapPin, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
 
@@ -11,15 +11,6 @@ interface Props {
 }
 
 export default function JobListItem({ job }: Props) {
-  function getAddress({ province, city_muni, barangay }: Props['job']) {
-    let address = ''
-    if (barangay) address += `${barangay}, `
-    if (city_muni) address += `${city_muni}, `
-    if (province) address += `${province}`
-
-    return address
-  }
-
   return (
     <Card className="bg-white dark:bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border dark:border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto space-y-6 ">
       {/* Job Header */}
@@ -40,7 +31,7 @@ export default function JobListItem({ job }: Props) {
           beforeContent={<MapPin size={18} />}
           content={getAddress(job)}
           className="bg-primary text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-          contentClassName="whitespace-nowrap max-w-[unset]"
+          contentClassName="max-w-[unset]"
         />
       </CardHeader>
 
