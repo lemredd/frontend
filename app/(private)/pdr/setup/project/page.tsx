@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useEffect } from 'react'
 
@@ -24,7 +24,8 @@ export default function ProviderSetupPage() {
       <Card className="w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-3xl font-light">
-            Tell us what needs to be <strong className='font-bold'>done.</strong>
+            Tell us what needs to be{' '}
+            <strong className="font-bold">done.</strong>
           </CardTitle>
           <CardDescription>
             {"We'll"} guide you to create the perfect brief. The more detail the

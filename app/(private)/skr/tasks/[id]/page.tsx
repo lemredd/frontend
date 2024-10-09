@@ -1,5 +1,6 @@
 'use client'
 
+import Breadcrumb from '@/components/custom/breadcrumb'
 import JobDetailsHeader from '@/components/custom/job/job-details-header'
 import JobDetailsSkills from '@/components/custom/job/job-details-skills'
 import Spinner from '@/components/custom/spinner'
@@ -83,6 +84,7 @@ export default function JobDetailsPage({ params: { id } }: Props) {
 
   return (
     <section className="space-y-8 container mx-auto flex h-full min-h-screen flex-col px-6 2xl:px-0">
+      <Breadcrumb />
       <Card className="bg-white border-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-xl border dark:border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto py-3  min-w-2xl w-full">
         {!isPending && job && (
           <>
