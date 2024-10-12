@@ -72,7 +72,7 @@ export default function JobDetailsPage({ params: { id } }: Props) {
   }
 
   return (
-    <Card className="bg-white border-gray-300 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black shadow-xl border dark:border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 mx-auto w-full max-w-5xl">
+    <Card className="modern-card max-w-5xl">
       {!isPending && job && (
         <>
           <CardHeader className="space-y-4">

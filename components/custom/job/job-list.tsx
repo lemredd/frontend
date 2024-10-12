@@ -72,7 +72,7 @@ export default function JobList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="gap-4">
       {jobs.map((job) => (
         <JobListItem
           key={job.id}

@@ -34,8 +34,8 @@ export function ProviderHeader() {
 
   return (
     <>
-      <header className="flex items-center justify-between w-full max-w-4xl mx-auto">
-        <h2 className="text-2xl">Tasks</h2>
+      <header className="flex items-center justify-between w-full mx-auto">
+        <h2 className="text-2xl font-extrabold">Tasks</h2>
         <Button asChild>
           <Link
             className="flex gap-x-2"
@@ -46,14 +46,15 @@ export function ProviderHeader() {
           </Link>
         </Button>
       </header>
-      <section className="space-y-4 w-full max-w-4xl mx-auto">
+      <section className="flex flex-col md:flex-row md:items-center md:justify-between w-full gap-4  mx-auto">
         <Tabs
           defaultValue={searchParams.get('status') ?? 'open'}
-          className="w-[400px]"
+          className="w-full md:max-w-[400px]"
         >
-          <TabsList>
+          <TabsList className="w-full">
             {STATUSES.map((status) => (
               <TabsTrigger
+                className="flex-grow"
                 key={status}
                 value={status}
                 asChild
@@ -66,7 +67,7 @@ export function ProviderHeader() {
           </TabsList>
         </Tabs>
         <form
-          className="flex items-center w-full"
+          className="flex items-center max-w-xl"
           onSubmit={search}
         >
           <div className="flex-grow flex items-center border border-r-0 rounded-l-md py-2 px-4 gap-x-2">

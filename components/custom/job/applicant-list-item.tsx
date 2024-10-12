@@ -1,13 +1,14 @@
-"use client"
+'use client'
 
-import { MapPin } from "lucide-react"
-import { Chip } from "@/components/ui/chip"
-import { Button } from "@/components/ui/button"
-import { CollapsibleDesc } from "@/components/custom/collapsible-desc"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { useTransition } from "react"
-import { approveApplicant } from "@/actions/pdr/job"
-import { useJobStore } from "@/store/JobStore"
+import { approveApplicant } from '@/actions/pdr/job'
+import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
+import Spinner from '@/components/custom/spinner'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Chip } from '@/components/ui/chip'
+import { useJobStore } from '@/store/JobStore'
+import { MapPin } from 'lucide-react'
+import { useTransition } from 'react'
 
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,7 +30,7 @@ export function ApplicantListItem({ applicant }: Props) {
   }
 
   return (
-    <Card>
+    <Card className="modern-card">
       <CardHeader>
         <h3 className="text-lg font-bold">
           {/* TODO: link to seeker profile */}
@@ -38,7 +39,7 @@ export function ApplicantListItem({ applicant }: Props) {
         <p>{applicant.profiles.short_desc}</p>
         <Chip
           beforeContent={<MapPin size={16} />}
-          content={Object.values(applicant.profiles.addresses[0]).join(", ")}
+          content={Object.values(applicant.profiles.addresses[0]).join(', ')}
           className="w-max"
           contentClassName="max-w-[unset]"
         />
@@ -48,7 +49,13 @@ export function ApplicantListItem({ applicant }: Props) {
       </CardContent>
       {isJobOpen() && (
         <CardFooter className="justify-end">
-          <Button disabled={isPending} onClick={approve}>Approve</Button>
+          <Button
+            className="text-white bg-green-500 hover:bg-green-600 transition-colors duration-200"
+            disabled={isPending}
+            onClick={approve}
+          >
+            {isPending ? <Spinner size="xs" /> : 'Approve'}
+          </Button>
         </CardFooter>
       )}
     </Card>

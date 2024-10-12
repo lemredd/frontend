@@ -4,10 +4,8 @@ import { useMemo } from 'react'
 const roleCodes = ['admin', 'skr', 'pdr']
 
 // Check if the segment is a UUID
-const isUUID = (segment: string) =>
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-    segment,
-  )
+const isCombinationWithHyphen = (segment: string) =>
+  /[^\s-]+(-[^\s-]+)+/.test(segment)
 
 // Utility function to convert plural to singular
 const singularize = (word: string) => {
@@ -30,7 +28,7 @@ export const useBreadcrumb = () => {
       const href = '/' + pathArray.slice(0, index + 1).join('/')
 
       // Use the singularized name for UUID segments
-      const name = isUUID(path)
+      const name = isCombinationWithHyphen(path)
         ? singularize(pathArray[index - 1] || '') // Singularize the previous segment for UUID
         : path.charAt(0).toUpperCase() + path.slice(1) // Capitalize normal path segments
 

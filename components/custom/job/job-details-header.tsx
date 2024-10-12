@@ -3,16 +3,9 @@
 import { applyJob, checkJobApplication } from '@/actions/pdr/job'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuthStore } from '@/store/AuthStore'
 import { useJobStore } from '@/store/JobStore'
-import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu'
 import { Bookmark, Clock, PhilippinePesoIcon, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
@@ -32,7 +25,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { getRecency } from '@/lib/utils'
 
 export function ProviderJobDetailsHeader() {
-  const { job, isOwned } = useJobStore()
+  const { job, isOwned, setEditing } = useJobStore()
   const TABS = ['details', 'applicants']
   const { id } = useParams()
   const currentTab = usePathname().split('/').filter(Boolean).slice(-1)[0]
@@ -40,47 +33,38 @@ export function ProviderJobDetailsHeader() {
   const buildHref = (tab: string) =>
     `/pdr/tasks/${id}/${tab === 'details' ? '' : 'applicants'}`
 
+  if (!job) return null
+
   return (
-    <header className="grid grid-flow-row gap-4 grid-cols-[1fr_auto] grid-rows-2">
-      <h1 className="flex items-center gap-x-2 text-2xl font-semibold capitalize">
-        {job?.name as string}
+    <header className="flex flex-col gap-4 md:flex-row md:items-center justify-between">
+      {/* Job Title and Status */}
+      <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <h1 className="text-2xl font-extrabold capitalize flex items-center gap-x-2">
+          {job?.name as string}
+        </h1>
         <Chip
+          getStatusColor
           content={job?.status as string}
-          className="w-max"
+          className="w-max capitalize"
         />
-      </h1>
-      <h3 className="text-lg self-center">₱{job?.price as string} PHP</h3>
-      <div className="flex gap-x-4">
-        <Tabs defaultValue={TABS.find((tab) => tab === currentTab) || TABS[0]}>
-          <TabsList>
-            {TABS.map((tab) => (
-              <TabsTrigger
-                key={tab}
-                value={tab}
-                asChild
-              >
-                <Link href={buildHref(tab)}>
-                  <span className="capitalize">{tab}</span>
-                </Link>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary">...</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup className="px-2 py-1">
-              {isOwned && (
-                <DropdownMenuItem className="hover:outline-none px-2 hover:bg-rose-500 transition-colors rounded cursor-pointer">
-                  Delete
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue={TABS.find((tab) => tab === currentTab) || TABS[0]}>
+        <TabsList className="flex justify-start">
+          {TABS.map((tab) => (
+            <TabsTrigger
+              key={tab}
+              value={tab}
+              asChild
+            >
+              <Link href={buildHref(tab)}>
+                <span className="capitalize">{tab}</span>
+              </Link>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </header>
   )
 }

@@ -12,7 +12,7 @@ interface Props {
 
 export default function JobListItem({ job }: Props) {
   return (
-    <Card className="bg-white dark:bg-gradient-to-r from-gray-800 via-gray-900 to-black shadow-xl border dark:border-gray-700 rounded-lg hover:shadow-2xl transition duration-300 max-w-4xl mx-auto space-y-6 ">
+    <Card className="modern-card ">
       {/* Job Header */}
       <CardHeader className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="space-y-1">

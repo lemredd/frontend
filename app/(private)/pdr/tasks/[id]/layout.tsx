@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
+import { useEffect } from 'react'
 
-import { useJobStore } from "@/store/JobStore"
-import { useAuthStore } from "@/store/AuthStore"
-import { createClient } from "@/utils/supabase/client"
-import { ProviderJobDetailsHeader } from "@/components/custom/job/job-details-header"
+import { ProviderJobDetailsHeader } from '@/components/custom/job/job-details-header'
+import { useAuthStore } from '@/store/AuthStore'
+import { useJobStore } from '@/store/JobStore'
+import { createClient } from '@/utils/supabase/client'
 
 interface Props {
   children: React.ReactNode
@@ -15,7 +15,7 @@ interface Props {
 }
 export default function ProviderTaskDetailLayout({
   children,
-  params: { id }
+  params: { id },
 }: Props) {
   const supabase = createClient()
   const { profile } = useAuthStore()
@@ -24,18 +24,20 @@ export default function ProviderTaskDetailLayout({
   useEffect(() => {
     if (!profile) return
     supabase
-      .from("jobs")
-      .select<string, typeof job>(`
+      .from('jobs')
+      .select<string, typeof job>(
+        `
         *,
         job_skills (
           skills (id, name)
         )
-      `)
+      `,
+      )
       .match({ id })
       .single()
       .then(({ data, error }) => {
         if (error) console.error(error)
-        setJob(data!, profile.id === data!.profile_id)
+        else setJob(data!, profile.id === data!.profile_id)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile])
