@@ -17,10 +17,7 @@ interface Props {
 const JOB_APPLICANT_FIELDS = `
   *,
   profiles (
-    id,
-    first_name,
-    last_name,
-    short_desc,
+    *,
     addresses (
       barangay, city_muni, province
     )
