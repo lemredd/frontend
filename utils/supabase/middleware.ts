@@ -6,6 +6,12 @@ const PDR_ROUTES_SKR_BLACKLIST = [
   "/pdr/tasks",
 ]
 
+const SKR_ROUTES_PDR_BLACKLIST = [
+  "/skr/profile",
+  "/skr/setup",
+  "/skr/tasks",
+]
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } =
@@ -87,7 +93,10 @@ export async function updateSession(request: NextRequest) {
 
       // TODO: ADD FOR PROVIDER
       case 'PDR':
-        if (!request.nextUrl.pathname.startsWith('/pdr')) {
+        if (
+          !request.nextUrl.pathname.startsWith('/pdr')
+          && SKR_ROUTES_PDR_BLACKLIST.some(route => request.nextUrl.pathname.startsWith(route))
+        ) {
           return Redirect('/pdr')
         }
         if (
