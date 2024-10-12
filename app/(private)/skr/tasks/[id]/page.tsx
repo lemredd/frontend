@@ -2,28 +2,39 @@
 
 import JobDetailsHeader from '@/components/custom/job/job-details-header'
 import JobDetailsSkills from '@/components/custom/job/job-details-skills'
+import { ProfileRating } from '@/components/custom/profile/rating'
 import Spinner from '@/components/custom/spinner'
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
 } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/client'
-import { Clock, MapPin } from 'lucide-react'
+import { Clock, MapPin, Star } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState, useTransition } from 'react'
 
 interface Props {
   params: { id: string }
 }
 
+const JOB_DETAILS = `
+  *,
+  job_skills (skills (id, name)),
+  profiles!jobs_profile_id_fkey (*)
+`
+
 export default function JobDetailsPage({ params: { id } }: Props) {
   const [isPending, startTransition] = useTransition()
   const supabase = createClient()
-  const [job, setJob] = useState<Record<string, unknown>>()
+  const [job, setJob] = useState<Record<string, any>>()
   const [loading, setLoading] = useState(true)
+
+  console.log(job)
 
   useEffect(() => {
     if (!id) {
@@ -35,27 +46,12 @@ export default function JobDetailsPage({ params: { id } }: Props) {
       supabase
         .from('jobs')
         .select(
-          `id,
-           name,
-           description,
-           price,
-           created_at,
-           province,
-           city_muni,
-           barangay,
-           job_skills (
-             skills (
-               id,
-               name
-             )
-           )`,
+          JOB_DETAILS,
         )
         .eq('id', id)
         .single()
         .then(({ data, error }) => {
-          if (error) {
-            console.error(error)
-          }
+          if (error) console.error(error)
           if (data) setJob(data)
 
           setLoading(false)
@@ -113,6 +109,20 @@ export default function JobDetailsPage({ params: { id } }: Props) {
               }}
             />
           </CardContent>
+          <CardFooter className="flex-col items-start">
+            <h3 className="text-lg font-semibold">About the client</h3>
+            <span>
+              {job.profiles.first_name} {job.profiles.last_name} <Link href={`/pdr/${job.profiles.username}`}><strong>@{job.profiles.username}</strong></Link>
+            </span>
+            <ProfileRating profile={job.profiles} />
+            <p>Member since {
+              new Date(job.profiles.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                day: 'numeric',
+                month: 'long',
+              })
+            }</p>
+          </CardFooter>
         </>
       )}
     </Card>
