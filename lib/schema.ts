@@ -162,3 +162,10 @@ export const CheckJobApplicationSchema = z.object({
 export const ApproveApplicantSchema = z.object({
   job_applicant_id: z.number()
 })
+
+export const FeedbackSchema = z.object({
+  feedback: z.string().optional(),
+  rate: z.number().min(1, { message: 'rate is required' }).max(5, { message: 'rate is required' }),
+  from_id: z.string().min(1, { message: 'from_id is required' }),
+  to_id: z.string().min(1, { message: 'to_id is required' }),
+})
