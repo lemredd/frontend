@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import { useJobStore } from '@/store/JobStore'
 import { MapPin } from 'lucide-react'
+import Link from 'next/link'
 import { useTransition } from 'react'
 
 interface Props {
@@ -32,10 +33,12 @@ export function ApplicantListItem({ applicant }: Props) {
   return (
     <Card className="modern-card">
       <CardHeader>
-        <h3 className="text-lg font-bold">
-          {/* TODO: link to seeker profile */}
-          {applicant.profiles.first_name as string}
-        </h3>
+        <Link href={`/skr/${applicant.profiles.username}`}>
+          <h3 className="text-lg font-bold">
+            {/* TODO: link to seeker profile */}
+            {applicant.profiles.first_name as string}
+          </h3>
+        </Link>
         <p>{applicant.profiles.short_desc}</p>
         <Chip
           beforeContent={<MapPin size={16} />}
