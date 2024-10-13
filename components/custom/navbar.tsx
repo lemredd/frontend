@@ -58,7 +58,8 @@ export function Navbar() {
         ? null
         : links.map((route, index) => {
             // Check if the current route is exactly the home path
-            const isExactHomeMatch = route.path === activePath
+            const isExactHomeMatch =
+              route.path === activePath || route.path === '/'
 
             // Check if it's a valid subpath but not the exact home
             const isSubPath =

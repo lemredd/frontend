@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { postJob } from '@/actions/pdr/job'
-import { FormError } from '@/components/custom/form-error'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
 import {
@@ -19,11 +18,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/hooks/use-toast'
 import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
 import { JobSchema } from '@/lib/schema'
 import { ComboboxItem } from '@/lib/types'
 import { createClient } from '@/utils/supabase/client'
 import { EditIcon, XIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { AsyncStrictCombobox } from '../combobox'
 
 type JobForm = z.infer<typeof JobSchema>
@@ -303,6 +304,11 @@ function PriceField({ form }: Pick<PartialFieldsProps, 'form'>) {
                 inputMode="numeric"
                 placeholder="Leave empty if TBD"
                 {...field}
+                value={field.value !== undefined ? field.value : ''} // Handle undefined as an empty string
+                onChange={(e) => {
+                  const value = e.target.value
+                  field.onChange(value === '' ? undefined : value) // Convert to number or set as undefined
+                }}
               />
             </FormControl>
             <FormMessage />
@@ -317,7 +323,8 @@ export function JobForm() {
   // TODO: store state in URL
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState(0)
-  const [error, setError] = useState<string>()
+  const router = useRouter()
+  const { toast } = useToast()
 
   const form = useForm<JobForm>({
     resolver: zodResolver(JobSchema),
@@ -337,8 +344,20 @@ export function JobForm() {
 
   function onSubmit() {
     startTransition(() => {
-      postJob(form.getValues(), true).then((data) => {
-        if (data?.error) setError(data.error)
+      postJob(form.getValues(), false).then((data) => {
+        if (data?.error) {
+          toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: data?.error,
+          })
+        } else {
+          router.push(`/pdr/tasks/`)
+          toast({
+            variant: 'success',
+            title: 'Task Posted Successfully!',
+          })
+        }
       })
     })
   }
@@ -380,7 +399,6 @@ export function JobForm() {
           />
         )}
         {step > 2 && <PriceField form={form} />}
-        <FormError message={error} />
         {step >= 3 && (
           <Button disabled={isPending || !canPost}>Post Job</Button>
         )}

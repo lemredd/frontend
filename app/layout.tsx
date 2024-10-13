@@ -2,6 +2,7 @@ import Loading from '@/app/loading'
 import Footer from '@/components/custom/footer'
 import { Navbar } from '@/components/custom/navbar'
 import { ThemeProvider } from '@/components/providers/theme-provider'
+import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 import NextTopLoader from 'nextjs-toploader'
@@ -30,6 +31,7 @@ export default function RootLayout({
     >
       <body className={`${poppins.className} antialiased`}>
         <Suspense fallback={<Loading />}>
+          <Toaster />
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
