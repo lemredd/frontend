@@ -3,7 +3,7 @@ import { Star } from "lucide-react"
 import { useEffect, useState } from "react"
 
 interface Props {
-  profile: Record<string, any>
+  profile: Record<string, any> | null
 }
 
 // TODO: get rating from profile
@@ -27,7 +27,7 @@ export function ProfileRating({ profile }: Props) {
       {[1, 2, 3, 4, 5].map(i => (
         <Star key={i} className={avgRating >= i ? "text-yellow-500" : "text-gray-400"} />
       ))}
-      <span>{avgRating}</span>
+      <span className="text-lg font-semibold text-gray-600">{avgRating}</span>
     </div>
   )
 }
