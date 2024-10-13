@@ -1,24 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PDR_ROUTES_SKR_BLACKLIST = [
-  "/pdr/setup",
-  "/pdr/tasks",
-]
+const PDR_ROUTES_SKR_BLACKLIST = ['/pdr/setup', '/pdr/tasks']
 
-const SKR_ROUTES_PDR_BLACKLIST = [
-  "/skr/profile",
-  "/skr/setup",
-  "/skr/tasks",
-]
+const SKR_ROUTES_PDR_BLACKLIST = ['/skr/profile', '/skr/setup', '/skr/tasks']
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } =
     process.env
-  const publicRoutes = ['/', '/about/']
   const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
-  const isPublicRoute = publicRoutes.includes(request.nextUrl.pathname)
+  const isPublicRoute = request.nextUrl.pathname === '/'
   const supabase = createServerClient(
     NEXT_PUBLIC_SUPABASE_URL!,
     NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -72,8 +64,11 @@ export async function updateSession(request: NextRequest) {
     switch (role_code) {
       case 'SKR':
         if (
-          !request.nextUrl.pathname.startsWith('/skr')
-          && PDR_ROUTES_SKR_BLACKLIST.some(route => request.nextUrl.pathname.startsWith(route))
+          (!request.nextUrl.pathname.startsWith('/skr') &&
+            PDR_ROUTES_SKR_BLACKLIST.some((route) =>
+              request.nextUrl.pathname.startsWith(route),
+            )) ||
+          isPublicRoute
         ) {
           return Redirect('/skr')
         }
@@ -94,8 +89,11 @@ export async function updateSession(request: NextRequest) {
       // TODO: ADD FOR PROVIDER
       case 'PDR':
         if (
-          !request.nextUrl.pathname.startsWith('/pdr')
-          && SKR_ROUTES_PDR_BLACKLIST.some(route => request.nextUrl.pathname.startsWith(route))
+          (!request.nextUrl.pathname.startsWith('/pdr') &&
+            SKR_ROUTES_PDR_BLACKLIST.some((route) =>
+              request.nextUrl.pathname.startsWith(route),
+            )) ||
+          isPublicRoute
         ) {
           return Redirect('/pdr')
         }
@@ -115,7 +113,7 @@ export async function updateSession(request: NextRequest) {
 
       // TODO: ADD FOR ADMIN
       case 'admin':
-        if (!request.nextUrl.pathname.startsWith('/admin')) {
+        if (!request.nextUrl.pathname.startsWith('/admin') || isPublicRoute) {
           return Redirect('/admin')
         }
         break
