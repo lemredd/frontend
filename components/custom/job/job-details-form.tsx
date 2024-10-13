@@ -37,13 +37,11 @@ export function JobDetailsForm() {
 
   const form = useForm<z.infer<typeof JobSchema>>({
     resolver: zodResolver(JobSchema),
-    defaultValues: {
-      name: (job?.name as string) || '',
-      description: job?.description
-        ? formatDescription(job.description as string)
-        : '',
-    },
   })
+
+  if (!job) {
+    return <NotFound className="text-foreground h" />
+  }
 
   function onSubmit(values: z.infer<typeof JobSchema>) {
     startTransition(() => {
@@ -52,81 +50,76 @@ export function JobDetailsForm() {
     })
   }
 
-  if (!job) {
-    return <NotFound className="text-foreground h" />
-  }
-
-  if (!isOwned || !isEditing) return (
-    <Card className="modern-card">
-      <CardHeader className="space-y-4">
-        <div className="flex flex-col gap-4">
-          {/* Job Date */}
-          <div className="flex justify-between items-center">
-            <div className="text-sm dark:text-gray-400 flex items-center gap-2">
-              <Clock
-                size={18}
-                className="dark:text-gray-500"
+  if (!isOwned || !isEditing)
+    return (
+      <Card className="modern-card">
+        <CardHeader className="space-y-4">
+          <div className="flex flex-col gap-4">
+            {/* Job Date */}
+            <div className="flex justify-between items-center">
+              <div className="text-sm dark:text-gray-400 flex items-center gap-2">
+                <Clock
+                  size={18}
+                  className="dark:text-gray-500"
+                />
+                <span>Posted {getRecency(job.created_at as string)}</span>
+              </div>
+              {/* Job Location */}
+              <Chip
+                beforeContent={<MapPin size={18} />}
+                content={getAddress(job)}
+                className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+                contentClassName="max-w-[unset]"
               />
-              <span>Posted {getRecency(job.created_at as string)}</span>
             </div>
-            {/* Job Location */}
-            <Chip
-              beforeContent={<MapPin size={18} />}
-              content={getAddress(job)}
-              className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-              contentClassName="max-w-[unset]"
-            />
           </div>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardContent className="flex flex-col space-y-6">
-        {/* Job Price */}
-        <div className="flex items-center gap-4 text-2xl font-semibold">
-          <PhilippinePesoIcon
-            size={22}
-            className="text-green-400"
+        <CardContent className="flex flex-col space-y-6">
+          {/* Job Price */}
+          <div className="flex items-center gap-4 text-2xl font-semibold">
+            <PhilippinePesoIcon
+              size={22}
+              className="text-green-400"
+            />
+            <span>{Number(job.price).toFixed(2)}</span>
+          </div>
+
+          {/* Job Skills */}
+          <JobDetailsSkills job={job} />
+
+          {/* Job Description */}
+          <h2 className="text-lg font-semibold">Description</h2>
+          <CardDescription
+            className="whitespace-pre-line dark:text-gray-300"
+            dangerouslySetInnerHTML={{
+              __html: formatDescription(job.description as string),
+            }}
           />
-          <span>{Number(job.price).toFixed(2)}</span>
-        </div>
+        </CardContent>
 
-        {/* Job Skills */}
-        <JobDetailsSkills job={job} />
-
-        {/* Job Description */}
-        <h2 className="text-lg font-semibold">Description</h2>
-        <CardDescription
-          className="whitespace-pre-line dark:text-gray-300"
-          dangerouslySetInnerHTML={{
-            __html: formatDescription(job.description as string),
-          }}
-        />
-      </CardContent>
-
-      {/* Edit and Delete Buttons */}
-      <CardFooter className="justify-end space-x-3">
-        {!isJobOpen() && job.status !== 'completed' && (
-          <CompleteJobForm />
-        )}
-        <Button
-          variant="secondary"
-          onClick={() => setEditing(true)}
-          className="flex items-center gap-2"
-        >
-          <Pencil size={18} />
-          Edit
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => console.log('Delete action')}
-          className="flex items-center gap-2"
-        >
-          <Trash size={18} />
-          Delete
-        </Button>
-      </CardFooter>
-    </Card>
-  )
+        {/* Edit and Delete Buttons */}
+        <CardFooter className="justify-end space-x-3">
+          {!isJobOpen() && job.status !== 'completed' && <CompleteJobForm />}
+          <Button
+            variant="secondary"
+            onClick={() => setEditing(true)}
+            className="flex items-center gap-2"
+          >
+            <Pencil size={18} />
+            Edit
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => console.log('Delete action')}
+            className="flex items-center gap-2"
+          >
+            <Trash size={18} />
+            Delete
+          </Button>
+        </CardFooter>
+      </Card>
+    )
 
   return (
     <Card className="modern-card">
@@ -145,6 +138,7 @@ export function JobDetailsForm() {
                   <FormControl>
                     <Input
                       {...field}
+                      defaultValue={job?.name as string}
                       disabled={isPending}
                       type="text"
                     />
@@ -163,6 +157,9 @@ export function JobDetailsForm() {
                     <Textarea
                       {...field}
                       disabled={isPending}
+                      defaultValue={formatDescription(
+                        job.description as string,
+                      )}
                       className="bg-background"
                       rows={5}
                     />
