@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
 } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
@@ -28,9 +29,10 @@ import { Clock, MapPin, Pencil, PhilippinePesoIcon, Trash } from 'lucide-react'
 import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { CompleteJobForm } from './complete-job-form'
 
 export function JobDetailsForm() {
-  const { job, isOwned, isEditing, setEditing } = useJobStore()
+  const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<z.infer<typeof JobSchema>>({
@@ -102,7 +104,10 @@ export function JobDetailsForm() {
       </CardContent>
 
       {/* Edit and Delete Buttons */}
-      <CardContent className="flex justify-end space-x-3">
+      <CardFooter className="justify-end space-x-3">
+        {!isJobOpen() && (
+          <CompleteJobForm />
+        )}
         <Button
           variant="secondary"
           onClick={() => setEditing(true)}
@@ -119,7 +124,7 @@ export function JobDetailsForm() {
           <Trash size={18} />
           Delete
         </Button>
-      </CardContent>
+      </CardFooter>
     </Card>
   )
 
