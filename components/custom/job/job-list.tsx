@@ -33,6 +33,7 @@ export default function JobList() {
     const query = supabase
       .from('jobs')
       .select(selectedFields)
+      .eq('status', 'open')
       .order('created_at', { ascending: false })
       .range(start, end)
 
