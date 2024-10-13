@@ -165,7 +165,14 @@ export const ApproveApplicantSchema = z.object({
 
 export const FeedbackSchema = z.object({
   feedback: z.string().optional(),
-  rate: z.number().min(1, { message: 'rate is required' }).max(5, { message: 'rate is required' }),
+  rate: z.string()
+    .refine((value) => Number(value) >= 0 && Number(value) <= 5, "Rate must be between 0 and 5")
+    .transform((value) => Number(value)),
   from_id: z.string().min(1, { message: 'from_id is required' }),
   to_id: z.string().min(1, { message: 'to_id is required' }),
+})
+
+export const CompleteJobWithFeedbackSchema = z.object({
+  ...FeedbackSchema.shape,
+  job_id: z.string().min(1, { message: 'job_id is required' }),
 })
