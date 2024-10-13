@@ -8,7 +8,27 @@ export default function usePSGCAddressFields() {
     fetch('https://psgc.gitlab.io/api/provinces')
       .then((response) => response.json())
       .then((response) => {
-        setProvinces(
+        setProvinces([
+          {
+            value: "0|Metro Manila",
+            label: "Metro Manila",
+          },
+          ...response.map((item: { name: string; code: string }) => ({
+            value: `${item.code}|${item.name}`,
+            label: item.name,
+          })),
+        ])
+      })
+  }
+
+  const [cityMunicipalities, setCityMunicipalities] = useState<ComboboxItem[]>(
+    [],
+  )
+  function getNCRCityMunicipalities() {
+    fetch(' https://psgc.gitlab.io/api/regions/130000000/cities-municipalities/')
+      .then((response) => response.json())
+      .then((response) => {
+        setCityMunicipalities(
           response.map((item: { name: string; code: string }) => ({
             value: `${item.code}|${item.name}`,
             label: item.name,
@@ -16,13 +36,11 @@ export default function usePSGCAddressFields() {
         )
       })
   }
-
-  const [cityMunicipalities, setCityMunicipalities] = useState<ComboboxItem[]>(
-    [],
-  )
   function getCityMunicipalities(province?: string) {
     if (!province) return
     province = province.split('|')[0]
+
+    if (province === "0") return getNCRCityMunicipalities()
 
     fetch(
       `https://psgc.gitlab.io/api/provinces/${province}/cities-municipalities`,
