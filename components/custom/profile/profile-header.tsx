@@ -61,13 +61,7 @@ export function OwnProfileHeader() {
           </div>
           {/* Rating Section */}
           <div className="flex justify-center sm:justify-start items-center space-x-2">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star
-                key={i}
-                className="text-yellow-500 w-5 h-5"
-              />
-            ))}
-            <span className="text-lg font-semibold text-gray-600">0.0</span>
+            <ProfileRating profile={profile} />
           </div>
         </div>
       </CardHeader>

@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 
-interface JobState {
-  job?: Record<string, unknown>
+interface JobState<T = Record<string, any>> {
+  job?: T
   isOwned: boolean
   isEditing: boolean
   setEditing: (isEditing: boolean) => void
-  setJob: (job: Record<string, unknown>, isOwned: boolean) => void
+  setJob: (job: T, isOwned: boolean) => void
   isJobOpen: () => boolean
 }
 

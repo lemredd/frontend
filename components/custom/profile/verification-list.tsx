@@ -83,7 +83,6 @@ interface SeekerVerificationListProps {
 export function SeekerVerificationList({ username }: SeekerVerificationListProps) {
   const [user, setUser] = useState<User | null>(null)
 
-  console.log(user)
   useEffect(() => {
     getUserByUsername(username).then(data => setUser(data))
   }, [username])
