@@ -170,6 +170,7 @@ export const FeedbackSchema = z.object({
     .transform((value) => Number(value)),
   from_id: z.string().min(1, { message: 'from_id is required' }),
   to_id: z.string().min(1, { message: 'to_id is required' }),
+  job_id: z.string().min(1, { message: 'job_id is required' }),
 })
 
 export const CompleteJobWithFeedbackSchema = z.object({

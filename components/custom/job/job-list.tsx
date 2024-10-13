@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import JobListItem from './job-list-item'
+import JobListItem, { SeekerProfileJobListItem } from './job-list-item'
 
 export default function JobList() {
   const { user, profile } = useAuthStore()
@@ -33,6 +33,7 @@ export default function JobList() {
     const query = supabase
       .from('jobs')
       .select(selectedFields)
+      .eq('status', 'open')
       .order('created_at', { ascending: false })
       .range(start, end)
 
@@ -72,7 +73,7 @@ export default function JobList() {
   }
 
   return (
-    <div className="gap-4">
+    <div className="space-y-4">
       {jobs.map((job) => (
         <JobListItem
           key={job.id}
@@ -80,5 +81,41 @@ export default function JobList() {
         />
       ))}
     </div>
+  )
+}
+
+export function SeekerProfileJobList() {
+  const { profile } = useAuthStore()
+  const supabase = createClient()
+
+  const [jobs, setJobs] = useState<Record<string, any>[]>([])
+
+  useEffect(() => {
+    if (!profile) return
+
+    const selectedFields = '*, feedbacks(*)'
+    supabase
+      .from('jobs')
+      .select(selectedFields)
+      .eq('seeker_id', profile.id)
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (data) setJobs(data)
+        if (error) console.error(error)
+      })
+  }, [profile, supabase])
+
+  return (
+    <>
+      <h2 className="text-xl">My Jobs</h2>
+      <div className="space-y-4">
+        {jobs.map((job) => (
+          <SeekerProfileJobListItem
+            key={job.id}
+            job={job}
+          />
+        ))}
+      </div>
+    </>
   )
 }
