@@ -33,7 +33,7 @@ export const getRecency = (date: string) => {
   const MINUTE = 1000 * 60
   const diffMinutes = now.getTime() / MINUTE - dateObj.getTime() / MINUTE
   const minutes = Math.floor(diffMinutes)
-  return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+  return minutes < 2 ? 'a minute ago' : `${minutes} minutes ago`
 }
 
 export const formatDescription = (description: string) => {
