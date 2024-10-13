@@ -54,76 +54,74 @@ export function JobDetailsForm() {
     return <NotFound className="text-foreground h" />
   }
 
-  if (!isOwned || !isEditing) {
-    return (
-      <Card className="modern-card">
-        <CardHeader className="space-y-4">
-          <div className="flex flex-col gap-4">
-            {/* Job Date */}
-            <div className="flex justify-between items-center">
-              <div className="text-sm dark:text-gray-400 flex items-center gap-1">
-                <Clock
-                  size={18}
-                  className="dark:text-gray-500"
-                />
-                <span>Posted {getRecency(job.created_at as string)}</span>
-              </div>
-              {/* Job Location */}
-              <Chip
-                beforeContent={<MapPin size={18} />}
-                content={getAddress(job)}
-                className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-                contentClassName="max-w-[unset]"
+  if (!isOwned || !isEditing) return (
+    <Card className="modern-card">
+      <CardHeader className="space-y-4">
+        <div className="flex flex-col gap-4">
+          {/* Job Date */}
+          <div className="flex justify-between items-center">
+            <div className="text-sm dark:text-gray-400 flex items-center gap-2">
+              <Clock
+                size={18}
+                className="dark:text-gray-500"
               />
+              <span>Posted {getRecency(job.created_at as string)}</span>
             </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="flex flex-col space-y-6">
-          {/* Job Price */}
-          <div className="flex items-center gap-4 text-2xl font-semibold">
-            <PhilippinePesoIcon
-              size={22}
-              className="text-green-400"
+            {/* Job Location */}
+            <Chip
+              beforeContent={<MapPin size={18} />}
+              content={getAddress(job)}
+              className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+              contentClassName="max-w-[unset]"
             />
-            <span>{Number(job.price).toFixed(2)}</span>
           </div>
+        </div>
+      </CardHeader>
 
-          {/* Job Skills */}
-          <JobDetailsSkills job={job} />
-
-          {/* Job Description */}
-          <h2 className="text-lg font-semibold">Description</h2>
-          <CardDescription
-            className="whitespace-pre-line dark:text-gray-300"
-            dangerouslySetInnerHTML={{
-              __html: formatDescription(job.description as string),
-            }}
+      <CardContent className="flex flex-col space-y-6">
+        {/* Job Price */}
+        <div className="flex items-center gap-4 text-2xl font-semibold">
+          <PhilippinePesoIcon
+            size={22}
+            className="text-green-400"
           />
-        </CardContent>
+          <span>{Number(job.price).toFixed(2)}</span>
+        </div>
 
-        {/* Edit and Delete Buttons */}
-        <CardContent className="flex justify-end space-x-3">
-          <Button
-            variant="secondary"
-            onClick={() => setEditing(true)}
-            className="flex items-center gap-2"
-          >
-            <Pencil size={18} />
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => console.log('Delete action')}
-            className="flex items-center gap-2"
-          >
-            <Trash size={18} />
-            Delete
-          </Button>
-        </CardContent>
-      </Card>
-    )
-  }
+        {/* Job Skills */}
+        <JobDetailsSkills job={job} />
+
+        {/* Job Description */}
+        <h2 className="text-lg font-semibold">Description</h2>
+        <CardDescription
+          className="whitespace-pre-line dark:text-gray-300"
+          dangerouslySetInnerHTML={{
+            __html: formatDescription(job.description as string),
+          }}
+        />
+      </CardContent>
+
+      {/* Edit and Delete Buttons */}
+      <CardContent className="flex justify-end space-x-3">
+        <Button
+          variant="secondary"
+          onClick={() => setEditing(true)}
+          className="flex items-center gap-2"
+        >
+          <Pencil size={18} />
+          Edit
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={() => console.log('Delete action')}
+          className="flex items-center gap-2"
+        >
+          <Trash size={18} />
+          Delete
+        </Button>
+      </CardContent>
+    </Card>
+  )
 
   return (
     <Card className="modern-card">
