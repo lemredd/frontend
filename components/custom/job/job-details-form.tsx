@@ -105,7 +105,7 @@ export function JobDetailsForm() {
 
       {/* Edit and Delete Buttons */}
       <CardFooter className="justify-end space-x-3">
-        {!isJobOpen() && (
+        {!isJobOpen() && job.status !== 'completed' && (
           <CompleteJobForm />
         )}
         <Button
