@@ -25,7 +25,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { getRecency } from '@/lib/utils'
 
 export function ProviderJobDetailsHeader() {
-  const { job, isOwned, setEditing } = useJobStore()
+  const { job } = useJobStore()
   const TABS = ['details', 'applicants']
   const { id } = useParams()
   const currentTab = usePathname().split('/').filter(Boolean).slice(-1)[0]

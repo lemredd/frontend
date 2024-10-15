@@ -1,20 +1,23 @@
 'use client'
 
+import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import { EditForm } from '@/components/custom/profile/edit-form'
-import { SeekerVerificationList, VerificationList } from '@/components/custom/profile/verification-list'
+import {
+  SeekerVerificationList,
+  VerificationList,
+} from '@/components/custom/profile/verification-list'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { PROFILE_STORE_FIELDS } from '@/lib/constants'
 import { useAuthStore } from '@/store/AuthStore'
+import { createClient } from '@/utils/supabase/client'
 import { AvatarImage } from '@radix-ui/react-avatar'
-import { Edit, Share2, Star } from 'lucide-react'
-import { EditAddressForm } from './edit-address-form'
-import { CollapsibleDesc } from "@/components/custom/collapsible-desc"
-import { useEffect, useState } from "react"
-import { createClient } from "@/utils/supabase/client"
-import { PROFILE_STORE_FIELDS } from "@/lib/constants"
+import { Edit, Share2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { EditAddressForm } from './edit-address-form'
 import { ProfileRating } from './rating'
 
 export function OwnProfileHeader() {
@@ -120,14 +123,14 @@ interface SeekerProfileHeaderProps {
 export function SeekerProfileHeader({ username }: SeekerProfileHeaderProps) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Record<string, any>>({})
-  const avatarSrc = "https://placehold.co/150"
+  const avatarSrc = 'https://placehold.co/150'
   const router = useRouter()
 
   useEffect(() => {
     supabase
-      .from("profiles")
+      .from('profiles')
       .select(PROFILE_STORE_FIELDS)
-      .eq("username", username)
+      .eq('username', username)
       .single()
       .then(({ data, error }) => {
         if (error) return console.error(error)
@@ -137,17 +140,29 @@ export function SeekerProfileHeader({ username }: SeekerProfileHeaderProps) {
       })
   }, [supabase, username, router])
 
-  const joinedDate = new Date(profile?.created_at)
-    .toLocaleDateString("PH", { month: "long", day: "numeric", year: "numeric" })
+  const joinedDate = new Date(profile?.created_at).toLocaleDateString('PH', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
 
   return (
     <header className="space-y-4">
       <Avatar className="size-[150px] relative rounded-md">
         <AvatarImage src={avatarSrc} />
-        <Button variant="secondary" size="icon" className="absolute bottom-2 right-2 rounded-sm"><Edit /></Button>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute bottom-2 right-2 rounded-sm"
+        >
+          <Edit />
+        </Button>
       </Avatar>
       <section className="grid grid-flow-col grid-cols-[1fr_auto] gap-y-4 grid-rows-[repeat(5,auto)]">
-        <h1 className="text-2xl font-bold">{profile?.first_name} {profile?.last_name} <span className="font-normal">@{profile?.username}</span></h1>
+        <h1 className="text-2xl font-bold">
+          {profile?.first_name} {profile?.last_name}{' '}
+          <span className="font-normal">@{profile?.username}</span>
+        </h1>
         <ProfileRating profile={profile} />
         <h2 className="text-lg font-bold">{profile?.short_desc}</h2>
         <div className="flex gap-x-2 items-center">
@@ -165,21 +180,22 @@ export function SeekerProfileHeader({ username }: SeekerProfileHeaderProps) {
   )
 }
 
-
 interface ProviderProfileHeaderProps {
   username: string
 }
-export function ProviderProfileHeader({ username }: ProviderProfileHeaderProps) {
+export function ProviderProfileHeader({
+  username,
+}: ProviderProfileHeaderProps) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Record<string, any>>({})
-  const avatarSrc = "https://placehold.co/150"
+  const avatarSrc = 'https://placehold.co/150'
   const router = useRouter()
 
   useEffect(() => {
     supabase
-      .from("profiles")
+      .from('profiles')
       .select(PROFILE_STORE_FIELDS)
-      .eq("username", username)
+      .eq('username', username)
       .single()
       .then(({ data, error }) => {
         if (error) return console.error(error)
@@ -187,17 +203,29 @@ export function ProviderProfileHeader({ username }: ProviderProfileHeaderProps) 
       })
   }, [supabase, username, router])
 
-  const joinedDate = new Date(profile?.created_at)
-    .toLocaleDateString("PH", { month: "long", day: "numeric", year: "numeric" })
+  const joinedDate = new Date(profile?.created_at).toLocaleDateString('PH', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
 
   return (
     <header className="space-y-4">
       <Avatar className="size-[150px] relative rounded-md">
         <AvatarImage src={avatarSrc} />
-        <Button variant="secondary" size="icon" className="absolute bottom-2 right-2 rounded-sm"><Edit /></Button>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute bottom-2 right-2 rounded-sm"
+        >
+          <Edit />
+        </Button>
       </Avatar>
       <section className="grid grid-flow-col grid-cols-[1fr_auto] gap-y-4 grid-rows-[repeat(3,auto)]">
-        <h1 className="text-2xl font-bold">{profile?.first_name} {profile?.last_name} <span className="font-normal">@{profile?.username}</span></h1>
+        <h1 className="text-2xl font-bold">
+          {profile?.first_name} {profile?.last_name}{' '}
+          <span className="font-normal">@{profile?.username}</span>
+        </h1>
         <ProfileRating profile={profile} />
         <div className="flex gap-x-2 items-center">
           <span>Joined {joinedDate}</span>

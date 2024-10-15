@@ -51,12 +51,17 @@ export function AsyncStrictCombobox({
       <PopoverTrigger
         asChild
         disabled={disabled}
+        className={`${disabled && 'cursor-not-allowed'}`}
       >
         <Button
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn(
+            'w-full justify-between',
+            disabled && 'cursor-not-allowed',
+          )}
+          disabled={disabled}
         >
           {value
             ? items.find((item) => item.value === value)?.label ||
@@ -84,7 +89,7 @@ export function AsyncStrictCombobox({
                   >
                     <Check
                       className={cn(
-                        'mr-2 h-4 w-4',
+                        'mr-2 size-4',
                         value === item.value ? 'opacity-100' : 'opacity-0',
                       )}
                     />

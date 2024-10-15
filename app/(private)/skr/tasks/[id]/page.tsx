@@ -14,7 +14,7 @@ import {
 import { Chip } from '@/components/ui/chip'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/client'
-import { Clock, MapPin, Star } from 'lucide-react'
+import { Clock, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState, useTransition } from 'react'
 
@@ -45,9 +45,7 @@ export default function JobDetailsPage({ params: { id } }: Props) {
     startTransition(() => {
       supabase
         .from('jobs')
-        .select(
-          JOB_DETAILS,
-        )
+        .select(JOB_DETAILS)
         .eq('id', id)
         .single()
         .then(({ data, error }) => {
@@ -112,16 +110,20 @@ export default function JobDetailsPage({ params: { id } }: Props) {
           <CardFooter className="flex-col items-start">
             <h3 className="text-lg font-semibold">About the client</h3>
             <span>
-              {job.profiles.first_name} {job.profiles.last_name} <Link href={`/pdr/${job.profiles.username}`}><strong>@{job.profiles.username}</strong></Link>
+              {job.profiles.first_name} {job.profiles.last_name}{' '}
+              <Link href={`/pdr/${job.profiles.username}`}>
+                <strong>@{job.profiles.username}</strong>
+              </Link>
             </span>
             <ProfileRating profile={job.profiles} />
-            <p>Member since {
-              new Date(job.profiles.created_at).toLocaleDateString('en-US', {
+            <p>
+              Member since{' '}
+              {new Date(job.profiles.created_at).toLocaleDateString('en-US', {
                 year: 'numeric',
                 day: 'numeric',
                 month: 'long',
-              })
-            }</p>
+              })}
+            </p>
           </CardFooter>
         </>
       )}
