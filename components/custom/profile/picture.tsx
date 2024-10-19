@@ -1,12 +1,13 @@
 import { uploadProfilePicture } from '@/actions/profile-picture'
-import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Profile, useAuthStore } from '@/store/AuthStore'
+import { createClient } from '@/utils/supabase/client'
 import { Edit } from 'lucide-react'
 import Image from 'next/image'
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 
 function ProfilePictureForm() {
   // Not using react-hook-form kasi idk pano magpasa ng `File` sa server action nang naka schema
@@ -14,6 +15,7 @@ function ProfilePictureForm() {
   const { profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [preview, setPreview] = useState("")
+  const close = useRef<HTMLButtonElement>(null)
   //const form = useForm<z.infer<typeof ProfilePictureSchema>>({
   //  resolver: zodResolver(ProfilePictureSchema),
   //})
@@ -27,7 +29,7 @@ function ProfilePictureForm() {
 
       uploadProfilePicture(form).then(({ success, error }) => {
         if (error) return console.error(error)
-        console.log(success)
+        close.current!.click()
       })
     })
   }
@@ -60,6 +62,8 @@ function ProfilePictureForm() {
           />
         )}
       </form>
+      <DialogClose ref={close}>
+      </DialogClose>
       <DialogFooter>
         <Button type="submit" form="profile-picture-form" disabled={isPending}>Upload</Button>
       </DialogFooter>
@@ -70,8 +74,18 @@ function ProfilePictureForm() {
 interface ProfilePictureProps {
   profile: Profile | null
 }
-export function ProfilePicture({ profile: _ }: ProfilePictureProps) {
-  const avatarSrc = 'https://placehold.co/150'
+export function ProfilePicture({ profile }: ProfilePictureProps) {
+  const supabase = createClient()
+  const [avatarSrc, setAvatarSrc] = useState("/images/profile_picture_placeholder.webp")
+  useEffect(() => {
+    if (!profile) return
+    const { data } = supabase
+      .storage
+      .from("profile_pictures")
+      .getPublicUrl(profile.id)
+
+    setAvatarSrc(data.publicUrl)
+  }, [profile, supabase])
 
   return (
     <div className="relative mx-auto sm:mx-0">
@@ -80,6 +94,13 @@ export function ProfilePicture({ profile: _ }: ProfilePictureProps) {
           src={avatarSrc}
           alt="Profile Avatar"
         />
+        <AvatarFallback>
+          {/* TODO: fix. not working. */}
+          <AvatarImage
+            src="/images/profile_picture_placeholder.webp"
+            alt="Profile Avatar Placeholder"
+          />
+        </AvatarFallback>
       </Avatar>
       <Dialog>
         <DialogTrigger asChild>
