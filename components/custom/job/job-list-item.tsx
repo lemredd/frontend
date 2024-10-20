@@ -68,13 +68,16 @@ export default function JobListItem({ job }: Props) {
 }
 
 
-export function SeekerProfileJobListItem({ job }: Props) {
+interface ProfileJobListItemProps extends Props {
+  role: "skr" | "pdr"
+}
+export function ProfileJobListItem({ job, role }: ProfileJobListItemProps) {
   return (
     <Card className="modern-card">
       {/* Job Header */}
       <CardHeader className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div className="space-y-1">
-          <Link href={`/skr/tasks/${job.id}`}>
+          <Link href={`/${role}/tasks/${job.id}`}>
             <h3 className="text-3xl font-extrabold ">{job.name}</h3>
           </Link>
           <div className="flex items-center gap-2 text-xs dark:text-gray-400">
