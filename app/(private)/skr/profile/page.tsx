@@ -1,6 +1,6 @@
 'use client'
 
-import { SeekerProfileJobList } from '@/components/custom/job/job-list'
+import { ProfileJobList } from '@/components/custom/job/job-list'
 import { OwnProfileHeader } from '@/components/custom/profile/profile-header'
 import Spinner from '@/components/custom/spinner'
 import { useAuthStore } from '@/store/AuthStore'
@@ -17,7 +17,7 @@ export default function ProfilePage() {
   return (
     <>
       <OwnProfileHeader />
-      <SeekerProfileJobList />
+      <ProfileJobList role="seeker" />
     </>
   )
 
