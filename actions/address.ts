@@ -50,11 +50,10 @@ export async function editAddress(
   }
 
   const supabase = createClient()
-  const { data: _, error } = await supabase
+  const { error } = await supabase
     .from("addresses")
     .update(validatedFields.data)
-    .eq("id", validatedFields.data.address_id)
-    .select()
+    .eq("id", validatedFields.data.id)
 
   if (error) return { error: error.message }
   revalidatePath('/', 'layout')
