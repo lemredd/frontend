@@ -17,7 +17,9 @@ interface Props {
 }
 export function EditAddressForm({ address }: Props) {
   // TODO: add form
-  const content = [address?.barangay, address?.city_muni, address?.province].join(", ")
+  const content = address
+    ? [address?.barangay, address?.city_muni, address?.province].join(", ")
+    : "No address yet"
   return (
     <Dialog>
       <DialogTrigger asChild>
