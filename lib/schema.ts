@@ -106,6 +106,11 @@ export const AddressSchema = z.object({
   postal_code: z.string().min(1, { message: 'Postal code is required' }),
 })
 
+export const EditAddressSchema = z.object({
+  ...AddressSchema.shape,
+  address_id: z.string().min(1, { message: 'address_id is required' }),
+})
+
 export const EditProfileSchema = z.object({
   ...SkillsSchema.shape,
   ...ProfileDescriptionSchema.shape,
