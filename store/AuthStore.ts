@@ -9,7 +9,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface Profile extends Record<string, any> {
+export interface Profile extends Record<string, any> {
   id: string
   user_id: string
 }

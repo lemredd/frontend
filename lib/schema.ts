@@ -112,6 +112,11 @@ export const EditProfileSchema = z.object({
   ...AddressSchema.shape,
 })
 
+export const ProfilePictureSchema = z.object({
+  profile_picture: z.instanceof(File).refine(file => file.size <= 10_000_000, 'File too large'),
+  name: z.string().min(1, 'name is required'),
+})
+
 export const ContactUsSchema = z.object({
   name: z.string().min(1, {
     message: 'Name is required',
@@ -177,3 +182,4 @@ export const CompleteJobWithFeedbackSchema = z.object({
   ...FeedbackSchema.shape,
   job_id: z.string().min(1, { message: 'job_id is required' }),
 })
+

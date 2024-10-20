@@ -19,10 +19,10 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { EditAddressForm } from './edit-address-form'
 import { ProfileRating } from './rating'
+import { ProfilePicture } from './picture'
 
 export function OwnProfileHeader() {
   const { profile } = useAuthStore()
-  const avatarSrc = 'https://placehold.co/150'
 
   const joinedDate = new Date(profile?.created_at).toLocaleDateString('PH', {
     month: 'long',
@@ -34,21 +34,7 @@ export function OwnProfileHeader() {
     <Card className="shadow-lg rounded-md max-w-4xl mx-auto md:p-4 xl:p-6">
       <CardHeader className="flex flex-col sm:flex-row sm:items-start sm:space-x-6 space-y-4 sm:space-y-0">
         {/* Avatar and Edit Button */}
-        <div className="relative mx-auto sm:mx-0">
-          <Avatar className="size-32 rounded-full shadow-md border-4 border-primary">
-            <AvatarImage
-              src={avatarSrc}
-              alt="Profile Avatar"
-            />
-          </Avatar>
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute bottom-2 right-2 rounded-full p-2 shadow-m"
-          >
-            <Edit size={16} />
-          </Button>
-        </div>
+        <ProfilePicture profile={profile} />
 
         {/* Profile Information */}
         <div className="flex-grow text-center sm:text-left space-y-3">
