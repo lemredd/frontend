@@ -108,7 +108,7 @@ export const AddressSchema = z.object({
 
 export const EditAddressSchema = z.object({
   ...AddressSchema.shape,
-  address_id: z.string().min(1, { message: 'address_id is required' }),
+  id: z.string().min(1, { message: 'address_id is required' }),
 })
 
 export const EditProfileSchema = z.object({
