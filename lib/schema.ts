@@ -78,6 +78,8 @@ export const ProfileDescriptionSchema = z.object({
   username: z.string().min(1, {
     message: 'Username is required',
   }),
+  // TODO: make profile picture `File` field
+  profile_picture: z.any(),
   shortDescription: z.string().min(1, {
     message: 'Description is required',
   }),
