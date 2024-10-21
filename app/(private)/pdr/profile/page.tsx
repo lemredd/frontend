@@ -17,8 +17,9 @@ export default function ProfilePage() {
   return (
     <>
       <OwnProfileHeader />
-      <ProfileJobList role="seeker" />
+      <ProfileJobList role="provider" />
     </>
   )
 
 }
+

@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { makeAddress } from '@/actions/skr/address'
+import { makeAddress } from '@/actions/address'
 import { AsyncStrictCombobox } from '@/components/custom/combobox'
 import { FormError } from '@/components/custom/form-error'
 import { Button } from '@/components/ui/button'
@@ -21,7 +21,10 @@ import { Input } from '@/components/ui/input'
 import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
 import { AddressSchema } from '@/lib/schema'
 
-export function AddressForm() {
+interface AddressFormProps {
+  redirectTo?: string
+}
+export function AddressForm({ redirectTo }: AddressFormProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string>()
   const form = useForm<z.infer<typeof AddressSchema>>({
@@ -38,7 +41,7 @@ export function AddressForm() {
 
   function onSubmit() {
     startTransition(() => {
-      makeAddress(form.getValues()).then((data) => {
+      makeAddress(form.getValues(), redirectTo).then((data) => {
         if (data?.error) setError(data?.error)
       })
     })

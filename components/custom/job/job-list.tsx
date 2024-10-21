@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import JobListItem, { SeekerProfileJobListItem } from './job-list-item'
+import JobListItem, { ProfileJobListItem } from './job-list-item'
 
 export default function JobList() {
   const { user, profile } = useAuthStore()
@@ -33,7 +33,7 @@ export default function JobList() {
     const query = supabase
       .from('jobs')
       .select(selectedFields)
-      .eq('status', 'open')
+      .eq('status', searchParams.get('status') ?? 'open')
       .order('created_at', { ascending: false })
       .range(start, end)
 
@@ -84,11 +84,16 @@ export default function JobList() {
   )
 }
 
-export function SeekerProfileJobList() {
+interface ProfileJobListProps {
+  role: "seeker" | "provider"
+}
+export function ProfileJobList({ role }: ProfileJobListProps) {
   const { profile } = useAuthStore()
   const supabase = createClient()
 
   const [jobs, setJobs] = useState<Record<string, any>[]>([])
+  const matcher = role === "seeker" ? "seeker_id" : "profile_id"
+  const roleLink = role === "seeker" ? "skr" : "pdr"
 
   useEffect(() => {
     if (!profile) return
@@ -97,21 +102,22 @@ export function SeekerProfileJobList() {
     supabase
       .from('jobs')
       .select(selectedFields)
-      .eq('seeker_id', profile.id)
+      .eq(matcher, profile.id)
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (data) setJobs(data)
         if (error) console.error(error)
       })
-  }, [profile, supabase])
+  }, [profile, supabase, matcher])
 
   return (
     <>
       <h2 className="text-xl">My Jobs</h2>
       <div className="space-y-4">
         {jobs.map((job) => (
-          <SeekerProfileJobListItem
+          <ProfileJobListItem
             key={job.id}
+            role={roleLink}
             job={job}
           />
         ))}

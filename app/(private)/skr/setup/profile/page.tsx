@@ -76,6 +76,25 @@ export default function UserDescriptionPage() {
             )}
           />
 
+          {/* profile picture */}
+          <FormField
+            control={form.control}
+            name="profile_picture"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="space-y-2">
+                  <h2 className="text-xl font-semibold">Profile picture</h2>
+                </FormLabel>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  {...field}
+                />
+              </FormItem>
+            )}
+          />
+
+
 
           {/* Short description */}
           <FormField

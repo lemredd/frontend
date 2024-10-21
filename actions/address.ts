@@ -4,10 +4,10 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import * as z from 'zod'
 
-import { AddressSchema } from '@/lib/schema'
+import { AddressSchema, EditAddressSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
 
-export const makeAddress = async (values: z.infer<typeof AddressSchema>) => {
+export const makeAddress = async (values: z.infer<typeof AddressSchema>, to = "/skr/setup/skills") => {
   const supabase = createClient()
   const validatedFields = AddressSchema.safeParse(values)
 
@@ -35,5 +35,27 @@ export const makeAddress = async (values: z.infer<typeof AddressSchema>) => {
   if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
-  redirect('/skr/setup/skills')
+  redirect(to)
+}
+
+export async function editAddress(
+  values: z.infer<typeof EditAddressSchema>,
+  roleLink: "skr" | "pdr"
+) {
+  const validatedFields = EditAddressSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+    }
+  }
+
+  const supabase = createClient()
+  const { error } = await supabase
+    .from("addresses")
+    .update(validatedFields.data)
+    .eq("id", validatedFields.data.id)
+
+  if (error) return { error: error.message }
+  revalidatePath('/', 'layout')
+  redirect(`/${roleLink}/profile`)
 }

@@ -78,6 +78,8 @@ export const ProfileDescriptionSchema = z.object({
   username: z.string().min(1, {
     message: 'Username is required',
   }),
+  // TODO: make profile picture `File` field
+  profile_picture: z.any(),
   shortDescription: z.string().min(1, {
     message: 'Description is required',
   }),
@@ -104,6 +106,11 @@ export const AddressSchema = z.object({
   address_1: z.string().optional(),
   address_2: z.string().optional(),
   postal_code: z.string().min(1, { message: 'Postal code is required' }),
+})
+
+export const EditAddressSchema = z.object({
+  ...AddressSchema.shape,
+  id: z.string().min(1, { message: 'address_id is required' }),
 })
 
 export const EditProfileSchema = z.object({

@@ -38,6 +38,8 @@ export const editProfile = async (
     .eq('id', profile!.id)
   if (error) return { error: error.message }
 
+  // TODO: save profile picture in supabase storage
+
   revalidatePath('/', 'layout')
   redirect('/skr/setup/address')
 }
