@@ -24,7 +24,6 @@ import { useAuthStore } from "@/store/AuthStore"
 import { z } from "zod"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { EditSkillsField } from "../fields/skills-field"
 
 export function EditForm() {
   const { profile } = useAuthStore()
@@ -35,28 +34,16 @@ export function EditForm() {
     defaultValues: {
       shortDescription: "",
       longDescription: "",
-      skillIds: [],
-      province: "",
-      city_muni: "",
-      barangay: "",
-      postal_code: "",
-      address_1: "",
-      address_2: "",
     }
   })
 
   useEffect(() => {
+    if (!profile) return
+
     form.reset({
       shortDescription: profile?.short_desc,
       longDescription: profile?.long_desc,
-      skillIds: (profile?.profile_skills as Record<string, Record<string, string>>[])
-        .map(({ skills: skill }) => skill.id),
-      province: profile?.addresses[0]?.province,
-      city_muni: profile?.addresses[0]?.city_muni,
-      barangay: profile?.addresses[0]?.barangay,
-      postal_code: profile?.addresses[0]?.postal_code,
-      address_1: profile?.addresses[0]?.address_1,
-      address_2: profile?.addresses[0]?.address_2,
+      id: profile.id
     })
   }, [profile, form])
 
@@ -113,15 +100,6 @@ export function EditForm() {
               </FormItem>
             )}
           />
-          <FormField control={form.control} name="skillIds" render={() => (
-            <FormItem>
-              <FormLabel>Skills</FormLabel>
-              <FormControl>
-                <EditSkillsField form={form} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
         </div>
         <DialogFooter>
           <Button type="submit" disabled={isPending}>Submit</Button>
