@@ -8,6 +8,7 @@ import Spinner from '@/components/custom/spinner'
 import usePaginationSearchParams from '@/hooks/usePaginationSearchParams'
 import { useJobStore } from '@/store/JobStore'
 import { createClient } from '@/utils/supabase/client'
+import { UserRoundSearchIcon } from 'lucide-react'
 
 interface Props {
   params: {
@@ -23,11 +24,11 @@ const JOB_APPLICANT_FIELDS = `
     )
   )
 `
+
 export default function TaskApplicantsPage({ params: { id } }: Props) {
   const { isJobOpen } = useJobStore()
   const supabase = createClient()
   const { start, end } = usePaginationSearchParams()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [applicants, setApplicants] = useState<any[]>([])
   const [totalApplicants, setTotalApplicants] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -45,7 +46,6 @@ export default function TaskApplicantsPage({ params: { id } }: Props) {
         if (error) console.error(error)
         setIsLoading(false)
       })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (isLoading) return <Spinner size="md" />
@@ -70,7 +70,13 @@ export default function TaskApplicantsPage({ params: { id } }: Props) {
           ))}
 
         {!totalApplicants && (
-          <h1 className="text-2xl text-center">No applicants</h1>
+          <div className="text-center space-y-4">
+            <UserRoundSearchIcon className="mx-auto size-24 text-gray-400" />
+            <h1 className="text-2xl">No applicants yet</h1>
+            <p className="text-gray-500">
+              It seems like there are no applicants for this job.
+            </p>
+          </div>
         )}
       </div>
     </>
