@@ -5,7 +5,6 @@ import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import Spinner from '@/components/custom/spinner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Chip } from '@/components/ui/chip'
 import { useJobStore } from '@/store/JobStore'
 import { MapPin } from 'lucide-react'
 import Link from 'next/link'
@@ -31,36 +30,42 @@ export function ApplicantListItem({ applicant }: Props) {
   }
 
   return (
-    <Card className="modern-card">
-      <CardHeader>
-        <Link href={`/skr/${applicant.profiles.username}`}>
-          <h3 className="text-lg font-bold">
-            {/* TODO: link to seeker profile */}
-            {applicant.profiles.first_name as string}
-          </h3>
-        </Link>
-        <p>{applicant.profiles.short_desc}</p>
-        <Chip
-          beforeContent={<MapPin size={16} />}
-          content={Object.values(applicant.profiles.addresses[0]).join(', ')}
-          className="w-max"
-          contentClassName="max-w-[unset]"
-        />
+    <Card className="border dark:border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 dark:bg-gray-800/50 dark:text-white">
+      <CardHeader className="p-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <Link href={`/skr/${applicant.profiles.username}`}>
+              <h3 className="text-lg font-semibold hover:underline">
+                {applicant.profiles.first_name}
+              </h3>
+            </Link>
+            <div className="text-sm flex items-center space-x-1 mt-1">
+              <MapPin
+                size={14}
+                className="dark:text-gray-400"
+              />
+              <span>
+                {Object.values(applicant.profiles.addresses[0]).join(', ')}
+              </span>
+            </div>
+          </div>
+          {isJobOpen() && (
+            <Button
+              className="text-white bg-green-600 hover:bg-green-700 rounded-md px-4 py-2"
+              disabled={isPending}
+              onClick={approve}
+            >
+              {isPending ? <Spinner size="xs" /> : 'Approve'}
+            </Button>
+          )}
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4">
         <CollapsibleDesc content={applicant.proposal} />
       </CardContent>
-      {isJobOpen() && (
-        <CardFooter className="justify-end">
-          <Button
-            className="text-white bg-green-500 hover:bg-green-600 transition-colors duration-200"
-            disabled={isPending}
-            onClick={approve}
-          >
-            {isPending ? <Spinner size="xs" /> : 'Approve'}
-          </Button>
-        </CardFooter>
-      )}
+      <CardFooter className="p-4 text-sm border-t dark:border-gray-700">
+        Applied on: {new Date(applicant.created_at).toLocaleDateString()}
+      </CardFooter>
     </Card>
   )
 }
