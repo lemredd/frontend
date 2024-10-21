@@ -18,19 +18,20 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { EditProfileSchema } from "@/lib/schema"
+import { EditProfileDescriptionSchema } from "@/lib/schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useAuthStore } from "@/store/AuthStore"
 import { z } from "zod"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { editFromProfilePage } from "@/actions/profile"
 
 export function EditForm() {
   const { profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
 
-  const form = useForm<z.infer<typeof EditProfileSchema>>({
-    resolver: zodResolver(EditProfileSchema),
+  const form = useForm<z.infer<typeof EditProfileDescriptionSchema>>({
+    resolver: zodResolver(EditProfileDescriptionSchema),
     defaultValues: {
       shortDescription: "",
       longDescription: "",
@@ -43,13 +44,17 @@ export function EditForm() {
     form.reset({
       shortDescription: profile?.short_desc,
       longDescription: profile?.long_desc,
-      id: profile.id
+      id: profile?.id,
     })
   }, [profile, form])
 
   function onSubmit() {
+
     startTransition(() => {
-      // TODO: make action to edit profile
+      editFromProfilePage(form.getValues()).then(data => {
+        if (data?.error) return console.error(data?.error)
+        location.reload()
+      })
     })
   }
 
