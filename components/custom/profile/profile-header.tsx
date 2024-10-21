@@ -20,9 +20,10 @@ import { useEffect, useState } from 'react'
 import { EditAddressForm } from './edit-address-form'
 import { ProfileRating } from './rating'
 import { ProfilePicture } from './picture'
+import { SeekerSkillsList } from './skills-list'
 
 export function OwnProfileHeader() {
-  const { profile } = useAuthStore()
+  const { profile, user } = useAuthStore()
 
   const joinedDate = new Date(profile?.created_at).toLocaleDateString('PH', {
     month: 'long',
@@ -95,6 +96,9 @@ export function OwnProfileHeader() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Skills List */}
+        {user?.user_metadata.role_code === "SKR" && <SeekerSkillsList skills={profile?.profile_skills} />}
 
         {/* Verification List */}
         <VerificationList />
