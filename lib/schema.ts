@@ -88,6 +88,16 @@ export const ProfileDescriptionSchema = z.object({
   }),
 })
 
+export const EditProfileDescriptionSchema = z.object({
+  shortDescription: z.string().min(1, {
+    message: 'Description is required',
+  }),
+  longDescription: z.string().min(1, {
+    message: 'Description is required',
+  }),
+  id: z.string().min(1, { message: 'id is required' }),
+})
+
 const transformPSGCField = (value: string) => value.split('|')[1]
 
 export const AddressSchema = z.object({
@@ -111,12 +121,6 @@ export const AddressSchema = z.object({
 export const EditAddressSchema = z.object({
   ...AddressSchema.shape,
   id: z.string().min(1, { message: 'address_id is required' }),
-})
-
-export const EditProfileSchema = z.object({
-  ...SkillsSchema.shape,
-  ...ProfileDescriptionSchema.shape,
-  ...AddressSchema.shape,
 })
 
 export const ProfilePictureSchema = z.object({
