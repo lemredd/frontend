@@ -25,7 +25,14 @@ import { JobSchema } from '@/lib/schema'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { useJobStore } from '@/store/JobStore'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Clock, MapPin, Pencil, PhilippinePesoIcon, Trash } from 'lucide-react'
+import {
+  Clock,
+  MapPin,
+  Pencil,
+  PhilippinePesoIcon,
+  Trash,
+  XCircleIcon,
+} from 'lucide-react'
 import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -101,21 +108,32 @@ export function JobDetailsForm() {
         {/* Edit and Delete Buttons */}
         <CardFooter className="justify-end space-x-3">
           {!isJobOpen() && job.status !== 'completed' && <CompleteJobForm />}
-          <Button
-            variant="secondary"
-            onClick={() => setEditing(true)}
-            className="flex items-center gap-2"
-          >
-            <Pencil size={18} />
-            Edit
-          </Button>
+          {isJobOpen() && (
+            <Button
+              variant="secondary"
+              onClick={() => setEditing(true)}
+              className="flex items-center gap-2"
+            >
+              <Pencil size={18} />
+              Edit
+            </Button>
+          )}
           <Button
             variant="destructive"
             onClick={() => console.log('Delete action')}
             className="flex items-center gap-2"
           >
-            <Trash size={18} />
-            Delete
+            {isJobOpen() ? (
+              <>
+                <Trash size={18} />
+                Delete
+              </>
+            ) : (
+              <>
+                <XCircleIcon size={18} />
+                Cancel
+              </>
+            )}
           </Button>
         </CardFooter>
       </Card>

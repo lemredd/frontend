@@ -36,7 +36,7 @@ export function ApplicantListItem({ applicant }: Props) {
           <div>
             <Link href={`/skr/${applicant.profiles.username}`}>
               <h3 className="text-lg font-semibold hover:underline">
-                {applicant.profiles.first_name}
+                {applicant.profiles.first_name} {applicant.profiles.last_name}
               </h3>
             </Link>
             <div className="text-sm flex items-center space-x-1 mt-1">
