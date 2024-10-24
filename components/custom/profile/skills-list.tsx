@@ -7,27 +7,24 @@ import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { ComboboxItem } from '@/lib/types'
 import { createClient } from '@/utils/supabase/client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AsyncStrictCombobox } from '../combobox'
 import { XIcon } from 'lucide-react'
 import { SkillsSchema } from "@/lib/schema"
+import { Form } from "@/components/ui/form"
+import { editSkills } from "@/actions/skr/skills"
+import { useAuthStore } from "@/store/AuthStore"
 
 
 interface EditSkillsFormProps {
   selectedSkills?: Record<string, any>[]
 }
 function EditSkillsForm({ selectedSkills }: EditSkillsFormProps) {
+  const { profile } = useAuthStore()
   const supabase = createClient()
+  const [isPending, startTransition] = useTransition()
   const [skills, setSkills] = useState<ComboboxItem[]>([])
   const [clonedSelectedSkills, setClonedSelectedSkills] = useState<EditSkillsFormProps['selectedSkills']>(selectedSkills)
   const [search, setSearch] = useState('')
@@ -58,6 +55,17 @@ function EditSkillsForm({ selectedSkills }: EditSkillsFormProps) {
       form.getValues("skillIds").filter(skillId => skillId !== id)
     )
     setClonedSelectedSkills(clonedSelectedSkills!.filter(skill => skill.id !== id))
+  }
+
+  function onSubmit() {
+    if (!profile) return
+
+    startTransition(() => {
+      editSkills(form.getValues(), profile.id).then(data => {
+        if (data?.error) return console.error(data?.error)
+        location.reload()
+      })
+    })
   }
 
   useEffect(() => {
@@ -99,40 +107,42 @@ function EditSkillsForm({ selectedSkills }: EditSkillsFormProps) {
   }, [form, supabase])
 
   return (
-    <form className="space-y-4">
-      <AsyncStrictCombobox
-        items={skills}
-        placeholder="Search for skills, e.g., JavaScript, Project Management"
-        value={search}
-        onValueChange={addSkill}
-      />
-      <div className="flex items-center flex-wrap gap-2">
-        {!!clonedSelectedSkills &&
-          clonedSelectedSkills.map(({ id, name }) => (
-            <Chip
-              key={id}
-              content={name}
-              className="w-max"
-              afterContent={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="!p-0 size-5"
-                  onClick={() => removeSkill(id)}
-                >
-                  <XIcon className="size-3" />
-                </Button>
-              }
-            />
-          ))}
-      </div>
-      <DialogFooter>
-        <Button type="submit" variant="default">
-          Save
-        </Button>
-      </DialogFooter>
-    </form>
+    <Form {...form}>
+      <form className="space-y-4" id="skills-form" onSubmit={form.handleSubmit(onSubmit)}>
+        <AsyncStrictCombobox
+          items={skills}
+          placeholder="Search for skills, e.g., JavaScript, Project Management"
+          value={search}
+          onValueChange={addSkill}
+        />
+        <div className="flex items-center flex-wrap gap-2">
+          {!!clonedSelectedSkills &&
+            clonedSelectedSkills.map(({ id, name }) => (
+              <Chip
+                key={id}
+                content={name}
+                className="w-max"
+                afterContent={
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="!p-0 size-5"
+                    onClick={() => removeSkill(id)}
+                  >
+                    <XIcon className="size-3" />
+                  </Button>
+                }
+              />
+            ))}
+        </div>
+        <DialogFooter>
+          <Button type="submit" variant="default" disabled={isPending} form="skills-form">
+            Save
+          </Button>
+        </DialogFooter>
+      </form>
+    </Form>
   )
 }
 
@@ -155,7 +165,7 @@ export function SeekerSkillsList({ skills }: SeekerSkillsListProps) {
           <DialogHeader>
             <DialogTitle>Add/Remove Skill</DialogTitle>
           </DialogHeader>
-          <EditSkillsForm selectedSkills={skills.map(({ skills: skill }) => ({ id: skill.id, name: skill.name }))} />
+          <EditSkillsForm selectedSkills={skills?.map(({ skills: skill }) => ({ id: skill.id, name: skill.name }))} />
 
         </DialogContent>
       </Dialog>
