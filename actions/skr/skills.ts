@@ -46,3 +46,37 @@ export const addSkills = async (values: z.infer<typeof SkillsSchema>) => {
   revalidatePath('/', 'layout')
   redirect('/')
 }
+
+
+export async function editSkills(
+  values: z.infer<typeof SkillsSchema>,
+  profileId: string
+) {
+  const validatedFields = SkillsSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+    }
+  }
+
+  const supabase = createClient()
+
+  const { error: deleteError } = await supabase
+    .from('profile_skills')
+    .delete()
+    .eq('profile_id', profileId)
+  if (deleteError) return { error: deleteError.message }
+
+  const { error } = await supabase
+    .from('profile_skills')
+    .insert(
+      validatedFields.data.skillIds.map((id) => ({
+        profile_id: profileId,
+        skill_id: id,
+      })),
+    )
+  if (error) return { error: error.message }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
