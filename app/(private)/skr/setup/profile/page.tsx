@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
-import { editProfile } from '@/actions/skr/profile'
+import { editProfile } from '@/actions/profile'
 import { FormError } from '@/components/custom/form-error'
 import SetupWrapper from '@/components/custom/setup-wrapper'
 import { Button } from '@/components/ui/button'

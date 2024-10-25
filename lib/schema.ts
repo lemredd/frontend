@@ -71,7 +71,10 @@ export const RegisterWithRoleSchema = z.object({
 })
 
 export const SkillsSchema = z.object({
-  skillIds: z.array(z.string()).min(1, { message: 'skill is required' }),
+  skillIds: z.array(z.string().transform(value => {
+    if (value.includes("|")) return value.split('|')[0]
+    return value
+  })).min(1, { message: 'skill is required' }),
 })
 
 export const ProfileDescriptionSchema = z.object({
@@ -86,6 +89,16 @@ export const ProfileDescriptionSchema = z.object({
   longDescription: z.string().min(1, {
     message: 'Description is required',
   }),
+})
+
+export const EditProfileDescriptionSchema = z.object({
+  shortDescription: z.string().min(1, {
+    message: 'Description is required',
+  }),
+  longDescription: z.string().min(1, {
+    message: 'Description is required',
+  }),
+  id: z.string().min(1, { message: 'id is required' }),
 })
 
 const transformPSGCField = (value: string) => value.split('|')[1]
@@ -111,12 +124,6 @@ export const AddressSchema = z.object({
 export const EditAddressSchema = z.object({
   ...AddressSchema.shape,
   id: z.string().min(1, { message: 'address_id is required' }),
-})
-
-export const EditProfileSchema = z.object({
-  ...SkillsSchema.shape,
-  ...ProfileDescriptionSchema.shape,
-  ...AddressSchema.shape,
 })
 
 export const ProfilePictureSchema = z.object({

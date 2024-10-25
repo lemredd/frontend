@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import * as z from 'zod'
 
-import { ProfileDescriptionSchema } from '@/lib/schema'
+import { EditProfileDescriptionSchema, ProfileDescriptionSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
 
 export const editProfile = async (
@@ -42,4 +42,28 @@ export const editProfile = async (
 
   revalidatePath('/', 'layout')
   redirect('/skr/setup/address')
+}
+
+export const editFromProfilePage = async (
+  values: z.infer<typeof EditProfileDescriptionSchema>
+) => {
+  const supabase = createClient()
+  const validatedFields = EditProfileDescriptionSchema.safeParse(values)
+
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+    }
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      short_desc: validatedFields.data.shortDescription,
+      long_desc: validatedFields.data.longDescription,
+    })
+    .eq("id", validatedFields.data.id)
+  if (error) return { error: error.message }
+
+  revalidatePath('/', 'layout')
 }
