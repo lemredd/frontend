@@ -27,6 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { EditIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { AsyncStrictCombobox } from '../combobox'
+import { useAuthStore } from '@/store/AuthStore'
 
 type JobForm = z.infer<typeof JobSchema>
 interface PartialFieldsProps {
@@ -318,6 +319,7 @@ function PriceField({ form }: Pick<PartialFieldsProps, 'form'>) {
 
 export function JobForm() {
   // TODO: store state in URL
+  const { profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState(0)
   const router = useRouter()
@@ -341,7 +343,7 @@ export function JobForm() {
 
   function onSubmit() {
     startTransition(() => {
-      postJob(form.getValues(), false).then((data) => {
+      postJob(form.getValues(), !profile?.is_completed).then((data) => {
         if (data?.error) {
           toast({
             variant: 'destructive',
@@ -349,11 +351,11 @@ export function JobForm() {
             description: data?.error,
           })
         } else {
-          router.push('/pdr/tasks/')
           toast({
             variant: 'success',
             title: 'Task Posted Successfully!',
           })
+          router.push('/pdr/tasks/')
         }
       })
     })
