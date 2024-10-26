@@ -93,9 +93,10 @@ interface AddressFieldsProps extends PartialFieldsProps {
 
 function AddressFields({ form, step, setStep }: AddressFieldsProps) {
   const canProceed =
-    !!form.getValues().province &&
-    !!form.getValues().city_muni &&
-    !!form.getValues().barangay
+    !!form.getValues("province") &&
+    !!form.getValues("city_muni") &&
+    !!form.getValues("barangay") &&
+    !!form.getValues("setup")
 
   const {
     provinces,
@@ -106,6 +107,18 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
     getBarangays,
   } = usePSGCAddressFields()
 
+  const [setups, setSetups] = useState<ComboboxItem[]>([])
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase
+      .rpc('get_types', { enum_type: 'job_setup' })
+      .then(({ data, error }) => {
+        if (error) return console.error(error)
+        setSetups(data.map((item: string) => ({ label: `${item[0].toLocaleUpperCase()}${item.slice(1)}`, value: item })))
+      })
+  }, [supabase])
+
   useEffect(() => {
     getProvinces()
     const subscription = form.watch(({ province, city_muni }, { name }) => {
@@ -114,7 +127,6 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
       if (province) getCityMunicipalities(province)
       if (city_muni) getBarangays(city_muni)
     })
-
     return () => subscription.unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch])
@@ -128,7 +140,7 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
   return (
     <>
       <h3 className="text-xl mt-2">Job Location</h3>
-      <div className="flex gap-x-4 [&>*]:basis-1/3">
+      <div className="gap-4 grid grid-cols-2 grid-rows-2">
         <FormField
           control={form.control}
           name="province"
@@ -179,6 +191,24 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
                   value={field.value}
                   onValueChange={(value) => form.setValue('barangay', value)}
                   disabled={!form.watch('city_muni')}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="setup"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Work setup</FormLabel>
+              <FormControl>
+                <AsyncStrictCombobox
+                  items={setups}
+                  placeholder="Select work setup"
+                  value={form.watch(field.name)}
+                  onValueChange={(value) => form.setValue('setup', value)}
                 />
               </FormControl>
               <FormMessage />
