@@ -28,6 +28,7 @@ import { EditIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { AsyncStrictCombobox } from '../combobox'
 import { useAuthStore } from '@/store/AuthStore'
+import { useJobSetups } from '@/hooks/useEnumTypes'
 
 type JobForm = z.infer<typeof JobSchema>
 interface PartialFieldsProps {
@@ -107,17 +108,11 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
     getBarangays,
   } = usePSGCAddressFields()
 
-  const [setups, setSetups] = useState<ComboboxItem[]>([])
-  const supabase = createClient()
+  const { setups, getSetups } = useJobSetups()
 
   useEffect(() => {
-    supabase
-      .rpc('get_types', { enum_type: 'job_setup' })
-      .then(({ data, error }) => {
-        if (error) return console.error(error)
-        setSetups(data.map((item: string) => ({ label: `${item[0].toLocaleUpperCase()}${item.slice(1)}`, value: item })))
-      })
-  }, [supabase])
+    getSetups()
+  }, [])
 
   useEffect(() => {
     getProvinces()

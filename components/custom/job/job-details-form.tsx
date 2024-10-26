@@ -33,14 +33,21 @@ import {
   Trash,
   XCircleIcon,
 } from 'lucide-react'
-import { useTransition } from 'react'
+import { useEffect, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { CompleteJobForm } from './complete-job-form'
+import { AsyncStrictCombobox } from '../combobox'
+import { useJobSetups } from '@/hooks/useEnumTypes'
 
 export function JobDetailsForm() {
   const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
   const [isPending, startTransition] = useTransition()
+
+  const { setups, getSetups } = useJobSetups()
+  useEffect(() => {
+    getSetups()
+  }, [])
 
   const form = useForm<z.infer<typeof JobSchema>>({
     resolver: zodResolver(JobSchema),
@@ -55,6 +62,10 @@ export function JobDetailsForm() {
       console.log(values)
       setEditing(false)
     })
+  }
+
+  function deleteJob() {
+    console.log("TODO")
   }
 
   if (!isOwned || !isEditing)
@@ -127,7 +138,7 @@ export function JobDetailsForm() {
           )}
           <Button
             variant="destructive"
-            onClick={() => console.log('Delete action')}
+            onClick={deleteJob}
             className="flex items-center gap-2"
           >
             {isJobOpen() ? (
@@ -187,6 +198,24 @@ export function JobDetailsForm() {
                       )}
                       className="bg-background"
                       rows={5}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="setup"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Work setup</FormLabel>
+                  <FormControl>
+                    <AsyncStrictCombobox
+                      items={setups}
+                      placeholder="Select work setup"
+                      value={form.watch(field.name)}
+                      onValueChange={(value) => form.setValue('setup', value)}
                     />
                   </FormControl>
                   <FormMessage />
