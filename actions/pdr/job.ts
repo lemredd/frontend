@@ -52,6 +52,7 @@ export async function postJob(
       province: validatedFields.data.province,
       city_muni: validatedFields.data.city_muni,
       barangay: validatedFields.data.barangay,
+      setup: validatedFields.data.setup,
       profile_id: profile.id,
     })
     .select()
