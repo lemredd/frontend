@@ -71,10 +71,14 @@ export const RegisterWithRoleSchema = z.object({
 })
 
 export const SkillsSchema = z.object({
-  skillIds: z.array(z.string().transform(value => {
-    if (value.includes("|")) return value.split('|')[0]
-    return value
-  })).min(1, { message: 'skill is required' }),
+  skillIds: z
+    .array(
+      z.string().transform((value) => {
+        if (value.includes('|')) return value.split('|')[0]
+        return value
+      }),
+    )
+    .min(1, { message: 'skill is required' }),
 })
 
 export const ProfileDescriptionSchema = z.object({
@@ -127,7 +131,9 @@ export const EditAddressSchema = z.object({
 })
 
 export const ProfilePictureSchema = z.object({
-  profile_picture: z.instanceof(File).refine(file => file.size <= 10_000_000, 'File too large'),
+  profile_picture: z
+    .instanceof(File)
+    .refine((file) => file.size <= 10_000_000, 'File too large'),
   name: z.string().min(1, 'name is required'),
 })
 
@@ -179,14 +185,15 @@ export const CheckJobApplicationSchema = z.object({
 })
 
 export const ApproveApplicantSchema = z.object({
-  job_applicant_id: z.number()
+  job_applicant_id: z.number(),
 })
 
 export const FeedbackSchema = z.object({
   feedback: z.string().optional(),
-  rate: z.string()
-    .refine((value) => Number(value) >= 0 && Number(value) <= 5, "Rate must be between 0 and 5")
-    .transform((value) => Number(value)),
+  rate: z
+    .number()
+    .min(0.5, { message: 'Rate must be at least 0.5' })
+    .max(5, { message: 'Rate cannot exceed 5' }),
   from_id: z.string().min(1, { message: 'from_id is required' }),
   to_id: z.string().min(1, { message: 'to_id is required' }),
   job_id: z.string().min(1, { message: 'job_id is required' }),
@@ -196,4 +203,3 @@ export const CompleteJobWithFeedbackSchema = z.object({
   ...FeedbackSchema.shape,
   job_id: z.string().min(1, { message: 'job_id is required' }),
 })
-
