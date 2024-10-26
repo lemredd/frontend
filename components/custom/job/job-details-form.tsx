@@ -72,12 +72,19 @@ export function JobDetailsForm() {
                 <span>Posted {getRecency(job.created_at as string)}</span>
               </div>
               {/* Job Location */}
-              <Chip
-                beforeContent={<MapPin size={18} />}
-                content={getAddress(job)}
-                className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-                contentClassName="max-w-[unset]"
-              />
+              <div className="flex gap-x-2">
+                <Chip
+                  beforeContent={<MapPin size={18} />}
+                  content={getAddress(job)}
+                  className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+                  contentClassName="max-w-[unset]"
+                />
+                <Chip
+                  content={job?.setup}
+                  className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+                  contentClassName="max-w-[unset]"
+                />
+              </div>
             </div>
           </div>
         </CardHeader>

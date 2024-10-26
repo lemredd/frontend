@@ -28,8 +28,7 @@ export default function JobList() {
     const start = (page - 1) * size
     const end = start + size
 
-    const selectedFields =
-      'id, created_at, name, description, price, province, city_muni, barangay'
+    const selectedFields = '*'
     const query = supabase
       .from('jobs')
       .select(selectedFields)
