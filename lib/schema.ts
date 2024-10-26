@@ -164,6 +164,7 @@ export const JobSchema = z.object({
     .min(1, { message: 'barangay is required' })
     .transform(transformPSGCField),
   skill_ids: z.array(z.string().min(1, { message: 'skill is required' })),
+  setup: z.string().min(1, { message: 'setup is required' }),
 })
 
 // Separate schema for checking and applying. One of them might change later.
