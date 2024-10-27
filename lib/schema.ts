@@ -167,6 +167,11 @@ export const JobSchema = z.object({
   setup: z.string().min(1, { message: 'setup is required' }),
 })
 
+export const EditJobSchema = z.object({
+  ...JobSchema.shape,
+  id: z.string().min(1, { message: 'job_id is required' }),
+})
+
 // Separate schema for checking and applying. One of them might change later.
 export const ApplyJobSchema = z.object({
   job_id: z.string().min(1, { message: 'job_id is required' }),
