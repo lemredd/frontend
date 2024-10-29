@@ -7,11 +7,16 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
 import { RefreshCwIcon } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import JobListItem, { ProfileJobListItem } from './job-list-item'
 
-export default function JobList() {
+interface ProfileJobListProps {
+  role: 'seeker' | 'provider'
+}
+
+export default function JobList({ role }: ProfileJobListProps) {
+  const router = useRouter()
   const { user, profile } = useAuthStore()
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -30,13 +35,14 @@ export default function JobList() {
     const size = +(searchParams.get('size') ?? 10)
     const start = (page - 1) * size
     const end = start + size
+    const status = searchParams.get('status') ?? 'open'
 
     const selectedFields =
       'id, created_at, name, description, price, province, city_muni, barangay'
     const query = supabase
       .from('jobs')
       .select(selectedFields)
-      .eq('status', searchParams.get('status') ?? 'open')
+      .eq('status', status)
       .order('created_at', { ascending: false })
       .range(start, end)
 
@@ -101,9 +107,20 @@ export default function JobList() {
   if (jobs.length === 0) {
     return (
       <EmptyState
-        message="No jobs found."
-        subtitle="Try adjusting your filters or check back later."
-        actionLabel="Reset Filters"
+        message={
+          role === 'seeker'
+            ? "You're not following any jobs."
+            : 'You haven’t posted any jobs yet.'
+        }
+        subtitle={
+          role === 'seeker'
+            ? 'Explore jobs that align with your interests to get started.'
+            : 'Start creating a job post to reach the right candidates.'
+        }
+        actionLabel={role === 'seeker' ? 'Find Jobs' : 'Create Job Post'}
+        onActionClick={() => {
+          router.push(role === 'seeker' ? '/jobs' : '/pdr/tasks/post/')
+        }}
       />
     )
   }
@@ -121,9 +138,6 @@ export default function JobList() {
   )
 }
 
-interface ProfileJobListProps {
-  role: 'seeker' | 'provider'
-}
 export function ProfileJobList({ role }: ProfileJobListProps) {
   const { profile } = useAuthStore()
   const supabase = createClient()
@@ -168,7 +182,9 @@ export function ProfileJobList({ role }: ProfileJobListProps) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">My Jobs</h2>
+      <h2 className="text-xl font-bold mb-4">
+        {role === 'seeker' ? 'Jobs You’re Interested In' : 'Jobs You’ve Posted'}
+      </h2>
       <div className="space-y-4">
         {jobs.map((job) => (
           <ProfileJobListItem

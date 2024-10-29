@@ -7,7 +7,7 @@ export default function SeekerTasksPage() {
   return (
     <>
       <SeekerTaskSearchBar />
-      <JobList />
+      <JobList role="seeker" />
     </>
   )
 }

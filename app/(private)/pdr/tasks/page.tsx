@@ -6,7 +6,7 @@ export default function TaskListPage() {
     <>
       <Header />
 
-      <JobList />
+      <JobList role="provider" />
     </>
   )
 }
