@@ -119,7 +119,7 @@ export default function JobList({ role }: ProfileJobListProps) {
         }
         actionLabel={role === 'seeker' ? 'Find Jobs' : 'Create Job Post'}
         onActionClick={() => {
-          router.push(role === 'seeker' ? '/jobs' : '/pdr/tasks/post/')
+          router.push(role === 'seeker' ? '/skr/tasks/' : '/pdr/tasks/post/')
         }}
       />
     )
