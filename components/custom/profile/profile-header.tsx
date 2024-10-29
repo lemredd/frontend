@@ -32,7 +32,7 @@ export function OwnProfileHeader() {
   })
 
   return (
-    <Card className="shadow-lg rounded-md max-w-4xl mx-auto md:p-4 xl:p-6">
+    <Card className="shadow-lg rounded-md md:p-4 xl:p-6">
       <CardHeader className="flex flex-col sm:flex-row sm:items-start sm:space-x-6 space-y-4 sm:space-y-0">
         {/* Avatar and Edit Button */}
         <ProfilePicture profile={profile} />
