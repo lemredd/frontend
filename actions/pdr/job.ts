@@ -7,6 +7,7 @@ import {
   ApplyJobSchema,
   ApproveApplicantSchema,
   CheckJobApplicationSchema,
+  EditJobSchema,
   JobSchema,
 } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
@@ -100,6 +101,35 @@ export async function postJob(
       job: jobData[0], // Include the job data in the response if needed
     },
   }
+}
+
+export async function editJob(values: z.infer<typeof EditJobSchema>) {
+  const validatedFields = EditJobSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+      details: validatedFields.error.errors,
+    }
+  }
+
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('jobs')
+    .update({
+      name: validatedFields.data.name,
+      description: validatedFields.data.description,
+      price: validatedFields.data.price,
+      province: validatedFields.data.province,
+      city_muni: validatedFields.data.city_muni,
+      barangay: validatedFields.data.barangay,
+      setup: validatedFields.data.setup,
+    })
+    .eq('id', validatedFields.data.id)
+    .select()
+
+  if (error) return { error: error.message }
+
+  return { success: 'Job updated successfully!', data }
 }
 
 export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
