@@ -32,6 +32,7 @@ import {
   PhilippinePesoIcon,
   Trash,
   XCircleIcon,
+  XIcon,
 } from 'lucide-react'
 import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
@@ -41,11 +42,14 @@ import { AsyncStrictCombobox } from '../combobox'
 import { useJobSetups } from '@/hooks/useEnumTypes'
 import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
 import { editJob } from '@/actions/pdr/job'
+import { createClient } from '@/utils/supabase/client'
+import { useSkills } from '@/hooks/useSkills'
 
 export function JobDetailsForm() {
   const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
   const [isPending, startTransition] = useTransition()
   const [mustReset, setMustReset] = useState(true)
+  const supabase = createClient()
 
   const form = useForm<z.infer<typeof EditJobSchema>>({
     resolver: zodResolver(EditJobSchema),
@@ -57,6 +61,7 @@ export function JobDetailsForm() {
       city_muni: '',
       barangay: '',
       setup: '',
+      skill_ids: [],
     }
   })
 
@@ -78,6 +83,36 @@ export function JobDetailsForm() {
     return () => subscription?.unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch])
+
+  const {
+    skills,
+    // setSkills
+  } = useSkills(supabase)
+  const selectedSkills = skills.filter(skill => form.watch('skill_ids', [])?.includes(skill.value.split('|')[0]))
+
+  function addSkill(value: string) {
+    const skillIds = form.getValues('skill_ids')
+    const [id] = value.split('|')
+    if (skillIds?.includes(id)) return undefined
+
+    form.setValue('skill_ids', [...skillIds!, id])
+  }
+
+  function removeSkill(id: string) {
+    const [_id] = id.split('|')
+    form.setValue('skill_ids', form.getValues('skill_ids')!.filter((skillId) => skillId !== _id))
+  }
+
+  //useEffect(() => {
+  //  if (!job) return
+  //  setSkills(
+  //    prev => prev.filter(
+  //      skill => !job.job_skills.some((jobSkill: Record<string, any>) => jobSkill.skills.id === skill.value.split('|')[0])
+  //    )
+  //  )
+  //  // eslint-disable-next-line react-hooks/exhaustive-deps
+  //}, [job])
+
   useEffect(() => {
     if (!job) return undefined
     if (!mustReset) return undefined
@@ -89,7 +124,8 @@ export function JobDetailsForm() {
       province: provinces.find(province => province.label === job.province)?.value,
       city_muni: cityMunicipalities.find(cityMuni => cityMuni.label === job.city_muni)?.value,
       barangay: barangays.find(barangay => barangay.label === job.barangay)?.value,
-      setup: job.setup
+      setup: job.setup,
+      skill_ids: job.job_skills.map(({ skills: skill }: Record<string, any>) => skill.id)
     })
 
     setMustReset(!(Object.values(form.getValues()).every(Boolean)))
@@ -339,9 +375,35 @@ export function JobDetailsForm() {
                 )}
               />
             </div>
-            {/* TODO: add field for skills */}
-            {/* TODO: add location fields */}
-
+            <>
+              <h3 className="text-xl mt-2">Required Skills</h3>
+              <AsyncStrictCombobox
+                items={skills}
+                placeholder="Search for skills, e.g., JavaScript, Project Management"
+                value=""
+                onValueChange={addSkill}
+              />
+              <div className="flex items-center gap-x-2">
+                {!!selectedSkills.length &&
+                  selectedSkills.map(({ value: id, label: name }) => (
+                    <Chip
+                      key={id}
+                      content={name}
+                      afterContent={
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="!p-0 size-5"
+                          onClick={() => removeSkill(id)}
+                        >
+                          <XIcon className="size-3" />
+                        </Button>
+                      }
+                    />
+                  ))}
+              </div>
+            </>
             <div className="flex justify-end gap-x-2">
               <Button
                 type="button"
