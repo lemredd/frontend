@@ -169,6 +169,7 @@ export const JobSchema = z.object({
 
 export const EditJobSchema = z.object({
   ...JobSchema.shape,
+  skill_ids: z.array(z.string()).optional(),
   id: z.string().min(1, { message: 'job_id is required' }),
 })
 
