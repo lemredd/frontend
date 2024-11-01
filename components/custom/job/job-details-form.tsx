@@ -79,7 +79,7 @@ export function JobDetailsForm() {
   }, [form.watch])
   useEffect(() => {
     if (!job) return undefined
-    if (Object.values(form.getValues()).every(Boolean) || !mustReset) return undefined
+    if (!mustReset) return undefined
 
     form.reset({
       id: job.id,
