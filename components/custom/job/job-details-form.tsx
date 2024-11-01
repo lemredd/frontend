@@ -41,9 +41,10 @@ import { CompleteJobForm } from './complete-job-form'
 import { AsyncStrictCombobox } from '../combobox'
 import { useJobSetups } from '@/hooks/useEnumTypes'
 import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
-import { editJob } from '@/actions/pdr/job'
+import { deleteJob as _deleteJob, editJob } from '@/actions/pdr/job'
 import { createClient } from '@/utils/supabase/client'
 import { useSkills } from '@/hooks/useSkills'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 export function JobDetailsForm() {
   const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
@@ -164,7 +165,10 @@ export function JobDetailsForm() {
   }
 
   function deleteJob() {
-    console.log("TODO")
+    _deleteJob(job?.id).then((data) => {
+      if (data?.error) return console.error(data)
+      location.href = "/pdr/tasks"
+    })
   }
 
   if (!isOwned || !isEditing)
@@ -235,23 +239,38 @@ export function JobDetailsForm() {
               Edit
             </Button>
           )}
-          <Button
-            variant="destructive"
-            onClick={deleteJob}
-            className="flex items-center gap-2"
-          >
-            {isJobOpen() ? (
-              <>
-                <Trash size={18} />
-                Delete
-              </>
-            ) : (
-              <>
-                <XCircleIcon size={18} />
-                Cancel
-              </>
-            )}
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="destructive"
+                className="flex items-center gap-2"
+              >
+                {isJobOpen() ? (
+                  <>
+                    <Trash size={18} />
+                    Delete
+                  </>
+                ) : (
+                  <>
+                    <XCircleIcon size={18} />
+                    Cancel
+                  </>
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you sure about this?</DialogTitle>
+              </DialogHeader>
+              <DialogDescription>This action is irreversible</DialogDescription>
+              <DialogFooter>
+                <Button variant="destructive" onClick={deleteJob}>Yes</Button>
+                <DialogClose asChild>
+                  <Button variant="outline">No</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardFooter>
       </Card>
     )
