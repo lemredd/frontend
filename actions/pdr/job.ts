@@ -181,6 +181,13 @@ export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
   return { application: application![0] }
 }
 
+export async function deleteJob(id: string) {
+  const supabase = createClient()
+  const { error } = await supabase.from('jobs').delete().eq('id', id)
+  if (error) return { error: error.message }
+  return { success: 'Job deleted successfully!' }
+}
+
 export async function checkJobApplication(
   values: z.infer<typeof CheckJobApplicationSchema>,
 ) {
