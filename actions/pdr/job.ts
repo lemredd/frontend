@@ -129,6 +129,26 @@ export async function editJob(values: z.infer<typeof EditJobSchema>) {
 
   if (error) return { error: error.message }
 
+  if (validatedFields.data.skill_ids) {
+    const { error: deleteJobSkillsError } = await supabase
+      .from('job_skills')
+      .delete()
+      .eq('job_id', validatedFields.data.id)
+
+    if (deleteJobSkillsError) return { error: deleteJobSkillsError.message }
+
+    const { error: jobSkillsError } = await supabase
+      .from('job_skills')
+      .insert(
+        validatedFields.data.skill_ids.map((id) => ({
+          job_id: validatedFields.data.id,
+          skill_id: id,
+        })),
+      )
+    if (jobSkillsError) return { error: jobSkillsError.message }
+  }
+
+
   return { success: 'Job updated successfully!', data }
 }
 
