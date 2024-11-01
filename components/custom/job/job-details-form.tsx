@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { EditJobSchema, JobSchema } from '@/lib/schema'
+import { EditJobSchema } from '@/lib/schema'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { useJobStore } from '@/store/JobStore'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -40,6 +40,7 @@ import { CompleteJobForm } from './complete-job-form'
 import { AsyncStrictCombobox } from '../combobox'
 import { useJobSetups } from '@/hooks/useEnumTypes'
 import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
+import { editJob } from '@/actions/pdr/job'
 
 export function JobDetailsForm() {
   const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
@@ -116,10 +117,13 @@ export function JobDetailsForm() {
     return <NotFound className="text-foreground h" />
   }
 
-  function onSubmit(values: z.infer<typeof JobSchema>) {
+  function onSubmit() {
     startTransition(() => {
-      console.log(values)
-      setEditing(false)
+      editJob(form.getValues()).then(data => {
+        if (data?.error) return console.error(data)
+
+        location.reload()
+      })
     })
   }
 
@@ -222,7 +226,6 @@ export function JobDetailsForm() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            id="edit-job-form"
             className="space-y-6"
           >
             <FormField
@@ -351,9 +354,9 @@ export function JobDetailsForm() {
               </Button>
               <Button
                 type="submit"
-                form="edit-job-form"
                 className="uppercase"
                 disabled={isPending}
+                onClick={onSubmit} // using form `onSubmit` seems to not work
               >
                 {isPending ? 'Saving...' : 'Save'}
               </Button>
