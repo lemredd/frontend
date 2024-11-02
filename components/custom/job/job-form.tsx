@@ -27,6 +27,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { EditIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { AsyncStrictCombobox } from '../combobox'
+import { useAuthStore } from '@/store/AuthStore'
+import { useJobSetups } from '@/hooks/useEnumTypes'
 
 type JobForm = z.infer<typeof JobSchema>
 interface PartialFieldsProps {
@@ -92,9 +94,10 @@ interface AddressFieldsProps extends PartialFieldsProps {
 
 function AddressFields({ form, step, setStep }: AddressFieldsProps) {
   const canProceed =
-    !!form.getValues().province &&
-    !!form.getValues().city_muni &&
-    !!form.getValues().barangay
+    !!form.getValues("province") &&
+    !!form.getValues("city_muni") &&
+    !!form.getValues("barangay") &&
+    !!form.getValues("setup")
 
   const {
     provinces,
@@ -105,6 +108,12 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
     getBarangays,
   } = usePSGCAddressFields()
 
+  const { setups, getSetups } = useJobSetups()
+
+  useEffect(() => {
+    getSetups()
+  }, [])
+
   useEffect(() => {
     getProvinces()
     const subscription = form.watch(({ province, city_muni }, { name }) => {
@@ -113,7 +122,6 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
       if (province) getCityMunicipalities(province)
       if (city_muni) getBarangays(city_muni)
     })
-
     return () => subscription.unsubscribe()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch])
@@ -127,7 +135,7 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
   return (
     <>
       <h3 className="text-xl mt-2">Job Location</h3>
-      <div className="flex gap-x-4 [&>*]:basis-1/3">
+      <div className="gap-4 grid grid-cols-2 grid-rows-2">
         <FormField
           control={form.control}
           name="province"
@@ -178,6 +186,24 @@ function AddressFields({ form, step, setStep }: AddressFieldsProps) {
                   value={field.value}
                   onValueChange={(value) => form.setValue('barangay', value)}
                   disabled={!form.watch('city_muni')}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="setup"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Work setup</FormLabel>
+              <FormControl>
+                <AsyncStrictCombobox
+                  items={setups}
+                  placeholder="Select work setup"
+                  value={form.watch(field.name)}
+                  onValueChange={(value) => form.setValue('setup', value)}
                 />
               </FormControl>
               <FormMessage />
@@ -318,6 +344,7 @@ function PriceField({ form }: Pick<PartialFieldsProps, 'form'>) {
 
 export function JobForm() {
   // TODO: store state in URL
+  const { profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState(0)
   const router = useRouter()
@@ -341,7 +368,7 @@ export function JobForm() {
 
   function onSubmit() {
     startTransition(() => {
-      postJob(form.getValues(), false).then((data) => {
+      postJob(form.getValues(), !profile?.is_completed).then((data) => {
         if (data?.error) {
           toast({
             variant: 'destructive',
@@ -349,11 +376,11 @@ export function JobForm() {
             description: data?.error,
           })
         } else {
-          router.push('/pdr/tasks/')
           toast({
             variant: 'success',
             title: 'Task Posted Successfully!',
           })
+          router.push('/pdr/tasks/')
         }
       })
     })

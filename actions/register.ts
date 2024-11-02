@@ -14,6 +14,13 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
       error: 'Invalid fields!',
     }
   }
+
+  const supabase = createClient()
+
+  const { error } = await supabase
+    .rpc('user_exists_by_email', { _email: validatedFields.data.email })
+
+  if (error) return { error: formatErrorMessage(error.message) }
 }
 
 export const registerWithRole = async (
@@ -40,7 +47,7 @@ export const registerWithRole = async (
     },
   })
 
-  if (error) return { error: formatErrorMessage(error.message) }
+  if (error) return { error: error.message }
 
   revalidatePath('/', 'layout')
   redirect(`/auth/verify/tell?email=${values.email}`)
