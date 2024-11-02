@@ -89,8 +89,12 @@ function ProfilePictureForm() {
 
 interface ProfilePictureProps {
   profile: Profile | null
+  isEditable?: boolean
 }
-export function ProfilePicture({ profile }: ProfilePictureProps) {
+export function ProfilePicture({
+  profile,
+  isEditable = false,
+}: ProfilePictureProps) {
   const supabase = createClient()
   const [avatarSrc, setAvatarSrc] = useState(
     '/images/profile_picture_placeholder.webp',
@@ -119,24 +123,28 @@ export function ProfilePicture({ profile }: ProfilePictureProps) {
           />
         </AvatarFallback>
       </Avatar>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute bottom-2 right-2 rounded-full p-2 shadow-m"
-          >
-            <Edit size={16} />
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Profile Picture</DialogTitle>
-            <DialogDescription>Upload a new profile picture</DialogDescription>
-          </DialogHeader>
-          <ProfilePictureForm />
-        </DialogContent>
-      </Dialog>
+      {isEditable && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute bottom-2 right-2 rounded-full p-2 shadow-m"
+            >
+              <Edit size={16} />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Profile Picture</DialogTitle>
+              <DialogDescription>
+                Upload a new profile picture
+              </DialogDescription>
+            </DialogHeader>
+            <ProfilePictureForm />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }
