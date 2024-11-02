@@ -135,6 +135,7 @@ export default function JobDetailsHeader({ job }: Props) {
           <span>{Number(job.price).toFixed(2)}</span>
         </div>
 
+
         <div className="text-sm dark:text-gray-400 sm:hidden items-center gap-2 flex">
           <Clock
             size={18}
@@ -145,6 +146,7 @@ export default function JobDetailsHeader({ job }: Props) {
       </div>
 
       <div className="items-center flex flex-col sm:flex-row gap-2">
+        <Chip content={job?.status as string} className="w-max" />
         <div className="sm:flex gap-2 hidden">
           <Share2 />
           <Bookmark />
@@ -191,6 +193,7 @@ export default function JobDetailsHeader({ job }: Props) {
             )}`}
           />
         )}
+
       </div>
     </header>
   )
