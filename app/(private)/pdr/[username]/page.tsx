@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 
-import { useAuthStore } from "@/store/AuthStore"
-import { ProviderProfileHeader } from "@/components/custom/profile/profile-header"
+import { ProfileHeader } from '@/components/custom/profile/profile-header'
+import { useAuthStore } from '@/store/AuthStore'
+import { useEffect } from 'react'
 
 interface Props {
   params: { username: string }
@@ -16,12 +16,12 @@ export default function ProviderProfilePage({ params: { username } }: Props) {
 
   useEffect(() => {
     if (!profile) return
-    if (profile.username === username) router.push("/skr/profile")
+    if (profile.username === username) router.push('/skr/profile')
   }, [profile, router, username])
 
   return (
     <section className="container mx-auto h-screen">
-      <ProviderProfileHeader username={username} />
+      <ProfileHeader username={username} />
       {/* TODO: list jobs posted by provider */}
     </section>
   )

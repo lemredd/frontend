@@ -6,15 +6,12 @@ import {
   SeekerVerificationList,
   VerificationList,
 } from '@/components/custom/profile/verification-list'
-import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { PROFILE_STORE_FIELDS } from '@/lib/constants'
 import { Profile, useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
-import { AvatarImage } from '@radix-ui/react-avatar'
-import { Edit } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { EditAddressForm } from './edit-address-form'
@@ -106,14 +103,13 @@ export function OwnProfileHeader() {
   )
 }
 
-interface SeekerProfileHeaderProps {
+interface ProfileHeaderProps {
   username: string
 }
-export function SeekerProfileHeader({ username }: SeekerProfileHeaderProps) {
+export function ProfileHeader({ username }: ProfileHeaderProps) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [addressContent, setAddressContent] = useState('')
-  const avatarSrc = 'https://placehold.co/150'
   const router = useRouter()
 
   useEffect(() => {
@@ -125,7 +121,8 @@ export function SeekerProfileHeader({ username }: SeekerProfileHeaderProps) {
       .then(({ data, error }) => {
         if (error) return console.error(error)
 
-        if (!data.is_completed) router.push('/skr/profile')
+        // ! TODO: handle properly if profile is not completed
+        // if (!data.is_completed) router.push('/skr/profile')
         setProfile(data)
         setAddressContent(
           profile?.address
@@ -194,64 +191,5 @@ export function SeekerProfileHeader({ username }: SeekerProfileHeaderProps) {
         <SeekerVerificationList username={username} />
       </CardContent>
     </Card>
-  )
-}
-
-interface ProviderProfileHeaderProps {
-  username: string
-}
-export function ProviderProfileHeader({
-  username,
-}: ProviderProfileHeaderProps) {
-  const supabase = createClient()
-  const [profile, setProfile] = useState<Record<string, any>>({})
-  const avatarSrc = 'https://placehold.co/150'
-  const router = useRouter()
-
-  useEffect(() => {
-    supabase
-      .from('profiles')
-      .select(PROFILE_STORE_FIELDS)
-      .eq('username', username)
-      .single()
-      .then(({ data, error }) => {
-        if (error) return console.error(error)
-        setProfile(data)
-      })
-  }, [supabase, username, router])
-
-  const joinedDate = new Date(profile?.created_at).toLocaleDateString('PH', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-
-  return (
-    <header className="space-y-4">
-      <Avatar className="size-[150px] relative rounded-md">
-        <AvatarImage src={avatarSrc} />
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute bottom-2 right-2 rounded-sm"
-        >
-          <Edit />
-        </Button>
-      </Avatar>
-      <section className="grid grid-flow-col grid-cols-[1fr_auto] gap-y-4 grid-rows-[repeat(3,auto)]">
-        <h1 className="text-2xl font-bold">
-          {profile?.first_name} {profile?.last_name}{' '}
-          <span className="font-normal">@{profile?.username}</span>
-        </h1>
-        <ProfileRating profile={profile} />
-        <div className="flex gap-x-2 items-center">
-          <span>Joined {joinedDate}</span>
-        </div>
-
-        <div className="row-span-full">
-          <SeekerVerificationList username={username} />
-        </div>
-      </section>
-    </header>
   )
 }
