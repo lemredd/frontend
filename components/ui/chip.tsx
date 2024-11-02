@@ -25,7 +25,7 @@ export function Chip({
   return (
     <div
       className={cn(
-        'rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 flex items-center gap-1.5 border border-foreground flex-wrap max-w-full',
+        'rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 flex items-center gap-1.5 border  flex-wrap max-w-full',
         getStatusColor && statusColors[content as keyof typeof statusColors],
         className,
       )}

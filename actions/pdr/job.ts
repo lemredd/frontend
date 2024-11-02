@@ -7,6 +7,7 @@ import {
   ApplyJobSchema,
   ApproveApplicantSchema,
   CheckJobApplicationSchema,
+  EditJobSchema,
   JobSchema,
 } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
@@ -52,6 +53,7 @@ export async function postJob(
       province: validatedFields.data.province,
       city_muni: validatedFields.data.city_muni,
       barangay: validatedFields.data.barangay,
+      setup: validatedFields.data.setup,
       profile_id: profile.id,
     })
     .select()
@@ -101,6 +103,55 @@ export async function postJob(
   }
 }
 
+export async function editJob(values: z.infer<typeof EditJobSchema>) {
+  const validatedFields = EditJobSchema.safeParse(values)
+  if (!validatedFields.success) {
+    return {
+      error: 'Invalid fields!',
+      details: validatedFields.error.errors,
+    }
+  }
+
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('jobs')
+    .update({
+      name: validatedFields.data.name,
+      description: validatedFields.data.description,
+      price: validatedFields.data.price,
+      province: validatedFields.data.province,
+      city_muni: validatedFields.data.city_muni,
+      barangay: validatedFields.data.barangay,
+      setup: validatedFields.data.setup,
+    })
+    .eq('id', validatedFields.data.id)
+    .select()
+
+  if (error) return { error: error.message }
+
+  if (validatedFields.data.skill_ids) {
+    const { error: deleteJobSkillsError } = await supabase
+      .from('job_skills')
+      .delete()
+      .eq('job_id', validatedFields.data.id)
+
+    if (deleteJobSkillsError) return { error: deleteJobSkillsError.message }
+
+    const { error: jobSkillsError } = await supabase
+      .from('job_skills')
+      .insert(
+        validatedFields.data.skill_ids.map((id) => ({
+          job_id: validatedFields.data.id,
+          skill_id: id,
+        })),
+      )
+    if (jobSkillsError) return { error: jobSkillsError.message }
+  }
+
+
+  return { success: 'Job updated successfully!', data }
+}
+
 export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
   const validatedFields = ApplyJobSchema.safeParse(values)
   if (!validatedFields.success) {
@@ -128,6 +179,13 @@ export async function applyJob(values: z.infer<typeof ApplyJobSchema>) {
   if (error) return { error: error.message }
 
   return { application: application![0] }
+}
+
+export async function deleteJob(id: string) {
+  const supabase = createClient()
+  const { error } = await supabase.from('jobs').delete().eq('id', id)
+  if (error) return { error: error.message }
+  return { success: 'Job deleted successfully!' }
 }
 
 export async function checkJobApplication(

@@ -37,8 +37,7 @@ export default function JobList({ role }: ProfileJobListProps) {
     const end = start + size
     const status = searchParams.get('status') ?? 'open'
 
-    const selectedFields =
-      'id, created_at, name, description, price, province, city_muni, barangay'
+    const selectedFields = '*'
     const query = supabase
       .from('jobs')
       .select(selectedFields)

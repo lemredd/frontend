@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { JobSchema } from '@/lib/schema'
+import { EditJobSchema } from '@/lib/schema'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { useJobStore } from '@/store/JobStore'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -32,28 +32,142 @@ import {
   PhilippinePesoIcon,
   Trash,
   XCircleIcon,
+  XIcon,
 } from 'lucide-react'
-import { useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { CompleteJobForm } from './complete-job-form'
+import { AsyncStrictCombobox } from '../combobox'
+import { useJobSetups } from '@/hooks/useEnumTypes'
+import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
+import { deleteJob as _deleteJob, editJob } from '@/actions/pdr/job'
+import { createClient } from '@/utils/supabase/client'
+import { useSkills } from '@/hooks/useSkills'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 export function JobDetailsForm() {
   const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
   const [isPending, startTransition] = useTransition()
+  const [mustReset, setMustReset] = useState(true)
+  const supabase = createClient()
 
-  const form = useForm<z.infer<typeof JobSchema>>({
-    resolver: zodResolver(JobSchema),
+  const form = useForm<z.infer<typeof EditJobSchema>>({
+    resolver: zodResolver(EditJobSchema),
+    defaultValues: {
+      id: '',
+      name: '',
+      description: '',
+      province: '',
+      city_muni: '',
+      barangay: '',
+      setup: '',
+      skill_ids: [],
+    }
   })
+
+  const {
+    provinces, getProvinces,
+    cityMunicipalities, getCityMunicipalities,
+    barangays, getBarangays
+  } = usePSGCAddressFields()
+  useEffect(() => {
+    getProvinces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      getCityMunicipalities(form.watch('province', undefined))
+      getBarangays(form.watch('city_muni', undefined))
+    })
+
+    return () => subscription?.unsubscribe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch])
+
+  const {
+    skills,
+    // setSkills
+  } = useSkills(supabase)
+  const selectedSkills = skills.filter(skill => form.watch('skill_ids', [])?.includes(skill.value.split('|')[0]))
+
+  function addSkill(value: string) {
+    const skillIds = form.getValues('skill_ids')
+    const [id] = value.split('|')
+    if (skillIds?.includes(id)) return undefined
+
+    form.setValue('skill_ids', [...skillIds!, id])
+  }
+
+  function removeSkill(id: string) {
+    const [_id] = id.split('|')
+    form.setValue('skill_ids', form.getValues('skill_ids')!.filter((skillId) => skillId !== _id))
+  }
+
+  //useEffect(() => {
+  //  if (!job) return
+  //  setSkills(
+  //    prev => prev.filter(
+  //      skill => !job.job_skills.some((jobSkill: Record<string, any>) => jobSkill.skills.id === skill.value.split('|')[0])
+  //    )
+  //  )
+  //  // eslint-disable-next-line react-hooks/exhaustive-deps
+  //}, [job])
+
+  useEffect(() => {
+    if (!job) return undefined
+    if (!mustReset) return undefined
+
+    form.reset({
+      id: job.id,
+      name: job.name,
+      description: job.description,
+      province: provinces.find(province => province.label === job.province)?.value,
+      city_muni: cityMunicipalities.find(cityMuni => cityMuni.label === job.city_muni)?.value,
+      barangay: barangays.find(barangay => barangay.label === job.barangay)?.value,
+      setup: job.setup,
+      skill_ids: job.job_skills.map(({ skills: skill }: Record<string, any>) => skill.id)
+    })
+
+    setMustReset(!(Object.values(form.getValues()).every(Boolean)))
+  }, [job, form, provinces, cityMunicipalities, barangays, mustReset])
+
+  function setProvince(value: string) {
+    form.setValue('province', value)
+    form.setValue('city_muni', '')
+    form.setValue('barangay', '')
+  }
+
+  const { setups, getSetups } = useJobSetups()
+  useEffect(() => {
+    getSetups()
+    if (!job) return;
+    form.reset({
+      name: job.name,
+      description: job.description,
+      setup: job.setup,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [job])
 
   if (!job) {
     return <NotFound className="text-foreground h" />
   }
 
-  function onSubmit(values: z.infer<typeof JobSchema>) {
+  function onSubmit() {
     startTransition(() => {
-      console.log(values)
-      setEditing(false)
+      editJob(form.getValues()).then(data => {
+        if (data?.error) return console.error(data)
+
+        location.reload()
+      })
+    })
+  }
+
+  function deleteJob() {
+    _deleteJob(job?.id).then((data) => {
+      if (data?.error) return console.error(data)
+      location.href = "/pdr/tasks"
     })
   }
 
@@ -72,12 +186,19 @@ export function JobDetailsForm() {
                 <span>Posted {getRecency(job.created_at as string)}</span>
               </div>
               {/* Job Location */}
-              <Chip
-                beforeContent={<MapPin size={18} />}
-                content={getAddress(job)}
-                className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-                contentClassName="max-w-[unset]"
-              />
+              <div className="flex gap-x-2">
+                <Chip
+                  beforeContent={<MapPin size={18} />}
+                  content={getAddress(job)}
+                  className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+                  contentClassName="max-w-[unset]"
+                />
+                <Chip
+                  content={job?.setup}
+                  className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+                  contentClassName="max-w-[unset]"
+                />
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -118,23 +239,38 @@ export function JobDetailsForm() {
               Edit
             </Button>
           )}
-          <Button
-            variant="destructive"
-            onClick={() => console.log('Delete action')}
-            className="flex items-center gap-2"
-          >
-            {isJobOpen() ? (
-              <>
-                <Trash size={18} />
-                Delete
-              </>
-            ) : (
-              <>
-                <XCircleIcon size={18} />
-                Cancel
-              </>
-            )}
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="destructive"
+                className="flex items-center gap-2"
+              >
+                {isJobOpen() ? (
+                  <>
+                    <Trash size={18} />
+                    Delete
+                  </>
+                ) : (
+                  <>
+                    <XCircleIcon size={18} />
+                    Cancel
+                  </>
+                )}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you sure about this?</DialogTitle>
+              </DialogHeader>
+              <DialogDescription>This action is irreversible</DialogDescription>
+              <DialogFooter>
+                <Button variant="destructive" onClick={deleteJob}>Yes</Button>
+                <DialogClose asChild>
+                  <Button variant="outline">No</Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardFooter>
       </Card>
     )
@@ -156,7 +292,6 @@ export function JobDetailsForm() {
                   <FormControl>
                     <Input
                       {...field}
-                      defaultValue={job?.name as string}
                       disabled={isPending}
                       type="text"
                     />
@@ -175,9 +310,6 @@ export function JobDetailsForm() {
                     <Textarea
                       {...field}
                       disabled={isPending}
-                      defaultValue={formatDescription(
-                        job.description as string,
-                      )}
                       className="bg-background"
                       rows={5}
                     />
@@ -186,9 +318,111 @@ export function JobDetailsForm() {
                 </FormItem>
               )}
             />
-            {/* TODO: add field for skills */}
-            {/* TODO: add location fields */}
-
+            <div className="grid grid-cols-2 grid-rows-2 gap-4">
+              <FormField
+                control={form.control}
+                name="province"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block">Province</FormLabel>
+                    <FormControl>
+                      <AsyncStrictCombobox
+                        items={provinces}
+                        placeholder="Select province"
+                        value={field.value}
+                        onValueChange={setProvince}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city_muni"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block">City/Municipality</FormLabel>
+                    <FormControl>
+                      <AsyncStrictCombobox
+                        items={cityMunicipalities}
+                        placeholder="Select city/municipality"
+                        value={field.value}
+                        onValueChange={(value) => form.setValue('city_muni', value)}
+                        disabled={!form.watch('province')}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="barangay"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block">Barangay</FormLabel>
+                    <FormControl>
+                      <AsyncStrictCombobox
+                        items={barangays}
+                        placeholder="Select barangay"
+                        value={field.value}
+                        onValueChange={(value) => form.setValue('barangay', value)}
+                        disabled={!form.watch('city_muni')}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="setup"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Work setup</FormLabel>
+                    <FormControl>
+                      <AsyncStrictCombobox
+                        items={setups}
+                        placeholder="Select work setup"
+                        value={form.watch(field.name)}
+                        onValueChange={(value) => form.setValue('setup', value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <>
+              <h3 className="text-xl mt-2">Required Skills</h3>
+              <AsyncStrictCombobox
+                items={skills}
+                placeholder="Search for skills, e.g., JavaScript, Project Management"
+                value=""
+                onValueChange={addSkill}
+              />
+              <div className="flex items-center gap-x-2">
+                {!!selectedSkills.length &&
+                  selectedSkills.map(({ value: id, label: name }) => (
+                    <Chip
+                      key={id}
+                      content={name}
+                      afterContent={
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="!p-0 size-5"
+                          onClick={() => removeSkill(id)}
+                        >
+                          <XIcon className="size-3" />
+                        </Button>
+                      }
+                    />
+                  ))}
+              </div>
+            </>
             <div className="flex justify-end gap-x-2">
               <Button
                 type="button"
@@ -203,6 +437,7 @@ export function JobDetailsForm() {
                 type="submit"
                 className="uppercase"
                 disabled={isPending}
+                onClick={onSubmit} // using form `onSubmit` seems to not work
               >
                 {isPending ? 'Saving...' : 'Save'}
               </Button>
