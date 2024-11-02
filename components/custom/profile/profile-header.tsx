@@ -14,12 +14,12 @@ import { PROFILE_STORE_FIELDS } from '@/lib/constants'
 import { useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
 import { AvatarImage } from '@radix-ui/react-avatar'
-import { Edit, Share2 } from 'lucide-react'
+import { Edit } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { EditAddressForm } from './edit-address-form'
-import { ProfileRating } from './rating'
 import { ProfilePicture } from './picture'
+import { ProfileRating } from './rating'
 import { SeekerSkillsList } from './skills-list'
 
 export function OwnProfileHeader() {
@@ -32,7 +32,7 @@ export function OwnProfileHeader() {
   })
 
   return (
-    <Card className="shadow-lg rounded-md max-w-4xl mx-auto md:p-4 xl:p-6">
+    <Card className="shadow-lg rounded-md md:p-4 xl:p-6">
       <CardHeader className="flex flex-col sm:flex-row sm:items-start sm:space-x-6 space-y-4 sm:space-y-0">
         {/* Avatar and Edit Button */}
         <ProfilePicture profile={profile} />
@@ -76,7 +76,7 @@ export function OwnProfileHeader() {
 
         {/* Button Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-          <div className="flex justify-center sm:justify-start gap-x-4">
+          {/* <div className="flex justify-center sm:justify-start gap-x-4">
             <Button
               size="icon"
               variant="ghost"
@@ -84,7 +84,7 @@ export function OwnProfileHeader() {
             >
               <Share2 />
             </Button>
-          </div>
+          </div> */}
           <Dialog>
             <DialogTrigger asChild>
               <Button className="rounded-full bg-primary text-white px-6 hover:bg-primary-dark mx-auto sm:mx-0">
@@ -98,7 +98,9 @@ export function OwnProfileHeader() {
         </div>
 
         {/* Skills List */}
-        {user?.user_metadata.role_code === "SKR" && <SeekerSkillsList skills={profile?.profile_skills} />}
+        {user?.user_metadata.role_code === 'SKR' && (
+          <SeekerSkillsList skills={profile?.profile_skills} />
+        )}
 
         {/* Verification List */}
         <VerificationList />

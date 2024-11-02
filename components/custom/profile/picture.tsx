@@ -1,7 +1,16 @@
 import { uploadProfilePicture } from '@/actions/profile-picture'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Profile, useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
@@ -14,7 +23,7 @@ function ProfilePictureForm() {
   // Check `actions/profile-picture.ts`. Doon ko na vinavalidate ang form data
   const { profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
-  const [preview, setPreview] = useState("")
+  const [preview, setPreview] = useState('')
   const close = useRef<HTMLButtonElement>(null)
   //const form = useForm<z.infer<typeof ProfilePictureSchema>>({
   //  resolver: zodResolver(ProfilePictureSchema),
@@ -27,16 +36,14 @@ function ProfilePictureForm() {
       const form = new FormData(event.currentTarget)
       form.append('name', profile.id)
 
-      uploadProfilePicture(form).then(({ success, error }) => {
-        if (error) return console.error(error)
+      uploadProfilePicture(form).then((data) => {
+        if (data?.error) return console.error(data.error)
         close.current!.click()
       })
     })
   }
 
-  function handleFileChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { files } = e.target
     const image = files?.item(0)
 
@@ -46,7 +53,11 @@ function ProfilePictureForm() {
 
   return (
     <>
-      <form onSubmit={upload} id="profile-picture-form" className="space-y-4">
+      <form
+        onSubmit={upload}
+        id="profile-picture-form"
+        className="space-y-4"
+      >
         <Input
           type="file"
           name="profile_picture"
@@ -62,10 +73,15 @@ function ProfilePictureForm() {
           />
         )}
       </form>
-      <DialogClose ref={close}>
-      </DialogClose>
+      <DialogClose ref={close}></DialogClose>
       <DialogFooter>
-        <Button type="submit" form="profile-picture-form" disabled={isPending}>Upload</Button>
+        <Button
+          type="submit"
+          form="profile-picture-form"
+          disabled={isPending}
+        >
+          Upload
+        </Button>
       </DialogFooter>
     </>
   )
@@ -76,12 +92,13 @@ interface ProfilePictureProps {
 }
 export function ProfilePicture({ profile }: ProfilePictureProps) {
   const supabase = createClient()
-  const [avatarSrc, setAvatarSrc] = useState("/images/profile_picture_placeholder.webp")
+  const [avatarSrc, setAvatarSrc] = useState(
+    '/images/profile_picture_placeholder.webp',
+  )
   useEffect(() => {
     if (!profile) return
-    const { data } = supabase
-      .storage
-      .from("profile_pictures")
+    const { data } = supabase.storage
+      .from('profile_pictures')
       .getPublicUrl(profile.id)
 
     setAvatarSrc(data.publicUrl)
@@ -118,7 +135,6 @@ export function ProfilePicture({ profile }: ProfilePictureProps) {
             <DialogDescription>Upload a new profile picture</DialogDescription>
           </DialogHeader>
           <ProfilePictureForm />
-
         </DialogContent>
       </Dialog>
     </div>

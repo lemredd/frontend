@@ -1,6 +1,7 @@
 'use client'
 
 import { completeJobWithFeedback } from '@/actions/feedback'
+import StarRating from '@/components/custom/star-rating'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,15 +20,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { RadioGroupItem } from '@/components/ui/radio-group'
 import { Textarea } from '@/components/ui/textarea'
 import { CompleteJobWithFeedbackSchema } from '@/lib/schema'
-import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/AuthStore'
 import { useJobStore } from '@/store/JobStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RadioGroup } from '@radix-ui/react-radio-group'
-import { Check, StarHalf } from 'lucide-react'
+import { Check } from 'lucide-react'
 import {
   TransitionStartFunction,
   useEffect,
@@ -54,10 +53,11 @@ function FeedbackForm({ startTransition }: FeedbackFormProps) {
   })
 
   function onSubmit() {
+    console.log('Submitting form...') // Add this line
+    console.log(form.getValues()) // This should log the current form values
     startTransition(() => {
       completeJobWithFeedback(form.getValues()).then(({ error }) => {
         if (error) return console.error(error)
-
         location.reload()
       })
     })
@@ -88,46 +88,19 @@ function FeedbackForm({ startTransition }: FeedbackFormProps) {
               <FormLabel>Rate</FormLabel>
               <FormControl>
                 <RadioGroup
-                  onValueChange={field.onChange}
+                  onValueChange={(newValue) => field.onChange(Number(newValue))}
                   value={String(field.value)}
                   className="flex items-center"
                 >
-                  {[0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map((value, i) => (
-                    <FormItem key={i}>
-                      <FormControl className="hidden">
-                        <RadioGroupItem
-                          value={String(value)}
-                          className="[&_.aspect-square]:hidden"
-                        />
-                      </FormControl>
-                      <FormLabel
-                        onMouseEnter={() => setHoverValue(value)}
-                        onMouseLeave={() => setHoverValue(null)}
-                        onClick={() => field.onChange(value)}
-                      >
-                        {Number.isInteger(value) ? (
-                          <StarHalf
-                            size={32}
-                            className={cn(
-                              'scale-x-[-1] ml-[-32px]',
-                              value <= (hoverValue ?? field.value)
-                                ? 'fill-yellow-500'
-                                : 'fill-gray-300',
-                            )}
-                          />
-                        ) : (
-                          <StarHalf
-                            size={32}
-                            className={cn(
-                              value <= (hoverValue ?? field.value)
-                                ? 'fill-yellow-500'
-                                : 'fill-gray-300',
-                            )}
-                          />
-                        )}
-                      </FormLabel>
-                    </FormItem>
-                  ))}
+                  <FormItem>
+                    <StarRating
+                      value={form.getValues('rate')}
+                      hoverValue={hoverValue}
+                      onChange={(newValue) => form.setValue('rate', newValue)}
+                      onMouseEnter={(hoverValue) => setHoverValue(hoverValue)}
+                      onMouseLeave={() => setHoverValue(null)}
+                    />
+                  </FormItem>
 
                   <output className="ml-4">{hoverValue || field.value}</output>
                 </RadioGroup>
@@ -136,6 +109,7 @@ function FeedbackForm({ startTransition }: FeedbackFormProps) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="feedback"

@@ -1,4 +1,6 @@
+import { ProfileJobList } from '@/components/custom/job/job-list'
+
 // import Image from 'next/image'
 export default function Dashboard() {
-  return <h1>PROVIDER DASHBOARD</h1>
+  return <ProfileJobList role="provider" />
 }

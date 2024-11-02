@@ -6,6 +6,7 @@ import { getAddress, getRecency } from '@/lib/utils'
 import { Clock, MapPin, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { SeekerFeedbackForm } from './feedback'
+import { useAuthStore } from '@/store/AuthStore'
 
 interface Props {
   job: Record<string, string>
@@ -75,11 +76,12 @@ export default function JobListItem({ job }: Props) {
   )
 }
 
-
 interface ProfileJobListItemProps extends Props {
-  role: "skr" | "pdr"
+  role: 'skr' | 'pdr'
 }
 export function ProfileJobListItem({ job, role }: ProfileJobListItemProps) {
+  const { profile } = useAuthStore()
+  const hasGivenFeedback = job.feedbacks.some(feedback => feedback.from_id === profile?.id)
   return (
     <Card className="modern-card">
       {/* Job Header */}
@@ -105,7 +107,11 @@ export function ProfileJobListItem({ job, role }: ProfileJobListItemProps) {
             className="bg-primary text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
             contentClassName="max-w-[unset]"
           />
-          <Chip className="w-max" content={job.status} />
+          <Chip
+            className="w-max capitalize"
+            content={job.status}
+            getStatusColor
+          />
         </div>
       </CardHeader>
 
@@ -118,7 +124,7 @@ export function ProfileJobListItem({ job, role }: ProfileJobListItemProps) {
 
         {/* Job Footer */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-          {job.status === "completed" && !job.feedbacks.length && (
+          {job.status === 'completed' && !hasGivenFeedback && (
             <SeekerFeedbackForm job={job} />
           )}
         </div>
