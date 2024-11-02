@@ -16,7 +16,10 @@ const statusColors: { [key: string]: string } = {
   pending: 'bg-yellow-300 text-yellow-800',
   accepted: 'bg-green-300 text-green-800',
   declined: 'bg-red-300 text-red-800',
+  onsite: 'bg-purple-100 text-purple-800 border-purple-300',
+  remote: 'bg-teal-100 text-teal-800 border-teal-300',
 }
+
 export function Chip({
   className,
   contentClassName,

@@ -134,7 +134,7 @@ export default function JobDetailsHeader({ job }: Props) {
         <Chip
           getStatusColor
           content={job?.status as string}
-          className="w-max"
+          className="w-max uppercase"
         />
         {!application && (
           <Dialog>
