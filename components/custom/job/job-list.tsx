@@ -158,6 +158,7 @@ export function ProfileJobList({ role }: ProfileJobListProps) {
       .eq(matcher, profile.id)
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
+        if (error) return console.error(error)
         if (data) {
           setJobs(data)
         }

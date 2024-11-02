@@ -9,11 +9,10 @@ import { SeekerFeedbackForm } from './feedback'
 import { useAuthStore } from '@/store/AuthStore'
 
 interface Props {
-  job: Record<string, string>
+  job: Record<string, any>
 }
 
 export default function JobListItem({ job }: Props) {
-  console.log(job)
   return (
     <Card className="modern-card ">
       {/* Job Header */}
@@ -81,7 +80,7 @@ interface ProfileJobListItemProps extends Props {
 }
 export function ProfileJobListItem({ job, role }: ProfileJobListItemProps) {
   const { profile } = useAuthStore()
-  const hasGivenFeedback = job.feedbacks.some(feedback => feedback.from_id === profile?.id)
+  const hasGivenFeedback = job.feedbacks.some((feedback: Record<string, any>) => feedback.from_id === profile?.id)
   return (
     <Card className="modern-card">
       {/* Job Header */}
