@@ -6,7 +6,7 @@ import { Chip } from '@/components/ui/chip'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuthStore } from '@/store/AuthStore'
 import { useJobStore } from '@/store/JobStore'
-import { Bookmark, Clock, PhilippinePesoIcon, Share2 } from 'lucide-react'
+import { Clock, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
@@ -135,7 +135,6 @@ export default function JobDetailsHeader({ job }: Props) {
           <span>{Number(job.price).toFixed(2)}</span>
         </div>
 
-
         <div className="text-sm dark:text-gray-400 sm:hidden items-center gap-2 flex">
           <Clock
             size={18}
@@ -146,11 +145,14 @@ export default function JobDetailsHeader({ job }: Props) {
       </div>
 
       <div className="items-center flex flex-col sm:flex-row gap-2">
-        <Chip content={job?.status as string} className="w-max" />
-        <div className="sm:flex gap-2 hidden">
+        <Chip
+          content={job?.status as string}
+          className="w-max"
+        />
+        {/* <div className="sm:flex gap-2 hidden">
           <Share2 />
           <Bookmark />
-        </div>
+        </div> */}
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
@@ -193,7 +195,6 @@ export default function JobDetailsHeader({ job }: Props) {
             )}`}
           />
         )}
-
       </div>
     </header>
   )
