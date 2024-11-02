@@ -14,7 +14,8 @@ import {
 import { Chip } from '@/components/ui/chip'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { createClient } from '@/utils/supabase/client'
-import { Clock, MapPin } from 'lucide-react'
+import { Briefcase, Clock, MapPin, User } from 'lucide-react'
+
 import Link from 'next/link'
 import { useEffect, useState, useTransition } from 'react'
 
@@ -33,8 +34,6 @@ export default function JobDetailsPage({ params: { id } }: Props) {
   const supabase = createClient()
   const [job, setJob] = useState<Record<string, any>>()
   const [loading, setLoading] = useState(true)
-
-  console.log(job)
 
   useEffect(() => {
     if (!id) {
@@ -66,7 +65,7 @@ export default function JobDetailsPage({ params: { id } }: Props) {
   }
 
   return (
-    <Card className="modern-card max-w-5xl">
+    <Card className="modern-card">
       {!isPending && job && (
         <>
           <CardHeader className="space-y-4">
@@ -75,8 +74,7 @@ export default function JobDetailsPage({ params: { id } }: Props) {
           </CardHeader>
           <CardContent className="flex flex-col space-y-6">
             <div className="flex justify-between items-center">
-              <div className="flex flex-col sm:flex-row  items-center gap-4 justify-between w-full">
-                {/* Job Date */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-between w-full">
                 <div className="text-sm dark:text-gray-400 flex items-center gap-1">
                   <Clock
                     size={18}
@@ -84,21 +82,17 @@ export default function JobDetailsPage({ params: { id } }: Props) {
                   />
                   <span>Posted {getRecency(job.created_at as string)}</span>
                 </div>
-
-                {/* Job Location */}
                 <Chip
                   beforeContent={<MapPin size={18} />}
                   content={getAddress(job)}
                   className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-                  contentClassName="max-w-[unset] "
+                  contentClassName="max-w-[unset]"
                 />
               </div>
             </div>
 
-            {/* Job Skills */}
             <JobDetailsSkills job={job} />
 
-            {/* Job Description */}
             <h2 className="text-lg font-semibold">Description</h2>
             <CardDescription
               className="whitespace-pre-line dark:text-gray-300"
@@ -107,23 +101,39 @@ export default function JobDetailsPage({ params: { id } }: Props) {
               }}
             />
           </CardContent>
-          <CardFooter className="flex-col items-start">
-            <h3 className="text-lg font-semibold">About the client</h3>
-            <span>
-              {job.profiles.first_name} {job.profiles.last_name}{' '}
-              <Link href={`/pdr/${job.profiles.username}`}>
-                <strong>@{job.profiles.username}</strong>
-              </Link>
-            </span>
-            <ProfileRating profile={job.profiles} />
-            <p>
-              Member since{' '}
-              {new Date(job.profiles.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                day: 'numeric',
-                month: 'long',
-              })}
-            </p>
+
+          {/* About the Client Section */}
+          <CardFooter className="flex-col items-start space-y-4 border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold">About the Client</h3>
+            <div className="flex items-center space-x-3">
+              <User
+                className="text-gray-500 dark:text-gray-400"
+                size={20}
+              />
+              <div>
+                <span className="text-base font-medium">
+                  <Link href={`/pdr/${job.profiles.username}`}>
+                    <strong className="text-blue-400 capitalize">
+                      {job.profiles.first_name} {job.profiles.last_name}
+                    </strong>
+                  </Link>
+                </span>
+                <p className="text-xs text-gray-400">
+                  Member since{' '}
+                  {new Date(job.profiles.created_at).toLocaleDateString(
+                    'en-US',
+                    { year: 'numeric', month: 'long', day: 'numeric' },
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Briefcase
+                className="text-gray-500 dark:text-gray-400"
+                size={20}
+              />
+              <ProfileRating profile={job.profiles} />
+            </div>
           </CardFooter>
         </>
       )}

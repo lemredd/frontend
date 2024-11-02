@@ -106,20 +106,6 @@ export default function JobDetailsHeader({ job }: Props) {
     })
   }, [user, job?.id])
 
-  // Function to get chip color based on application status
-  const getChipClassName = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-300 text-yellow-800' // Yellow for pending
-      case 'accepted':
-        return 'bg-green-300 text-green-800' // Green for accepted
-      case 'declined':
-        return 'bg-red-300 text-red-800' // Red for declined
-      default:
-        return ''
-    }
-  }
-
   return (
     <header className="w-full flex flex-col sm:flex-row  justify-center sm:justify-between items-center gap-2 text-center sm:text-left">
       <div className="flex flex-col gap-2">
@@ -146,13 +132,10 @@ export default function JobDetailsHeader({ job }: Props) {
 
       <div className="items-center flex flex-col sm:flex-row gap-2">
         <Chip
+          getStatusColor
           content={job?.status as string}
           className="w-max"
         />
-        {/* <div className="sm:flex gap-2 hidden">
-          <Share2 />
-          <Bookmark />
-        </div> */}
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
@@ -189,10 +172,9 @@ export default function JobDetailsHeader({ job }: Props) {
         )}
         {!!application && (
           <Chip
+            getStatusColor
             content={application.status as string}
-            className={`capitalize ${getChipClassName(
-              application.status as string,
-            )}`}
+            className="capitalize"
           />
         )}
       </div>
