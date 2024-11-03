@@ -1,5 +1,7 @@
 'use client'
 
+import { AdminSidebar } from '@/components/custom/sidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import withAdminProtection from '@/hoc/withAdminProtection'
 
 const AdminLayout = ({
@@ -8,9 +10,10 @@ const AdminLayout = ({
   children: React.ReactNode
 }>) => {
   return (
-    <main className="container mx-auto flex h-screen flex-col justify-center">
-      {children}
-    </main>
+    <SidebarProvider>
+      <AdminSidebar />
+      <SidebarInset>{children}</SidebarInset>
+    </SidebarProvider>
   )
 }
 
