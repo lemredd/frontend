@@ -1,9 +1,15 @@
 'use client'
 
-import { ChevronRight, ChevronsUpDown, Frame, Settings2 } from 'lucide-react'
+import {
+  ChevronRight,
+  ChevronsUpDown,
+  Home,
+  LineChart,
+  Settings2,
+} from 'lucide-react'
 
 import Logout from '@/components/custom/auth/logout'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ProfilePicture } from '@/components/custom/profile/picture'
 import {
   Collapsible,
   CollapsibleContent,
@@ -14,7 +20,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -32,61 +37,52 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import useActivePath from '@/hooks/useActivePath'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/store/AuthStore'
+import { User } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { RiUserSearchFill } from 'react-icons/ri'
-// This is sample data.
+
 const data = {
   user: {
-    name: 'test',
-    email: 'test',
+    name: 'Test User',
+    email: 'test@example.com',
     avatar: '/avatars/shadcn.jpg',
   },
-  collapsible: [
+  dashboards: [
+    { name: 'Overview', url: '/admin/', icon: Home },
+    { name: 'Reports', url: '/admin/reports/', icon: LineChart },
+  ],
+  settings: [
     {
       title: 'Settings',
-      url: '#',
       icon: Settings2,
       items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
+        { title: 'Profile', url: '/settings/profile/' },
+        { title: 'Preferences', url: '/settings/preferences/' },
+        { title: 'Security', url: '/settings/security/' },
       ],
-    },
-  ],
-  dashboards: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
     },
   ],
 }
 
 export function AdminSidebar() {
+  const user = useAuthStore((state) => state.user) as User
+  const { email } = user || {}
+  const profile = useAuthStore((state) => state.profile)
+  const activePath = useActivePath()
+
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <Link
               href="/"
-              className="inline-flex items-center px-2 space-x-2 h-12 text-sm group-data-[collapsible=icon]:!p-0"
+              className="inline-flex items-center px-2 space-x-2 h-12 text-sm"
             >
-              <RiUserSearchFill className="text-2xl" />
+              <RiUserSearchFill className="text-primary text-2xl" />
               <h1 className={cn('text-xl font-bold hidden md:block')}>
                 Task Grabber
               </h1>
@@ -95,29 +91,41 @@ export function AdminSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        {/* Dashboard Links */}
         <SidebarGroup>
           <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
           <SidebarMenu>
-            {data.dashboards.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton
-                  tooltip={item.name}
-                  asChild
-                >
-                  <a href={item.url}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {data.dashboards.map((item) => {
+              const isActive =
+                activePath === item.url ||
+                (activePath === '/' && item.url === '/admin/')
+              console.log(activePath === item.url)
+              return (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton
+                    asChild
+                    className={
+                      isActive
+                        ? 'bg-primary text-white hover:bg-primary hover:text-white'
+                        : ''
+                    }
+                  >
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            })}
           </SidebarMenu>
         </SidebarGroup>
 
+        {/* Settings Section with Collapsible */}
         <SidebarGroup>
           <SidebarGroupLabel>Others</SidebarGroupLabel>
           <SidebarMenu>
-            {data.collapsible.map((item) => (
+            {data.settings.map((item) => (
               <Collapsible
                 key={item.title}
                 asChild
@@ -125,7 +133,7 @@ export function AdminSidebar() {
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -133,15 +141,23 @@ export function AdminSidebar() {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                      {item.items.map((subItem) => {
+                        const isActive = activePath === subItem.url
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              className={cn(
+                                isActive ? 'bg-gray-700 text-white' : '',
+                              )}
+                            >
+                              <Link href={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        )
+                      })}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
@@ -150,59 +166,36 @@ export function AdminSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+
+      {/* User Profile Section in Footer */}
+      <SidebarFooter className="p-4 border-t border-gray-700">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                  className="flex items-center space-x-2"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage
-                      src={data.user.avatar}
-                      alt={data.user.name}
-                    />
-                    <AvatarFallback className="rounded-lg">A</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {data.user.name}
+                  <ProfilePicture
+                    profile={profile}
+                    size="sm"
+                  />
+                  <div className="text-left">
+                    <span className="block font-semibold">
+                      {profile?.username}
                     </span>
-                    <span className="truncate text-xs">{data.user.email}</span>
+                    <span className="block text-xs text-gray-400">{email}</span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
+                  <ChevronsUpDown className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                side="bottom"
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={data.user.avatar}
-                        alt={data.user.name}
-                      />
-                      <AvatarFallback className="rounded-lg">A</AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {data.user.name}Dashboard
-                      </span>
-                      <span className="truncate text-xs">
-                        {data.user.email}
-                      </span>
-                    </div>
-                  </div>
+              <DropdownMenuContent className="w-56 bg-gray-800 rounded-md">
+                <DropdownMenuLabel className="text-gray-200 px-4 py-2">
+                  Account
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Logout />
+                  <Logout className="w-full" />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
