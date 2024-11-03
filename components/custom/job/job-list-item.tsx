@@ -2,7 +2,7 @@ import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import SecondBrain from '@/components/ui/second-brain'
-import { getAddress, getRecency } from '@/lib/utils'
+import { getAddress, getRecency, pluralize } from '@/lib/utils'
 import { useAuthStore } from '@/store/AuthStore'
 import { Clock, MapPin, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -13,6 +13,8 @@ interface Props {
 }
 
 export default function JobListItem({ job }: Props) {
+  const { user } = useAuthStore()
+
   return (
     <Card className="modern-card ">
       {/* Job Header */}
@@ -20,11 +22,21 @@ export default function JobListItem({ job }: Props) {
         <div className="space-y-1">
           <h3 className="text-3xl font-extrabold ">{job.name}</h3>
           <div className="flex items-center gap-2 text-xs dark:text-gray-400">
-            <Clock
-              size={16}
-              className="dark:text-gray-500"
-            />
-            <span>Posted {getRecency(job.created_at)}</span>
+            <div className="flex items-center gap-2">
+              <Clock
+                size={16}
+                className="dark:text-gray-500"
+              />
+              <span>Posted {getRecency(job.created_at)}</span>
+            </div>
+            {user?.user_metadata.role_code === "PDR" && (
+              <>
+                <span>|</span>
+                <div className="flex items-center gap-2">
+                  <span>{job.job_applicants.length} {pluralize(job.job_applicants.length, 'applicant')}</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
