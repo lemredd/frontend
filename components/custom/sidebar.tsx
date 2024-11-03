@@ -45,11 +45,6 @@ import Link from 'next/link'
 import { RiUserSearchFill } from 'react-icons/ri'
 
 const data = {
-  user: {
-    name: 'Test User',
-    email: 'test@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
     { name: 'Reports', url: '/admin/reports/', icon: LineChart },
