@@ -163,8 +163,12 @@ function EditSkillsForm({ selectedSkills }: EditSkillsFormProps) {
 
 interface SeekerSkillsListProps {
   skills?: Record<string, any>[]
+  isEditable?: boolean
 }
-export function SeekerSkillsList({ skills }: SeekerSkillsListProps) {
+export function SeekerSkillsList({
+  skills,
+  isEditable = false,
+}: SeekerSkillsListProps) {
   return (
     <ul className="flex items-center gap-2 flex-wrap">
       {!!skills &&
@@ -177,27 +181,29 @@ export function SeekerSkillsList({ skills }: SeekerSkillsListProps) {
             />
           </li>
         ))}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="gap-x-2"
-          >
-            <Plus size={16} /> Add Skill
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add/Remove Skill</DialogTitle>
-          </DialogHeader>
-          <EditSkillsForm
-            selectedSkills={skills?.map(({ skills: skill }) => ({
-              id: skill.id,
-              name: skill.name,
-            }))}
-          />
-        </DialogContent>
-      </Dialog>
+      {isEditable && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              className="gap-x-2"
+            >
+              <Plus size={16} /> Add Skill
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add/Remove Skill</DialogTitle>
+            </DialogHeader>
+            <EditSkillsForm
+              selectedSkills={skills?.map(({ skills: skill }) => ({
+                id: skill.id,
+                name: skill.name,
+              }))}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </ul>
   )
 }
