@@ -27,9 +27,9 @@ export default function AccountMenu({ className }: AccountMenuProps) {
   const { first_name, last_name, email, role_code } = user?.user_metadata || {}
 
   const fullName = `${first_name ?? ''} ${last_name ?? ''}`.trim()
-  const avatarFallback = `${getInitialLetter(first_name)}${getInitialLetter(
-    last_name,
-  )}`
+  const avatarFallback = `${getInitialLetter(
+    first_name ?? '',
+  )}${getInitialLetter(last_name ?? '')}`
 
   const dropdownItems = [
     { label: 'Profile', href: `/${role_code.toLowerCase()}/profile/` },

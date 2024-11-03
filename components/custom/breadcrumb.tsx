@@ -33,7 +33,7 @@ import { useAuthStore } from '@/store/AuthStore'
 import Link from 'next/link'
 import React from 'react'
 
-const Breadcrumb = () => {
+const Breadcrumb = ({ initialValue = 'Home' }: { initialValue?: string }) => {
   const breadcrumbs = useBreadcrumb()
   const { user } = useAuthStore()
   const role_code = user?.user_metadata?.role_code.toLowerCase()
@@ -44,7 +44,7 @@ const Breadcrumb = () => {
     <BCrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <Link href={`/${role_code}`}>Home</Link>
+          <Link href={`/${role_code}`}>{initialValue}</Link>
         </BreadcrumbItem>
         {breadcrumbs.length > ITEMS_TO_DISPLAY && ITEMS_TO_DISPLAY > 0 ? (
           <>

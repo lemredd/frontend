@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import { Profile, useAuthStore } from '@/store/AuthStore'
 import { createClient } from '@/utils/supabase/client'
 import { Edit } from 'lucide-react'
@@ -90,10 +91,13 @@ function ProfilePictureForm() {
 interface ProfilePictureProps {
   profile: Profile | null
   isEditable?: boolean
+  size?: 'sm' | 'md' | 'lg'
 }
+
 export function ProfilePicture({
   profile,
   isEditable = false,
+  size = 'md',
 }: ProfilePictureProps) {
   const supabase = createClient()
   const [avatarSrc, setAvatarSrc] = useState(
@@ -110,7 +114,16 @@ export function ProfilePicture({
 
   return (
     <div className="relative mx-auto sm:mx-0">
-      <Avatar className="size-32 rounded-full shadow-md border-4 border-primary">
+      <Avatar
+        className={cn(
+          'rounded-full shadow-md border-primary',
+          size == 'sm'
+            ? 'border'
+            : size == 'lg'
+            ? 'border-5 size-36'
+            : 'border-4 size-32',
+        )}
+      >
         <AvatarImage
           src={avatarSrc}
           alt="Profile Avatar"

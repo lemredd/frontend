@@ -22,20 +22,11 @@ const useNavbarRoutes = (role?: UserRole): TNavbarRoute[] => {
       { label: 'Tasks', path: '/pdr/tasks/' },
     ]
 
-    // Routes for admin
-    const adminRoutes: TNavbarRoute[] = [
-      { label: 'Dashboard', path: '/admin/dashboard/' },
-      { label: 'Manage Users', path: '/admin/users/' },
-      { label: 'Settings', path: '/admin/settings/' },
-    ]
-
     // Return different routes based on the role
     if (role === 'SKR') {
       return seekerRoutes
     } else if (role === 'PDR') {
       return providerRoutes
-    } else if (role === 'ADMIN') {
-      return adminRoutes
     } else {
       return publicRoutes // For unauthenticated users
     }
