@@ -14,7 +14,7 @@ export default function JobDetailsSkills({ job }: Props) {
     if (user?.user_metadata.role_code !== "SKR") return undefined
 
     if (profile?.profile_skills.some((profileSkill: Record<string, any>) => profileSkill.skills.id === skill.id))
-      return "bg-green-300"
+      return "bg-green-500 text-white"
 
     return undefined
   }
