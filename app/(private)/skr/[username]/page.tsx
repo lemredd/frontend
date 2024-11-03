@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
-import { useAuthStore } from "@/store/AuthStore"
-import { SeekerProfileHeader } from "@/components/custom/profile/profile-header"
+import { ProfileHeader } from '@/components/custom/profile/profile-header'
+import { useAuthStore } from '@/store/AuthStore'
 
 interface Props {
   params: {
@@ -18,12 +18,12 @@ export default function SkrProfilePage({ params: { username } }: Props) {
 
   useEffect(() => {
     if (!profile) return
-    if (profile.username === username) router.push("/skr/profile")
+    if (profile.username === username) router.push('/skr/profile')
   }, [profile, router, username])
 
   return (
     <section className="container mx-auto h-screen">
-      <SeekerProfileHeader username={username} />
+      <ProfileHeader username={username} />
     </section>
   )
 }

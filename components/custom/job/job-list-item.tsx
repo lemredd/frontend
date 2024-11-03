@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import SecondBrain from '@/components/ui/second-brain'
 import { getAddress, getRecency } from '@/lib/utils'
+import { useAuthStore } from '@/store/AuthStore'
 import { Clock, MapPin, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { SeekerFeedbackForm } from './feedback'
-import { useAuthStore } from '@/store/AuthStore'
 
 interface Props {
   job: Record<string, any>
@@ -33,13 +33,13 @@ export default function JobListItem({ job }: Props) {
           <Chip
             beforeContent={<MapPin size={18} />}
             content={getAddress(job)}
-            className="bg-primary text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+            className=" bg-primary text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
             contentClassName="max-w-[unset]"
           />
           <Chip
+            getStatusColor
             content={job?.setup}
-            className="bg-primary text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
-            contentClassName="max-w-[unset]"
+            contentClassName="uppercase max-w-[unset]"
           />
         </div>
       </CardHeader>
@@ -80,7 +80,9 @@ interface ProfileJobListItemProps extends Props {
 }
 export function ProfileJobListItem({ job, role }: ProfileJobListItemProps) {
   const { profile } = useAuthStore()
-  const hasGivenFeedback = job.feedbacks.some((feedback: Record<string, any>) => feedback.from_id === profile?.id)
+  const hasGivenFeedback = job.feedbacks.some(
+    (feedback: Record<string, any>) => feedback.from_id === profile?.id,
+  )
   return (
     <Card className="modern-card">
       {/* Job Header */}

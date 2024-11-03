@@ -13,7 +13,13 @@ const statusColors: { [key: string]: string } = {
   ongoing: 'bg-yellow-100 text-yellow-800 border-yellow-300',
   open: 'bg-blue-100 text-blue-800 border-blue-300',
   close: 'bg-red-100 text-red-800 border-red-300',
+  pending: 'bg-yellow-300 text-yellow-800',
+  accepted: 'bg-green-300 text-green-800',
+  declined: 'bg-red-300 text-red-800',
+  onsite: 'bg-purple-100 text-purple-800 border-purple-300',
+  remote: 'bg-teal-100 text-teal-800 border-teal-300',
 }
+
 export function Chip({
   className,
   contentClassName,
@@ -26,7 +32,8 @@ export function Chip({
     <div
       className={cn(
         'rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 flex items-center gap-1.5 border  flex-wrap max-w-full',
-        getStatusColor && statusColors[content as keyof typeof statusColors],
+        getStatusColor &&
+          statusColors[content.toLowerCase() as keyof typeof statusColors],
         className,
       )}
       title={content}

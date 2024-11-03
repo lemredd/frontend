@@ -6,7 +6,7 @@ import { Chip } from '@/components/ui/chip'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuthStore } from '@/store/AuthStore'
 import { useJobStore } from '@/store/JobStore'
-import { Bookmark, Clock, PhilippinePesoIcon, Share2 } from 'lucide-react'
+import { Clock, PhilippinePesoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
@@ -106,20 +106,6 @@ export default function JobDetailsHeader({ job }: Props) {
     })
   }, [user, job?.id])
 
-  // Function to get chip color based on application status
-  const getChipClassName = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-300 text-yellow-800' // Yellow for pending
-      case 'accepted':
-        return 'bg-green-300 text-green-800' // Green for accepted
-      case 'declined':
-        return 'bg-red-300 text-red-800' // Red for declined
-      default:
-        return ''
-    }
-  }
-
   return (
     <header className="w-full flex flex-col sm:flex-row  justify-center sm:justify-between items-center gap-2 text-center sm:text-left">
       <div className="flex flex-col gap-2">
@@ -135,7 +121,6 @@ export default function JobDetailsHeader({ job }: Props) {
           <span>{Number(job.price).toFixed(2)}</span>
         </div>
 
-
         <div className="text-sm dark:text-gray-400 sm:hidden items-center gap-2 flex">
           <Clock
             size={18}
@@ -146,11 +131,11 @@ export default function JobDetailsHeader({ job }: Props) {
       </div>
 
       <div className="items-center flex flex-col sm:flex-row gap-2">
-        <Chip content={job?.status as string} className="w-max" />
-        <div className="sm:flex gap-2 hidden">
-          <Share2 />
-          <Bookmark />
-        </div>
+        <Chip
+          getStatusColor
+          content={job?.status as string}
+          className="w-max uppercase"
+        />
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
@@ -187,13 +172,11 @@ export default function JobDetailsHeader({ job }: Props) {
         )}
         {!!application && (
           <Chip
+            getStatusColor
             content={application.status as string}
-            className={`capitalize ${getChipClassName(
-              application.status as string,
-            )}`}
+            className="capitalize"
           />
         )}
-
       </div>
     </header>
   )

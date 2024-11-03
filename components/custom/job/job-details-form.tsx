@@ -1,5 +1,6 @@
 'use client'
 
+import { deleteJob as _deleteJob, editJob } from '@/actions/pdr/job'
 import JobDetailsSkills from '@/components/custom/job/job-details-skills'
 import NotFound from '@/components/custom/not-found'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,16 @@ import {
 } from '@/components/ui/card'
 import { Chip } from '@/components/ui/chip'
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
   Form,
   FormControl,
   FormField,
@@ -21,9 +32,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { useJobSetups } from '@/hooks/useEnumTypes'
+import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
+import { useSkills } from '@/hooks/useSkills'
 import { EditJobSchema } from '@/lib/schema'
 import { formatDescription, getAddress, getRecency } from '@/lib/utils'
 import { useJobStore } from '@/store/JobStore'
+import { createClient } from '@/utils/supabase/client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Clock,
@@ -37,14 +52,8 @@ import {
 import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { CompleteJobForm } from './complete-job-form'
 import { AsyncStrictCombobox } from '../combobox'
-import { useJobSetups } from '@/hooks/useEnumTypes'
-import usePSGCAddressFields from '@/hooks/usePSGCAddressFields'
-import { deleteJob as _deleteJob, editJob } from '@/actions/pdr/job'
-import { createClient } from '@/utils/supabase/client'
-import { useSkills } from '@/hooks/useSkills'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { CompleteJobForm } from './complete-job-form'
 
 export function JobDetailsForm() {
   const { job, isOwned, isEditing, setEditing, isJobOpen } = useJobStore()
@@ -63,13 +72,16 @@ export function JobDetailsForm() {
       barangay: '',
       setup: '',
       skill_ids: [],
-    }
+    },
   })
 
   const {
-    provinces, getProvinces,
-    cityMunicipalities, getCityMunicipalities,
-    barangays, getBarangays
+    provinces,
+    getProvinces,
+    cityMunicipalities,
+    getCityMunicipalities,
+    barangays,
+    getBarangays,
   } = usePSGCAddressFields()
   useEffect(() => {
     getProvinces()
@@ -89,7 +101,9 @@ export function JobDetailsForm() {
     skills,
     // setSkills
   } = useSkills(supabase)
-  const selectedSkills = skills.filter(skill => form.watch('skill_ids', [])?.includes(skill.value.split('|')[0]))
+  const selectedSkills = skills.filter((skill) =>
+    form.watch('skill_ids', [])?.includes(skill.value.split('|')[0]),
+  )
 
   function addSkill(value: string) {
     const skillIds = form.getValues('skill_ids')
@@ -101,7 +115,10 @@ export function JobDetailsForm() {
 
   function removeSkill(id: string) {
     const [_id] = id.split('|')
-    form.setValue('skill_ids', form.getValues('skill_ids')!.filter((skillId) => skillId !== _id))
+    form.setValue(
+      'skill_ids',
+      form.getValues('skill_ids')!.filter((skillId) => skillId !== _id),
+    )
   }
 
   //useEffect(() => {
@@ -122,14 +139,20 @@ export function JobDetailsForm() {
       id: job.id,
       name: job.name,
       description: job.description,
-      province: provinces.find(province => province.label === job.province)?.value,
-      city_muni: cityMunicipalities.find(cityMuni => cityMuni.label === job.city_muni)?.value,
-      barangay: barangays.find(barangay => barangay.label === job.barangay)?.value,
+      province: provinces.find((province) => province.label === job.province)
+        ?.value,
+      city_muni: cityMunicipalities.find(
+        (cityMuni) => cityMuni.label === job.city_muni,
+      )?.value,
+      barangay: barangays.find((barangay) => barangay.label === job.barangay)
+        ?.value,
       setup: job.setup,
-      skill_ids: job.job_skills.map(({ skills: skill }: Record<string, any>) => skill.id)
+      skill_ids: job.job_skills.map(
+        ({ skills: skill }: Record<string, any>) => skill.id,
+      ),
     })
 
-    setMustReset(!(Object.values(form.getValues()).every(Boolean)))
+    setMustReset(!Object.values(form.getValues()).every(Boolean))
   }, [job, form, provinces, cityMunicipalities, barangays, mustReset])
 
   function setProvince(value: string) {
@@ -141,7 +164,7 @@ export function JobDetailsForm() {
   const { setups, getSetups } = useJobSetups()
   useEffect(() => {
     getSetups()
-    if (!job) return;
+    if (!job) return
     form.reset({
       name: job.name,
       description: job.description,
@@ -156,7 +179,7 @@ export function JobDetailsForm() {
 
   function onSubmit() {
     startTransition(() => {
-      editJob(form.getValues()).then(data => {
+      editJob(form.getValues()).then((data) => {
         if (data?.error) return console.error(data)
 
         location.reload()
@@ -167,7 +190,7 @@ export function JobDetailsForm() {
   function deleteJob() {
     _deleteJob(job?.id).then((data) => {
       if (data?.error) return console.error(data)
-      location.href = "/pdr/tasks"
+      location.href = '/pdr/tasks'
     })
   }
 
@@ -194,8 +217,9 @@ export function JobDetailsForm() {
                   contentClassName="max-w-[unset]"
                 />
                 <Chip
+                  getStatusColor
                   content={job?.setup}
-                  className="bg-primary !w-fit text-white text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
+                  className="uppercase !w-fit text-sm rounded-full px-4 py-1 flex items-center gap-1 shadow-md"
                   contentClassName="max-w-[unset]"
                 />
               </div>
@@ -239,38 +263,47 @@ export function JobDetailsForm() {
               Edit
             </Button>
           )}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="destructive"
-                className="flex items-center gap-2"
-              >
-                {isJobOpen() ? (
-                  <>
-                    <Trash size={18} />
-                    Delete
-                  </>
-                ) : (
-                  <>
-                    <XCircleIcon size={18} />
-                    Cancel
-                  </>
-                )}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Are you sure about this?</DialogTitle>
-              </DialogHeader>
-              <DialogDescription>This action is irreversible</DialogDescription>
-              <DialogFooter>
-                <Button variant="destructive" onClick={deleteJob}>Yes</Button>
-                <DialogClose asChild>
-                  <Button variant="outline">No</Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          {!isJobOpen() && job.status !== 'completed' && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="flex items-center gap-2"
+                >
+                  {isJobOpen() ? (
+                    <>
+                      <Trash size={18} />
+                      Delete
+                    </>
+                  ) : (
+                    <>
+                      <XCircleIcon size={18} />
+                      Cancel
+                    </>
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you sure about this?</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                  This action is irreversible
+                </DialogDescription>
+                <DialogFooter>
+                  <Button
+                    variant="destructive"
+                    onClick={deleteJob}
+                  >
+                    Yes
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline">No</Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </CardFooter>
       </Card>
     )
@@ -348,7 +381,9 @@ export function JobDetailsForm() {
                         items={cityMunicipalities}
                         placeholder="Select city/municipality"
                         value={field.value}
-                        onValueChange={(value) => form.setValue('city_muni', value)}
+                        onValueChange={(value) =>
+                          form.setValue('city_muni', value)
+                        }
                         disabled={!form.watch('province')}
                       />
                     </FormControl>
@@ -367,7 +402,9 @@ export function JobDetailsForm() {
                         items={barangays}
                         placeholder="Select barangay"
                         value={field.value}
-                        onValueChange={(value) => form.setValue('barangay', value)}
+                        onValueChange={(value) =>
+                          form.setValue('barangay', value)
+                        }
                         disabled={!form.watch('city_muni')}
                       />
                     </FormControl>
