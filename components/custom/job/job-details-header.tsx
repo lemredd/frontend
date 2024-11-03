@@ -162,7 +162,7 @@ export default function JobDetailsHeader({ job }: Props) {
                 <Button
                   type="submit"
                   onClick={apply}
-                  disabled={isPending}
+                  disabled={isPending || !proposal}
                 >
                   {isPending ? <Spinner size="sm" /> : 'Submit'}
                 </Button>

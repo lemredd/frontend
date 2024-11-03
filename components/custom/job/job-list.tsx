@@ -21,7 +21,7 @@ export default function JobList({ role }: ProfileJobListProps) {
   const searchParams = useSearchParams()
   const supabase = createClient()
 
-  const [jobs, setJobs] = useState<Record<string, string>[]>([])
+  const [jobs, setJobs] = useState<Record<string, any>[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -37,7 +37,8 @@ export default function JobList({ role }: ProfileJobListProps) {
     const end = start + size
     const status = searchParams.get('status') ?? 'open'
 
-    const selectedFields = '*'
+    let selectedFields = '*'
+    if (role === "provider") selectedFields = '*, job_applicants(*)'
     const query = supabase
       .from('jobs')
       .select(selectedFields)
@@ -65,13 +66,14 @@ export default function JobList({ role }: ProfileJobListProps) {
     query.then(({ data, error }) => {
       if (error) {
         setError('Failed to fetch jobs. Please try again later.')
-        console.error(error)
-      } else if (data) {
-        setJobs(data)
+        return console.error(error)
       }
+
+      console.log(data)
+      setJobs(data)
       setLoading(false)
     })
-  }, [searchParams, user, profile, supabase])
+  }, [role, searchParams, user, profile, supabase])
 
   if (loading) {
     return (
