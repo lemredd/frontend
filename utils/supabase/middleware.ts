@@ -112,7 +112,7 @@ export async function updateSession(request: NextRequest) {
         break
 
       // TODO: ADD FOR ADMIN
-      case 'admin':
+      case 'ADMIN':
         if (!request.nextUrl.pathname.startsWith('/admin') || isPublicRoute) {
           return Redirect('/admin')
         }

@@ -1,6 +1,4 @@
 import Loading from '@/app/loading'
-import Footer from '@/components/custom/footer'
-import { Navbar } from '@/components/custom/navbar'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import type { Metadata } from 'next'
@@ -53,9 +51,7 @@ export default function RootLayout({
               zIndex={1600}
               showAtBottom={false}
             />
-            <Navbar />
             {children}
-            <Footer />
           </ThemeProvider>
         </Suspense>
       </body>
