@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export function pluralize(count: number, word: string) {
+  return count === 1 ? word : `${word}s`
+}
+
 export const formatErrorMessage = (errorCode: string) => {
   return errorCode
     .split('_')
