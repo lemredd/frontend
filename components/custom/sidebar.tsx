@@ -78,9 +78,7 @@ export function AdminSidebar() {
               className="inline-flex items-center px-2 space-x-2 h-12 text-sm"
             >
               <RiUserSearchFill className="text-primary text-2xl" />
-              <h1 className={cn('text-xl font-bold hidden md:block')}>
-                Task Grabber
-              </h1>
+              <h1 className={cn('text-xl font-bold ')}>Task Grabber</h1>
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>
