@@ -6,6 +6,7 @@ import {
   Home,
   LineChart,
   Settings2,
+  Users,
 } from 'lucide-react'
 
 import Logout from '@/components/custom/auth/logout'
@@ -48,6 +49,7 @@ const data = {
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
     { name: 'Reports', url: '/admin/reports/', icon: LineChart },
+    { name: 'Users', url: '/admin/users/', icon: Users },
   ],
   settings: [
     {
