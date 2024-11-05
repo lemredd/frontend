@@ -1,6 +1,7 @@
-import { UserTable } from "@/components/custom/admin/user-table"
-import { createAdminClient } from "@/utils/supabase/server"
 import { Suspense } from "react"
+
+import { listUsers } from "@/actions/user"
+import { UserTable } from "@/components/custom/admin/user-table"
 
 function Fallback() {
   return (
@@ -15,12 +16,12 @@ function Fallback() {
   )
 }
 
-export default async function Users() {
-  const supabase = createAdminClient()
-  const { data } = await supabase.auth.admin.listUsers({
-    page: 1,
-    perPage: 10
-  })
+interface UsersProps {
+  searchParams: Record<string, string | string[] | undefined>
+}
+export default async function Users({ searchParams }: UsersProps) {
+  const { page } = searchParams
+  const { data } = await listUsers(searchParams.page ? parseInt(page as string) : 1)
 
   return (
     <Suspense fallback={<Fallback />}>
