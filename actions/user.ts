@@ -52,6 +52,11 @@ export async function listUsers(page: number) {
   })
 }
 
+export async function countUsers() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('get_user_count')
+}
+
 export async function deleteUser(id: string) {
   const supabase = createAdminClient()
   const { error } = await supabase.auth.admin.deleteUser(id)
