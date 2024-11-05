@@ -44,13 +44,20 @@ export async function getUserByUsername(username: string) {
  * Admin actions
  */
 
+export async function listUsers(page: number) {
+  const supabase = createAdminClient()
+  return await supabase.auth.admin.listUsers({
+    page,
+    perPage: 10
+  })
+}
+
 export async function deleteUser(id: string) {
   const supabase = createAdminClient()
   const { error } = await supabase.auth.admin.deleteUser(id)
   if (error) return { error: error.message }
   return { success: 'User deleted successfully!' }
 }
-
 
 export async function deleteMultipleUsers(ids: string[]) {
   const supabase = createAdminClient()
