@@ -7,11 +7,21 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { createClient } from "@/utils/supabase/client"
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { PROFILE_STORE_FIELDS } from "@/lib/constants"
 import { DialogTitle } from "@radix-ui/react-dialog"
-import { deleteUser as _deleteUser, deleteMultipleUsers } from "@/actions/user"
+import { deleteUser as _deleteUser, countUsers, deleteMultipleUsers } from "@/actions/user"
 import { Checkbox } from "@/components/ui/checkbox"
+
+import {
+  Pagination,
+  PaginationContent,
+  //PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationRouterLink,
+} from "@/components/ui/pagination"
 
 const TABLE_HEADERS = [
   "check_all",
@@ -20,6 +30,8 @@ const TABLE_HEADERS = [
   "Joined at",
   "Actions",
 ]
+
+const PAGE_SIZE = 10
 
 interface UserDialogProps {
   user: User
@@ -87,6 +99,14 @@ interface UserTableProps {
 export function UserTable({ users }: UserTableProps) {
   const [checkedIds, setCheckedIds] = useState<string[]>([])
   const [isPending, startTransition] = useTransition()
+  const [count, setCount] = useState<number>()
+
+  useEffect(() => {
+    countUsers().then(({ data }) => setCount(data))
+  }, [])
+
+  const totalPages = !!count ? Math.ceil(count / PAGE_SIZE) : 0
+  const pages = !!count ? Array.from({ length: totalPages }, (_, i) => i + 1) : []
 
   function checkAll(checked: boolean) {
     if (checked) {
@@ -121,7 +141,6 @@ export function UserTable({ users }: UserTableProps) {
 
     return ROLES[role]
   }
-  console.log(checkedIds)
 
   return (
     <>
@@ -151,6 +170,28 @@ export function UserTable({ users }: UserTableProps) {
           ))}
         </TableBody>
       </Table>
+      {!!count ? (
+        // TODO: make previous and next work
+        <Pagination className="justify-end mt-4">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious />
+            </PaginationItem>
+
+            {pages.map(page => (
+              <PaginationItem key={page}>
+                <PaginationRouterLink href={`/admin/users?page=${page}`}>{page}</PaginationRouterLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      ) : (
+        <p>Getting total users count...</p>
+      )}
       {!!checkedIds.length && (
         <Button disabled={isPending} variant="destructive" onClick={deleteSelected}>Delete</Button>
       )}
