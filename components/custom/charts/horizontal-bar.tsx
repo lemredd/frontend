@@ -18,38 +18,36 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-export const description = 'A mixed bar chart'
-
 const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 187, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 90, fill: 'var(--color-other)' },
+  { skill: 'Front-End Developer', jobs: 275, fill: 'var(--color-frontend)' },
+  { skill: 'Back-End Developer', jobs: 200, fill: 'var(--color-backend)' },
+  { skill: 'Graphic Artist', jobs: 187, fill: 'var(--color-graphic)' },
+  { skill: 'Project Manager', jobs: 173, fill: 'var(--color-manager)' },
+  { skill: 'UI/UX Designer', jobs: 90, fill: 'var(--color-uiux)' },
 ]
 
 const chartConfig = {
-  visitors: {
-    label: 'Visitors',
+  jobs: {
+    label: 'Job Openings',
   },
-  chrome: {
-    label: 'Chrome',
+  frontend: {
+    label: 'Front-End Developer',
     color: 'hsl(var(--chart-1))',
   },
-  safari: {
-    label: 'Safari',
+  backend: {
+    label: 'Back-End Developer',
     color: 'hsl(var(--chart-2))',
   },
-  firefox: {
-    label: 'Firefox',
+  graphic: {
+    label: 'Graphic Artist',
     color: 'hsl(var(--chart-3))',
   },
-  edge: {
-    label: 'Edge',
+  manager: {
+    label: 'Project Manager',
     color: 'hsl(var(--chart-4))',
   },
-  other: {
-    label: 'Other',
+  uiux: {
+    label: 'UI/UX Designer',
     color: 'hsl(var(--chart-5))',
   },
 } satisfies ChartConfig
@@ -58,40 +56,36 @@ export function HorizontalBarChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Mixed</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Top Skills by Job Demand</CardTitle>
+        <CardDescription>All-time job demand</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart
-            accessibilityLayer
             data={chartData}
             layout="vertical"
-            margin={{
-              left: 0,
-            }}
+            margin={{ left: 0 }}
           >
             <YAxis
-              dataKey="browser"
+              dataKey="skill"
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) =>
-                chartConfig[value as keyof typeof chartConfig]?.label
+                chartConfig[value as keyof typeof chartConfig]?.label || value
               }
             />
             <XAxis
-              dataKey="visitors"
+              dataKey="jobs"
               type="number"
-              hide
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
             <Bar
-              dataKey="visitors"
+              dataKey="jobs"
               layout="vertical"
               radius={5}
             />
@@ -100,10 +94,10 @@ export function HorizontalBarChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          Consistently high demand <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Reflects demand across all tracked periods
         </div>
       </CardFooter>
     </Card>
