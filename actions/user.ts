@@ -25,7 +25,6 @@ export async function refreshUser() {
   return { user, profile }
 }
 
-
 export async function getUserByUsername(username: string) {
   const supabase = createClient()
   const { data: profile } = await supabase
@@ -39,4 +38,35 @@ export async function getUserByUsername(username: string) {
   const { data: { user } } = await adminSupabase.auth.admin.getUserById(profile.user_id)
 
   return user
+}
+
+/*
+ * Admin actions
+ */
+
+export async function listUsers(page: number) {
+  const supabase = createAdminClient()
+  return await supabase.auth.admin.listUsers({
+    page,
+    perPage: 10
+  })
+}
+
+export async function countUsers() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('get_user_count')
+}
+
+export async function deleteUser(id: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.auth.admin.deleteUser(id)
+  if (error) return { error: error.message }
+  return { success: 'User deleted successfully!' }
+}
+
+export async function deleteMultipleUsers(ids: string[]) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.rpc('delete_users_by_ids', { ids })
+  if (error) return { error: error.message }
+  return { success: 'User deleted successfully!' }
 }
