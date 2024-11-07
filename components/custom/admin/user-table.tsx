@@ -22,6 +22,7 @@ import {
   PaginationPrevious,
   PaginationRouterLink,
 } from "@/components/ui/pagination"
+import { getHumanReadableRole } from "@/lib/utils"
 
 const TABLE_HEADERS = [
   "check_all",
@@ -131,15 +132,6 @@ export function UserTable({ users }: UserTableProps) {
         location.reload()
       })
     })
-  }
-
-  function getHumanReadableRole<K extends "PDR" | "SKR">(role: K) {
-    const ROLES = {
-      "PDR": "Provider",
-      "SKR": "Seeker",
-    } as Record<K, string>
-
-    return ROLES[role]
   }
 
   return (
