@@ -44,6 +44,21 @@ export async function getUserByUsername(username: string) {
  * Admin actions
  */
 
+export async function rankSkillsByJobs() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('rank_skills_by_jobs')
+}
+
+export async function rankSkillsByProfile() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('rank_skills_by_profile')
+}
+
+export async function CountProfilesByRole() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('count_profiles_by_role')
+}
+
 export async function listUsers(page: number) {
   const supabase = createAdminClient()
   return await supabase.auth.admin.listUsers({
