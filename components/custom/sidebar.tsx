@@ -4,6 +4,7 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Home,
+  Lightbulb,
   Settings2,
   Users,
 } from 'lucide-react'
@@ -47,8 +48,8 @@ import { RiUserSearchFill } from 'react-icons/ri'
 const data = {
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
-    // { name: 'Reports', url: '/admin/reports/', icon: LineChart },
     { name: 'Users', url: '/admin/users/', icon: Users },
+    { name: 'Skills', url: '/admin/skills/', icon: Lightbulb },
   ],
   settings: [
     {
