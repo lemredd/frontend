@@ -2,34 +2,42 @@
 
 import { Pencil } from "lucide-react"
 import { User } from "@supabase/supabase-js"
+import { ColumnDef } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
+import { DataTable } from "@/components/ui/data-table"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { createClient } from "@/utils/supabase/client"
 import { useEffect, useState, useTransition } from "react"
 import { PROFILE_STORE_FIELDS } from "@/lib/constants"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { deleteUser as _deleteUser, countUsers, deleteMultipleUsers } from "@/actions/user"
-import { Checkbox } from "@/components/ui/checkbox"
+//import { Checkbox } from "@/components/ui/checkbox"
 
-import {
-  Pagination,
-  PaginationContent,
-  //PaginationEllipsis,
-  PaginationItem,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationRouterLink,
-} from "@/components/ui/pagination"
 import { getHumanReadableRole } from "@/lib/utils"
 
-const TABLE_HEADERS = [
-  "check_all",
-  "email",
-  "role",
-  "Joined at",
-  "Actions",
+const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
+  {
+    accessorKey: "email",
+    header: "Email"
+  },
+  {
+    accessorKey: "user_metadata.role_code",
+    header: "Role",
+    cell: ({ row }) => getHumanReadableRole(row.original.user_metadata.role_code)
+  },
+  {
+    accessorKey: "created_at",
+    header: "Joined at",
+    cell: ({ row }) => new Date(row.original.created_at).toLocaleString()
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => (
+      <UserDialog user={row.original} />
+    )
+  }
 ]
 
 const PAGE_SIZE = 10
@@ -69,8 +77,8 @@ function UserDialog({ user }: UserDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button onClick={getProfile}>
-          <Pencil />
+        <Button onClick={getProfile} size="sm">
+          <Pencil size={16} />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-full lg:max-w-[800px]">
@@ -135,58 +143,61 @@ export function UserTable({ users }: UserTableProps) {
   }
 
   return (
-    <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {TABLE_HEADERS.map(header => header === "check_all" ? (
-              <TableHead key={header}>
-                <Checkbox onCheckedChange={checkAll}></Checkbox>
-              </TableHead>
-            ) : (
-              <TableHead key={header}>{header}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.filter(user => !user.email?.includes('admin')).map((user) => (
-            <TableRow key={user.id}>
-              <TableCell><Checkbox value={user.id} checked={checkedIds.includes(user.id)} onCheckedChange={checked => checkUser(checked as boolean, user.id)}></Checkbox></TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{getHumanReadableRole(user.user_metadata.role_code)}</TableCell>
-              <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
-              <TableCell>
-                <UserDialog user={user} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      {!!count ? (
-        // TODO: make previous and next work
-        <Pagination className="justify-end mt-4">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious />
-            </PaginationItem>
-
-            {pages.map(page => (
-              <PaginationItem key={page}>
-                <PaginationRouterLink href={`/admin/users?page=${page}`}>{page}</PaginationRouterLink>
-              </PaginationItem>
-            ))}
-
-            <PaginationItem>
-              <PaginationNext />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      ) : (
-        <p>Getting total users count...</p>
-      )}
-      {!!checkedIds.length && (
-        <Button disabled={isPending} variant="destructive" onClick={deleteSelected}>Delete</Button>
-      )}
-    </>
+    <DataTable columns={USER_TABLE_COLUMNS} data={users} />
   )
+  //return (
+  //  <>
+  //    <Table>
+  //      <TableHeader>
+  //        <TableRow>
+  //          {TABLE_HEADERS.map(header => header === "check_all" ? (
+  //            <TableHead key={header}>
+  //              <Checkbox onCheckedChange={checkAll}></Checkbox>
+  //            </TableHead>
+  //          ) : (
+  //            <TableHead key={header}>{header}</TableHead>
+  //          ))}
+  //        </TableRow>
+  //      </TableHeader>
+  //      <TableBody>
+  //        {users.filter(user => !user.email?.includes('admin')).map((user) => (
+  //          <TableRow key={user.id}>
+  //            <TableCell><Checkbox value={user.id} checked={checkedIds.includes(user.id)} onCheckedChange={checked => checkUser(checked as boolean, user.id)}></Checkbox></TableCell>
+  //            <TableCell>{user.email}</TableCell>
+  //            <TableCell>{getHumanReadableRole(user.user_metadata.role_code)}</TableCell>
+  //            <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
+  //            <TableCell>
+  //              <UserDialog user={user} />
+  //            </TableCell>
+  //          </TableRow>
+  //        ))}
+  //      </TableBody>
+  //    </Table>
+  //    {!!count ? (
+  //      // TODO: make previous and next work
+  //      <Pagination className="justify-end mt-4">
+  //        <PaginationContent>
+  //          <PaginationItem>
+  //            <PaginationPrevious />
+  //          </PaginationItem>
+
+  //          {pages.map(page => (
+  //            <PaginationItem key={page}>
+  //              <PaginationRouterLink href={`/admin/users?page=${page}`}>{page}</PaginationRouterLink>
+  //            </PaginationItem>
+  //          ))}
+
+  //          <PaginationItem>
+  //            <PaginationNext />
+  //          </PaginationItem>
+  //        </PaginationContent>
+  //      </Pagination>
+  //    ) : (
+  //      <p>Getting total users count...</p>
+  //    )}
+  //    {!!checkedIds.length && (
+  //      <Button disabled={isPending} variant="destructive" onClick={deleteSelected}>Delete</Button>
+  //    )}
+  //  </>
+  //)
 }
