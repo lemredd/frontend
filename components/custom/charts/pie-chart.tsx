@@ -23,7 +23,7 @@ import { useMemo } from 'react'
 export function PieChartGraph() {
   const { chartData, chartConfig, loading } = useFetchChartData({
     fetchData: rankSkillsByProfile,
-    xKey: 'name',
+    labelKey: 'name',
   })
 
   const totalProfiles = useMemo(() => {
@@ -31,7 +31,7 @@ export function PieChartGraph() {
       (acc: any, curr: any) => acc + curr.profile_skills_count,
       0,
     )
-  }, [])
+  }, [chartData])
 
   if (loading) {
     return (

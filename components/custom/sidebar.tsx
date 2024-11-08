@@ -4,7 +4,6 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Home,
-  LineChart,
   Settings2,
   Users,
 } from 'lucide-react'
@@ -48,7 +47,7 @@ import { RiUserSearchFill } from 'react-icons/ri'
 const data = {
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
-    { name: 'Reports', url: '/admin/reports/', icon: LineChart },
+    // { name: 'Reports', url: '/admin/reports/', icon: LineChart },
     { name: 'Users', url: '/admin/users/', icon: Users },
   ],
   settings: [

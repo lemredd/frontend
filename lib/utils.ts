@@ -73,13 +73,12 @@ export const buildChartConfig = (
   const config: ChartConfig = {}
 
   data.forEach((item, index) => {
-    const key = item[labelKey]?.toLowerCase().replace(/\s/g, '')
+    const key = item[labelKey]?.toLowerCase()
     config[key] = {
       label: item[labelKey],
       color: colorGenerator(index),
     }
   })
-
   return config
 }
 
@@ -94,7 +93,7 @@ export const addColorsToChartData = (
   labelKey: string = 'name',
 ) => {
   return data.map((item) => {
-    const itemKey = item[labelKey]?.toLowerCase().replace(/\s/g, '')
+    const itemKey = item[labelKey]?.toLowerCase()
     return {
       ...item,
       fill: config[itemKey]?.color || 'hsl(var(--chart-default))',

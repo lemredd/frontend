@@ -22,7 +22,7 @@ import { useFetchChartData } from '@/hooks/admin/useFetchChartData'
 export function HorizontalBarChart() {
   const { chartData, chartConfig, loading } = useFetchChartData({
     fetchData: rankSkillsByJobs,
-    xKey: 'name',
+    labelKey: 'name',
   })
 
   if (loading) {
