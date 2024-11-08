@@ -59,6 +59,11 @@ export async function CountProfilesByRole() {
   return await supabase.rpc('count_profiles_by_role')
 }
 
+export async function countUsersByMonthCreated() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('count_users_by_month_created')
+}
+
 export async function listUsers(page: number) {
   const supabase = createAdminClient()
   return await supabase.auth.admin.listUsers({
