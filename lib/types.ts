@@ -31,3 +31,14 @@ export interface Job {
   barangay: string
   job_skills: JobSkill[]
 }
+
+export type DataItem = Record<string, any>
+
+export interface ChartConfigItem {
+  label: string
+  color: string
+}
+
+export interface ChartConfig {
+  [key: string]: ChartConfigItem | { label: string }
+}

@@ -1,3 +1,6 @@
+import { ChartConfig } from '@/components/ui/chart'
+import { MAX_COLOR_VARIABLES } from '@/lib/constants'
+import { DataItem } from '@/lib/types'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -61,3 +64,39 @@ export function getAddress(job: Record<string, unknown>) {
 
   return address
 }
+
+export const buildChartConfig = (
+  data: DataItem[],
+  labelKey: string = 'skill',
+  valueKey: string = 'jobs',
+  colorGenerator: (index: number) => string = generateColor,
+): ChartConfig => {
+  const config: ChartConfig = {
+    [valueKey]: {
+      label: 'Job Openings',
+    },
+  }
+
+  data.forEach((item, index) => {
+    const key = item[labelKey].toLowerCase().replace(/\s/g, '')
+    config[key] = {
+      label: item[labelKey],
+      color: colorGenerator(index),
+    }
+  })
+
+  return config
+}
+
+const generateColor = (index: number): string => {
+  const colorIndex = (index % MAX_COLOR_VARIABLES) + 1
+  return `hsl(var(--chart-${colorIndex}))`
+}
+
+export const addColorsToChartData = (data: DataItem[], config: ChartConfig) =>
+  data.map((item) => ({
+    ...item,
+    fill:
+      config[item.skill.toLowerCase().replace(/\s/g, '')]?.color ||
+      'hsl(var(--chart-default))',
+  }))

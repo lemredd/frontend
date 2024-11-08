@@ -12,47 +12,100 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-
-const chartData = [
-  { skill: 'Front-End Developer', jobs: 275, fill: 'var(--color-frontend)' },
-  { skill: 'Back-End Developer', jobs: 200, fill: 'var(--color-backend)' },
-  { skill: 'Graphic Artist', jobs: 187, fill: 'var(--color-graphic)' },
-  { skill: 'Project Manager', jobs: 173, fill: 'var(--color-manager)' },
-  { skill: 'UI/UX Designer', jobs: 90, fill: 'var(--color-uiux)' },
-]
-
-const chartConfig = {
-  jobs: {
-    label: 'Job Openings',
-  },
-  frontend: {
-    label: 'Front-End Developer',
-    color: 'hsl(var(--chart-1))',
-  },
-  backend: {
-    label: 'Back-End Developer',
-    color: 'hsl(var(--chart-2))',
-  },
-  graphic: {
-    label: 'Graphic Artist',
-    color: 'hsl(var(--chart-3))',
-  },
-  manager: {
-    label: 'Project Manager',
-    color: 'hsl(var(--chart-4))',
-  },
-  uiux: {
-    label: 'UI/UX Designer',
-    color: 'hsl(var(--chart-5))',
-  },
-} satisfies ChartConfig
+import { addColorsToChartData, buildChartConfig } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 export function HorizontalBarChart() {
+  const [chartData, setChartData] = useState<any>([])
+  const [chartConfig, setChartConfig] = useState<any>({})
+  const [loading, setLoading] = useState(true)
+
+  // Simulating data fetching
+  const fetchChartData = async () => {
+    const data = await new Promise<any[]>((resolve) =>
+      setTimeout(() => {
+        resolve([
+          {
+            skill: 'Front-End Developer',
+            jobs: 275,
+          },
+          {
+            skill: 'Back-End Developer',
+            jobs: 200,
+          },
+          { skill: 'Graphic Artist', jobs: 187 },
+          { skill: 'Project Manager', jobs: 173 },
+          { skill: 'UI/UX Designer', jobs: 90 },
+          {
+            skill: 'Database Administrator',
+            jobs: 85,
+          },
+          { skill: 'DevOps Engineer', jobs: 80 },
+          {
+            skill: 'Product Owner',
+            jobs: 75,
+          },
+          {
+            skill: 'Mobile Developer',
+            jobs: 70,
+          },
+          {
+            skill: 'Technical Writer',
+            jobs: 65,
+          },
+          {
+            skill: 'Cybersecurity Analyst',
+            jobs: 60,
+          },
+          { skill: 'QA Engineer', jobs: 55 },
+          {
+            skill: 'Business Analyst',
+            jobs: 50,
+          },
+          {
+            skill: 'Data Scientist',
+            jobs: 45,
+          },
+          {
+            skill: 'Machine Learning Engineer',
+            jobs: 40,
+          },
+        ])
+      }, 1000),
+    )
+
+    // Build chart config with the fetched data
+    const config = buildChartConfig(data, 'skill', 'jobs')
+    const dataWithColors = addColorsToChartData(data, config)
+
+    // Update state
+    setChartData(dataWithColors)
+    setChartConfig(config)
+    setLoading(false)
+  }
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchChartData()
+  }, [])
+
+  // Loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Skills by Job Demand</CardTitle>
+          <CardDescription>All-time job demand</CardDescription>
+        </CardHeader>
+        <CardContent></CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
