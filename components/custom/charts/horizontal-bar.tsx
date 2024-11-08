@@ -12,86 +12,133 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-
-export const description = 'A mixed bar chart'
-
-const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 187, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 90, fill: 'var(--color-other)' },
-]
-
-const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-  },
-  chrome: {
-    label: 'Chrome',
-    color: 'hsl(var(--chart-1))',
-  },
-  safari: {
-    label: 'Safari',
-    color: 'hsl(var(--chart-2))',
-  },
-  firefox: {
-    label: 'Firefox',
-    color: 'hsl(var(--chart-3))',
-  },
-  edge: {
-    label: 'Edge',
-    color: 'hsl(var(--chart-4))',
-  },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--chart-5))',
-  },
-} satisfies ChartConfig
+import { addColorsToChartData, buildChartConfig } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 export function HorizontalBarChart() {
+  const [chartData, setChartData] = useState<any>([])
+  const [chartConfig, setChartConfig] = useState<any>({})
+  const [loading, setLoading] = useState(true)
+
+  // Simulating data fetching
+  const fetchChartData = async () => {
+    const data = await new Promise<any[]>((resolve) =>
+      setTimeout(() => {
+        resolve([
+          {
+            skill: 'Front-End Developer',
+            jobs: 275,
+          },
+          {
+            skill: 'Back-End Developer',
+            jobs: 200,
+          },
+          { skill: 'Graphic Artist', jobs: 187 },
+          { skill: 'Project Manager', jobs: 173 },
+          { skill: 'UI/UX Designer', jobs: 90 },
+          {
+            skill: 'Database Administrator',
+            jobs: 85,
+          },
+          { skill: 'DevOps Engineer', jobs: 80 },
+          {
+            skill: 'Product Owner',
+            jobs: 75,
+          },
+          {
+            skill: 'Mobile Developer',
+            jobs: 70,
+          },
+          {
+            skill: 'Technical Writer',
+            jobs: 65,
+          },
+          {
+            skill: 'Cybersecurity Analyst',
+            jobs: 60,
+          },
+          { skill: 'QA Engineer', jobs: 55 },
+          {
+            skill: 'Business Analyst',
+            jobs: 50,
+          },
+          {
+            skill: 'Data Scientist',
+            jobs: 45,
+          },
+          {
+            skill: 'Machine Learning Engineer',
+            jobs: 40,
+          },
+        ])
+      }, 1000),
+    )
+
+    // Build chart config with the fetched data
+    const config = buildChartConfig(data, 'skill', 'jobs')
+    const dataWithColors = addColorsToChartData(data, config)
+
+    // Update state
+    setChartData(dataWithColors)
+    setChartConfig(config)
+    setLoading(false)
+  }
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchChartData()
+  }, [])
+
+  // Loading state
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Skills by Job Demand</CardTitle>
+          <CardDescription>All-time job demand</CardDescription>
+        </CardHeader>
+        <CardContent></CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Mixed</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Top Skills by Job Demand</CardTitle>
+        <CardDescription>All-time job demand</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart
-            accessibilityLayer
             data={chartData}
             layout="vertical"
-            margin={{
-              left: 0,
-            }}
+            margin={{ left: 0 }}
           >
             <YAxis
-              dataKey="browser"
+              dataKey="skill"
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) =>
-                chartConfig[value as keyof typeof chartConfig]?.label
+                chartConfig[value as keyof typeof chartConfig]?.label || value
               }
             />
             <XAxis
-              dataKey="visitors"
+              dataKey="jobs"
               type="number"
-              hide
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
             <Bar
-              dataKey="visitors"
+              dataKey="jobs"
               layout="vertical"
               radius={5}
             />
@@ -100,10 +147,10 @@ export function HorizontalBarChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          Consistently high demand <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Reflects demand across all tracked periods
         </div>
       </CardFooter>
     </Card>
