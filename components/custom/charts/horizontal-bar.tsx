@@ -3,6 +3,7 @@
 import { TrendingUp } from 'lucide-react'
 import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
+import { rankSkillsByJobs } from '@/actions/user'
 import {
   Card,
   CardContent,
@@ -16,92 +17,29 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-import { addColorsToChartData, buildChartConfig } from '@/lib/utils'
-import { useEffect, useState } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useFetchChartData } from '@/hooks/admin/useFetchChartData'
 
 export function HorizontalBarChart() {
-  const [chartData, setChartData] = useState<any>([])
-  const [chartConfig, setChartConfig] = useState<any>({})
-  const [loading, setLoading] = useState(true)
+  const { chartData, chartConfig, loading } = useFetchChartData({
+    fetchData: rankSkillsByJobs,
+    xKey: 'name',
+  })
 
-  // Simulating data fetching
-  const fetchChartData = async () => {
-    const data = await new Promise<any[]>((resolve) =>
-      setTimeout(() => {
-        resolve([
-          {
-            skill: 'Front-End Developer',
-            jobs: 275,
-          },
-          {
-            skill: 'Back-End Developer',
-            jobs: 200,
-          },
-          { skill: 'Graphic Artist', jobs: 187 },
-          { skill: 'Project Manager', jobs: 173 },
-          { skill: 'UI/UX Designer', jobs: 90 },
-          {
-            skill: 'Database Administrator',
-            jobs: 85,
-          },
-          { skill: 'DevOps Engineer', jobs: 80 },
-          {
-            skill: 'Product Owner',
-            jobs: 75,
-          },
-          {
-            skill: 'Mobile Developer',
-            jobs: 70,
-          },
-          {
-            skill: 'Technical Writer',
-            jobs: 65,
-          },
-          {
-            skill: 'Cybersecurity Analyst',
-            jobs: 60,
-          },
-          { skill: 'QA Engineer', jobs: 55 },
-          {
-            skill: 'Business Analyst',
-            jobs: 50,
-          },
-          {
-            skill: 'Data Scientist',
-            jobs: 45,
-          },
-          {
-            skill: 'Machine Learning Engineer',
-            jobs: 40,
-          },
-        ])
-      }, 1000),
-    )
-
-    // Build chart config with the fetched data
-    const config = buildChartConfig(data, 'skill', 'jobs')
-    const dataWithColors = addColorsToChartData(data, config)
-
-    // Update state
-    setChartData(dataWithColors)
-    setChartConfig(config)
-    setLoading(false)
-  }
-
-  // Fetch data when component mounts
-  useEffect(() => {
-    fetchChartData()
-  }, [])
-
-  // Loading state
   if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Top Skills by Job Demand</CardTitle>
-          <CardDescription>All-time job demand</CardDescription>
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-32" />
         </CardHeader>
-        <CardContent></CardContent>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <Skeleton className="h-4 w-36 mb-1" />
+          <Skeleton className="h-4 w-24" />
+        </CardFooter>
       </Card>
     )
   }
@@ -117,20 +55,19 @@ export function HorizontalBarChart() {
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ left: 0 }}
+            margin={{ left: 30 }}
           >
             <YAxis
-              dataKey="skill"
+              dataKey="name"
               type="category"
               tickLine={false}
-              tickMargin={10}
               axisLine={false}
               tickFormatter={(value) =>
                 chartConfig[value as keyof typeof chartConfig]?.label || value
               }
             />
             <XAxis
-              dataKey="jobs"
+              dataKey="job_skills_count"
               type="number"
             />
             <ChartTooltip
@@ -138,7 +75,7 @@ export function HorizontalBarChart() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Bar
-              dataKey="jobs"
+              dataKey="job_skills_count"
               layout="vertical"
               radius={5}
             />

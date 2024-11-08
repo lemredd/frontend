@@ -32,13 +32,13 @@ export interface Job {
   job_skills: JobSkill[]
 }
 
-export type DataItem = Record<string, any>
-
-export interface ChartConfigItem {
-  label: string
-  color: string
+export interface DataItem {
+  [key: string]: any
 }
 
 export interface ChartConfig {
-  [key: string]: ChartConfigItem | { label: string }
+  [key: string]: {
+    label: string
+    color?: string
+  }
 }

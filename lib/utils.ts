@@ -67,18 +67,13 @@ export function getAddress(job: Record<string, unknown>) {
 
 export const buildChartConfig = (
   data: DataItem[],
-  labelKey: string = 'skill',
-  valueKey: string = 'jobs',
+  labelKey: string = 'name',
   colorGenerator: (index: number) => string = generateColor,
 ): ChartConfig => {
-  const config: ChartConfig = {
-    [valueKey]: {
-      label: 'Job Openings',
-    },
-  }
+  const config: ChartConfig = {}
 
   data.forEach((item, index) => {
-    const key = item[labelKey].toLowerCase().replace(/\s/g, '')
+    const key = item[labelKey]?.toLowerCase().replace(/\s/g, '')
     config[key] = {
       label: item[labelKey],
       color: colorGenerator(index),
@@ -93,10 +88,16 @@ const generateColor = (index: number): string => {
   return `hsl(var(--chart-${colorIndex}))`
 }
 
-export const addColorsToChartData = (data: DataItem[], config: ChartConfig) =>
-  data.map((item) => ({
-    ...item,
-    fill:
-      config[item.skill.toLowerCase().replace(/\s/g, '')]?.color ||
-      'hsl(var(--chart-default))',
-  }))
+export const addColorsToChartData = (
+  data: DataItem[],
+  config: ChartConfig,
+  labelKey: string = 'name',
+) => {
+  return data.map((item) => {
+    const itemKey = item[labelKey]?.toLowerCase().replace(/\s/g, '')
+    return {
+      ...item,
+      fill: config[itemKey]?.color || 'hsl(var(--chart-default))',
+    }
+  })
+}

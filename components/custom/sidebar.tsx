@@ -94,7 +94,6 @@ export function AdminSidebar() {
               const isActive =
                 activePath === item.url ||
                 (activePath === '/' && item.url === '/admin/')
-              console.log(activePath === item.url)
               return (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton
