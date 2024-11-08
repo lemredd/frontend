@@ -1,9 +1,8 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
-import * as React from 'react'
 import { Label, Pie, PieChart } from 'recharts'
 
+import { rankSkillsByProfile } from '@/actions/user'
 import {
   Card,
   CardContent,
@@ -13,63 +12,55 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-
-export const description = 'A donut chart with text'
-
-const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 287, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 190, fill: 'var(--color-other)' },
-]
-
-const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-  },
-  chrome: {
-    label: 'Chrome',
-    color: 'hsl(var(--chart-1))',
-  },
-  safari: {
-    label: 'Safari',
-    color: 'hsl(var(--chart-2))',
-  },
-  firefox: {
-    label: 'Firefox',
-    color: 'hsl(var(--chart-3))',
-  },
-  edge: {
-    label: 'Edge',
-    color: 'hsl(var(--chart-4))',
-  },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--chart-5))',
-  },
-} satisfies ChartConfig
+import { Skeleton } from '@/components/ui/skeleton'
+import { useFetchChartData } from '@/hooks/admin/useFetchChartData'
+import { useMemo } from 'react'
 
 export function PieChartGraph() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
+  const { chartData, chartConfig, loading } = useFetchChartData({
+    fetchData: rankSkillsByProfile,
+    xKey: 'name',
+  })
+
+  const totalProfiles = useMemo(() => {
+    return chartData.reduce(
+      (acc: any, curr: any) => acc + curr.profile_skills_count,
+      0,
+    )
   }, [])
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-32" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <Skeleton className="h-4 w-36 mb-1" />
+          <Skeleton className="h-4 w-24" />
+        </CardFooter>
+      </Card>
+    )
+  }
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Donut with Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Most Utilized Skills Across User Profiles</CardTitle>
+        <CardDescription>All-time data</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-[300px]"
         >
           <PieChart>
             <ChartTooltip
@@ -78,8 +69,8 @@ export function PieChartGraph() {
             />
             <Pie
               data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
+              dataKey="profile_skills_count"
+              nameKey="name"
               innerRadius={60}
               strokeWidth={5}
             >
@@ -98,14 +89,14 @@ export function PieChartGraph() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {totalProfiles.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Profiles
                         </tspan>
                       </text>
                     )
@@ -117,11 +108,8 @@ export function PieChartGraph() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Reflecting profile skills usage over all time
         </div>
       </CardFooter>
     </Card>

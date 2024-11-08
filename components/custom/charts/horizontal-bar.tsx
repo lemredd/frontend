@@ -1,6 +1,5 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
 import { Bar, BarChart, XAxis, YAxis } from 'recharts'
 
 import { rankSkillsByJobs } from '@/actions/user'
@@ -48,7 +47,7 @@ export function HorizontalBarChart() {
     <Card>
       <CardHeader>
         <CardTitle>Top Skills by Job Demand</CardTitle>
-        <CardDescription>All-time job demand</CardDescription>
+        <CardDescription>All-time data</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -83,9 +82,6 @@ export function HorizontalBarChart() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Consistently high demand <TrendingUp className="h-4 w-4" />
-        </div>
         <div className="leading-none text-muted-foreground">
           Reflects demand across all tracked periods
         </div>
