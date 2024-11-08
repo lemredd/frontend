@@ -1,7 +1,8 @@
-'use server'
+"use server"
 
-import { PROFILE_STORE_FIELDS } from '@/lib/constants'
-import { createAdminClient, createClient } from '@/utils/supabase/server'
+import { PROFILE_STORE_FIELDS } from "@/lib/constants"
+import { createAdminClient, createClient } from "@/utils/supabase/server"
+import { revalidatePath } from "next/cache"
 
 /**
  * Refetches the authenticated user.
@@ -84,6 +85,8 @@ export async function deleteUser(id: string) {
   const supabase = createAdminClient()
   const { error } = await supabase.auth.admin.deleteUser(id)
   if (error) return { error: error.message }
+
+  revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
 }
 
