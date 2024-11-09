@@ -4,7 +4,6 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Home,
-  LineChart,
   Settings2,
   Users,
 } from 'lucide-react'
@@ -48,7 +47,7 @@ import { RiUserSearchFill } from 'react-icons/ri'
 const data = {
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
-    { name: 'Reports', url: '/admin/reports/', icon: LineChart },
+    // { name: 'Reports', url: '/admin/reports/', icon: LineChart },
     { name: 'Users', url: '/admin/users/', icon: Users },
   ],
   settings: [
@@ -94,7 +93,6 @@ export function AdminSidebar() {
               const isActive =
                 activePath === item.url ||
                 (activePath === '/' && item.url === '/admin/')
-              console.log(activePath === item.url)
               return (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton

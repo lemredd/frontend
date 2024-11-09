@@ -24,16 +24,16 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 1rem;
-    --chart-1: 221.2 83.2% 53.3%;  /* Bright blue */
-    --chart-2: 212 95% 68%;        /* Light cyan */
-    --chart-3: 216 92% 60%;        /* Aqua */
-    --chart-4: 210 98% 78%;        /* Very light blue */
-    --chart-5: 212 97% 87%;        /* Pale blue */
-    --chart-6: 223 60% 50%;        /* Darker blue */
-    --chart-7: 200 70% 60%;        /* Cool blue */
-    --chart-8: 225 85% 70%;        /* Soft sky blue */
-    --chart-9: 210 80% 50%;        /* Classic blue */
-    --chart-10: 230 100% 80%;      /* Very pale sky blue */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --chart-6: 340 70% 55%;
+    --chart-7: 260 60% 54%;  
+    --chart-8: 120 45% 50%;   
+    --chart-9: 15 80% 60%;   
+    --chart-10: 205 65% 48%; 
     --glass-background: rgba(255, 255, 255, 0.641);
     --gradient-text: linear-gradient(
       to right,#0056b3 0%, #0073e6 25%, #00aaff 75%, #0056b3 100%
@@ -69,16 +69,16 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
-    --chart-1: 221.2 83.2% 65%;   /* Softer blue */
-    --chart-2: 212 70% 60%;       /* Muted cyan */
-    --chart-3: 216 60% 55%;       /* Dark aqua */
-    --chart-4: 210 85% 50%;       /* Medium blue */
-    --chart-5: 212 70% 45%;       /* Steel blue */
-    --chart-6: 223 50% 55%;       /* Deep blue */
-    --chart-7: 200 50% 60%;       /* Cool grey-blue */
-    --chart-8: 225 60% 65%;       /* Soft slate blue */
-    --chart-9: 210 55% 50%;       /* Classic dark blue */
-    --chart-10: 230 60% 70%;      /* Light slate blue */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+     --chart-6: 10 70% 55%;  
+    --chart-7: 240 60% 55%;   
+    --chart-8: 80 50% 50%;   
+    --chart-9: 45 85% 55%;    
+    --chart-10: 195 70% 48%;  
     --glass-background: rgba(0, 0, 0, 0.18);
     --gradient-text: linear-gradient(
       to right, #b7deed 0%, #71ceef 25%, #21b4e2 75%,#b7deed 100%

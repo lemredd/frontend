@@ -1,8 +1,7 @@
-"use server"
+'use server'
 
-import { PROFILE_STORE_FIELDS } from "@/lib/constants"
-import { createAdminClient, createClient } from "@/utils/supabase/server"
-
+import { PROFILE_STORE_FIELDS } from '@/lib/constants'
+import { createAdminClient, createClient } from '@/utils/supabase/server'
 
 /**
  * Refetches the authenticated user.
@@ -12,7 +11,9 @@ import { createAdminClient, createClient } from "@/utils/supabase/server"
 export async function refreshUser() {
   const supabase = createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) return { user: null, profile: null }
 
@@ -35,7 +36,9 @@ export async function getUserByUsername(username: string) {
 
   const adminSupabase = createAdminClient()
 
-  const { data: { user } } = await adminSupabase.auth.admin.getUserById(profile.user_id)
+  const {
+    data: { user },
+  } = await adminSupabase.auth.admin.getUserById(profile.user_id)
 
   return user
 }
@@ -44,11 +47,31 @@ export async function getUserByUsername(username: string) {
  * Admin actions
  */
 
+export async function rankSkillsByJobs() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('rank_skills_by_jobs')
+}
+
+export async function rankSkillsByProfile() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('rank_skills_by_profile')
+}
+
+export async function countProfilesByRole() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('count_profiles_by_role')
+}
+
+export async function countUsersByMonthCreated() {
+  const supabase = createAdminClient()
+  return await supabase.rpc('count_users_by_month_created')
+}
+
 export async function listUsers(page: number) {
   const supabase = createAdminClient()
   return await supabase.auth.admin.listUsers({
     page,
-    perPage: 10
+    perPage: 10,
   })
 }
 

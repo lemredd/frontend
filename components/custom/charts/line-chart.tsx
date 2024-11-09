@@ -1,8 +1,9 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
-import { CartesianGrid, LabelList, Line, LineChart } from 'recharts'
+import { TrendingDown, TrendingUp } from 'lucide-react'
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from 'recharts'
 
+import { countUsersByMonthCreated } from '@/actions/user'
 import {
   Card,
   CardContent,
@@ -12,55 +13,63 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
-
-export const description = 'A line chart with a custom label'
-
-const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 187, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 90, fill: 'var(--color-other)' },
-]
-
-const chartConfig = {
-  visitors: {
-    label: 'Visitors',
-    color: 'hsl(var(--chart-2))',
-  },
-  chrome: {
-    label: 'Chrome',
-    color: 'hsl(var(--chart-1))',
-  },
-  safari: {
-    label: 'Safari',
-    color: 'hsl(var(--chart-2))',
-  },
-  firefox: {
-    label: 'Firefox',
-    color: 'hsl(var(--chart-3))',
-  },
-  edge: {
-    label: 'Edge',
-    color: 'hsl(var(--chart-4))',
-  },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--chart-5))',
-  },
-} satisfies ChartConfig
+import { Skeleton } from '@/components/ui/skeleton'
+import { useFetchChartData } from '@/hooks/admin/useFetchChartData'
+import { calculateTrend } from '@/lib/utils'
 
 export function LineChartLabel() {
+  const { chartData, chartConfig, loading } = useFetchChartData({
+    fetchData: countUsersByMonthCreated,
+    labelKey: 'name',
+    chartType: 'line',
+  })
+
+  const currentMonthData = chartData[chartData.length - 1]?.count
+  const previousMonthData = chartData[chartData.length - 2]?.count
+
+  const { trendText, isTrendingUp } = calculateTrend(
+    currentMonthData,
+    previousMonthData,
+  )
+
+  const trendIcon = isTrendingUp ? (
+    <TrendingUp className="h-4 w-4 text-green-500" />
+  ) : (
+    <TrendingDown className="h-4 w-4 text-red-500" />
+  )
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-32" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full" />
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <Skeleton className="h-4 w-36 mb-1" />
+          <Skeleton className="h-4 w-24" />
+        </CardFooter>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Line Chart - Custom Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>User Registration Trend</CardTitle>
+        <CardDescription>
+          {chartData.length > 1 &&
+            `${chartData[0].month} - ${
+              chartData[chartData.length - 1].month
+            } 2024`}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -68,29 +77,30 @@ export function LineChartLabel() {
             accessibilityLayer
             data={chartData}
             margin={{
-              top: 24,
-              left: 24,
-              right: 24,
+              top: 20,
+              left: 12,
+              right: 12,
             }}
           >
             <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
             <ChartTooltip
               cursor={false}
-              content={
-                <ChartTooltipContent
-                  indicator="line"
-                  nameKey="visitors"
-                  hideLabel
-                />
-              }
+              content={<ChartTooltipContent indicator="line" />}
             />
             <Line
-              dataKey="visitors"
+              dataKey="count"
               type="natural"
-              stroke="var(--color-visitors)"
+              stroke="var(--color-user_count)"
               strokeWidth={2}
               dot={{
-                fill: 'var(--color-visitors)',
+                fill: 'var(--color-user_count)',
               }}
               activeDot={{
                 r: 6,
@@ -101,21 +111,17 @@ export function LineChartLabel() {
                 offset={12}
                 className="fill-foreground"
                 fontSize={12}
-                dataKey="browser"
-                formatter={(value: keyof typeof chartConfig) =>
-                  chartConfig[value]?.label
-                }
               />
             </Line>
           </LineChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        <div className="flex items-center gap-2 font-medium leading-none">
+          {trendText} {trendIcon}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing total number of users registered per month
         </div>
       </CardFooter>
     </Card>
