@@ -1,4 +1,8 @@
-import { addColorsToChartData, buildChartConfig } from '@/lib/utils'
+import {
+  addColorsToChartData,
+  buildChartConfig,
+  getDateMonth,
+} from '@/lib/utils'
 import { PostgrestSingleResponse } from '@supabase/supabase-js' // Import the response type from Supabase
 import { useEffect, useState } from 'react'
 
@@ -17,9 +21,7 @@ function transformAreaChartData(rawData: any[]) {
   } = {}
 
   rawData.forEach((item) => {
-    const month = new Date(item.month_created).toLocaleString('default', {
-      month: 'long',
-    })
+    const month = getDateMonth(item.month_created)
 
     if (!groupedData[month]) {
       groupedData[month] = { month, provider: 0, seeker: 0 }
@@ -30,6 +32,22 @@ function transformAreaChartData(rawData: any[]) {
     } else if (item.name === 'SEEKER') {
       groupedData[month].seeker += item.profile_roles_count
     }
+  })
+
+  return Object.values(groupedData)
+}
+
+function transformLineChartData(rawData: any[]) {
+  const groupedData: {
+    [month: string]: { month: string; count: number }
+  } = {}
+
+  rawData.forEach((item) => {
+    const month = getDateMonth(item.creation_month)
+    if (!groupedData[month]) {
+      groupedData[month] = { month, count: 0 }
+    }
+    groupedData[month].count += item.user_count
   })
 
   return Object.values(groupedData)
@@ -54,11 +72,13 @@ export function useFetchChartData({
       }
 
       let data = response.data || []
-
+      console.log(data)
       const config = buildChartConfig(data, labelKey)
 
       if (chartType === 'area') {
         data = transformAreaChartData(data)
+      } else if (chartType === 'line') {
+        data = transformLineChartData(data)
       }
 
       const dataWithColors = addColorsToChartData(data, config)
