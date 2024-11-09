@@ -94,5 +94,7 @@ export async function deleteMultipleUsers(ids: string[]) {
   const supabase = createAdminClient()
   const { error } = await supabase.rpc('delete_users_by_ids', { ids })
   if (error) return { error: error.message }
+
+  revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
 }
