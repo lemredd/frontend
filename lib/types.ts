@@ -1,3 +1,4 @@
+import { Table } from '@tanstack/react-table'
 import { IconType } from 'react-icons/lib'
 
 export type UserRole = 'SKR' | 'PDR' | 'ADMIN' | undefined
@@ -41,4 +42,8 @@ export interface ChartConfig {
     label: string
     color?: string
   }
+}
+
+export interface TableInjectionProps<TData> {
+  table: Table<TData>
 }
