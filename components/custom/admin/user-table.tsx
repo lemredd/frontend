@@ -3,7 +3,7 @@
 import { Pencil } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { User } from "@supabase/supabase-js"
-import { ColumnDef, PaginationState } from "@tanstack/react-table"
+import { ColumnDef, PaginationState, Table } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
@@ -120,12 +120,38 @@ function UserDialog({ user }: UserDialogProps) {
   )
 }
 
+export interface SelectedActionsProps<TData> {
+  table: Table<TData>
+}
+function SelectedActions({ table }: SelectedActionsProps<User>) {
+  const [isPending, startTransition] = useTransition()
+
+  function deleteSelected() {
+    startTransition(() => {
+      const ids = table.getSelectedRowModel().rows.map(row => row.original.id)
+      deleteMultipleUsers(ids).then(({ error }) => {
+        if (error) return console.error(error)
+        table.toggleAllRowsSelected(false)
+      })
+    })
+  }
+
+  return (
+    <Button
+      variant="destructive"
+      size="sm"
+      onClick={deleteSelected}
+      disabled={isPending}
+    >
+      Delete selected
+    </Button>
+  )
+}
+
 interface UserTableProps {
   users: User[]
 }
 export function UserTable({ users }: UserTableProps) {
-  const [checkedIds, setCheckedIds] = useState<string[]>([])
-  const [isPending, startTransition] = useTransition()
   const [count, setCount] = useState<number>()
   const router = useRouter()
 
@@ -143,31 +169,6 @@ export function UserTable({ users }: UserTableProps) {
     router.push(`/admin/users?page=${pagination.pageIndex + 1}`)
   }, [pagination, router])
 
-  function checkAll(checked: boolean) {
-    if (checked) {
-      setCheckedIds(users.map(user => user.id))
-    } else {
-      setCheckedIds([])
-    }
-  }
-
-  function checkUser(checked: boolean, id: string) {
-    if (checked) {
-      setCheckedIds(prev => [...prev, id])
-    } else {
-      setCheckedIds(prev => prev.filter(_id => _id !== id))
-    }
-  }
-
-  function deleteSelected() {
-    startTransition(() => {
-      deleteMultipleUsers(checkedIds).then(({ error }) => {
-        if (error) return console.error(error)
-        location.reload()
-      })
-    })
-  }
-
   return (
     <DataTable
       columns={USER_TABLE_COLUMNS}
@@ -176,7 +177,7 @@ export function UserTable({ users }: UserTableProps) {
       manualPagination={!!count}
       onPaginationChange={setPagination}
       state={{ pagination }}
-      deleteSelected={deleteSelected}
+      SelectedActions={SelectedActions}
     />
   )
 }
