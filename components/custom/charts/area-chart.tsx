@@ -42,9 +42,9 @@ export function AreaChartLegend() {
   const isTrendingUp = trendChange > 0
 
   const trendIcon = isTrendingUp ? (
-    <TrendingUp className="h-4 w-4" />
+    <TrendingUp className="h-4 w-4 text-green-500" />
   ) : (
-    <TrendingDown className="h-4 w-4" />
+    <TrendingDown className="h-4 w-4 text-red-500" />
   )
   const trendText = isTrendingUp
     ? `Trending up by ${trendChange.toFixed(1)}%`

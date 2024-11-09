@@ -72,7 +72,6 @@ export function useFetchChartData({
       }
 
       let data = response.data || []
-      console.log(data)
       const config = buildChartConfig(data, labelKey)
 
       if (chartType === 'area') {

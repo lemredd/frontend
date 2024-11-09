@@ -1,6 +1,6 @@
 'use client'
 
-import { TrendingUp } from 'lucide-react'
+import { TrendingDown, TrendingUp } from 'lucide-react'
 import { CartesianGrid, LabelList, Line, LineChart, XAxis } from 'recharts'
 
 import { countUsersByMonthCreated } from '@/actions/user'
@@ -27,7 +27,22 @@ export function LineChartLabel() {
     chartType: 'line',
   })
 
-  console.log(chartConfig)
+  const currentMonthData = chartData[chartData.length - 1]?.count
+  const previousMonthData = chartData[chartData.length - 2]?.count
+
+  const trendChange = previousMonthData
+    ? ((currentMonthData - previousMonthData) / previousMonthData) * 100
+    : 0
+  const isTrendingUp = trendChange > 0
+
+  const trendIcon = isTrendingUp ? (
+    <TrendingUp className="h-4 w-4 text-green-500" />
+  ) : (
+    <TrendingDown className="h-4 w-4 text-red-500" />
+  )
+  const trendText = isTrendingUp
+    ? `Trending up by ${trendChange.toFixed(1)}%`
+    : `Trending down by ${Math.abs(Number(trendChange.toFixed(1)))}%`
 
   if (loading) {
     return (
@@ -99,11 +114,11 @@ export function LineChartLabel() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+        <div className="flex items-center gap-2 font-medium leading-none">
+          {trendText} {trendIcon}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing total number of users registered per month
         </div>
       </CardFooter>
     </Card>
