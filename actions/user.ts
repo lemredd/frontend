@@ -1,6 +1,6 @@
 "use server"
 
-import { PROFILE_STORE_FIELDS } from "@/lib/constants"
+import { PROFILE_STORE_FIELDS, USER_LIST_PAGE_SIZE } from "@/lib/constants"
 import { createAdminClient, createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
@@ -72,7 +72,7 @@ export async function listUsers(page: number) {
   const supabase = createAdminClient()
   return await supabase.auth.admin.listUsers({
     page,
-    perPage: 10,
+    perPage: USER_LIST_PAGE_SIZE
   })
 }
 
