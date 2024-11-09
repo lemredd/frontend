@@ -1,22 +1,40 @@
 "use client"
 
 import { Pencil } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { User } from "@supabase/supabase-js"
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, PaginationState } from "@tanstack/react-table"
 
 import { Button } from "@/components/ui/button"
 import { DataTable } from "@/components/ui/data-table"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog"
 import { createClient } from "@/utils/supabase/client"
 import { useEffect, useState, useTransition } from "react"
 import { PROFILE_STORE_FIELDS } from "@/lib/constants"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { deleteUser as _deleteUser, countUsers, deleteMultipleUsers } from "@/actions/user"
-//import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox"
 
 import { getHumanReadableRole } from "@/lib/utils"
 
 const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        onCheckedChange={value => table.toggleAllRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={value => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+  },
   {
     accessorKey: "email",
     header: "Email"
@@ -84,17 +102,17 @@ function UserDialog({ user }: UserDialogProps) {
       <DialogContent className="w-full lg:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>{user?.email}</DialogTitle>
+          <DialogDescription>Joined at {new Date(user?.created_at).toLocaleString()}</DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 grid-rows-5 grid-flow-row">
           <div>username</div><div>{profile?.username}</div>
           <div>role</div><div>{user.user_metadata.role || "N/A"}</div>
           <div>Full name</div><div>{getFullName()}</div>
-          <div>Joined at</div><div>{new Date(user?.created_at).toLocaleString()}</div>
         </div>
         <DialogFooter>
           <Button variant="destructive" onClick={deleteUser} disabled={isPending}>Delete</Button>
           <Button disabled={isPending}>Reset Password</Button>
-          <Button disabled={isPending}>Reconfirm Email</Button>
+          <Button disabled={isPending || !!user.email_confirmed_at}>Confirm Email</Button>
           <Button disabled={isPending}>Save</Button>
         </DialogFooter>
       </DialogContent>
@@ -109,13 +127,21 @@ export function UserTable({ users }: UserTableProps) {
   const [checkedIds, setCheckedIds] = useState<string[]>([])
   const [isPending, startTransition] = useTransition()
   const [count, setCount] = useState<number>()
+  const router = useRouter()
 
   useEffect(() => {
     countUsers().then(({ data }) => setCount(data))
   }, [])
 
-  const totalPages = !!count ? Math.ceil(count / PAGE_SIZE) : 0
-  const pages = !!count ? Array.from({ length: totalPages }, (_, i) => i + 1) : []
+  const pageCount = !!count ? Math.ceil(count / PAGE_SIZE) : 0
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: PAGE_SIZE
+  })
+
+  useEffect(() => {
+    router.push(`/admin/users?page=${pagination.pageIndex + 1}`)
+  }, [pagination, router])
 
   function checkAll(checked: boolean) {
     if (checked) {
@@ -143,61 +169,14 @@ export function UserTable({ users }: UserTableProps) {
   }
 
   return (
-    <DataTable columns={USER_TABLE_COLUMNS} data={users} />
+    <DataTable
+      columns={USER_TABLE_COLUMNS}
+      data={users}
+      pageCount={pageCount}
+      manualPagination={!!count}
+      onPaginationChange={setPagination}
+      state={{ pagination }}
+      deleteSelected={deleteSelected}
+    />
   )
-  //return (
-  //  <>
-  //    <Table>
-  //      <TableHeader>
-  //        <TableRow>
-  //          {TABLE_HEADERS.map(header => header === "check_all" ? (
-  //            <TableHead key={header}>
-  //              <Checkbox onCheckedChange={checkAll}></Checkbox>
-  //            </TableHead>
-  //          ) : (
-  //            <TableHead key={header}>{header}</TableHead>
-  //          ))}
-  //        </TableRow>
-  //      </TableHeader>
-  //      <TableBody>
-  //        {users.filter(user => !user.email?.includes('admin')).map((user) => (
-  //          <TableRow key={user.id}>
-  //            <TableCell><Checkbox value={user.id} checked={checkedIds.includes(user.id)} onCheckedChange={checked => checkUser(checked as boolean, user.id)}></Checkbox></TableCell>
-  //            <TableCell>{user.email}</TableCell>
-  //            <TableCell>{getHumanReadableRole(user.user_metadata.role_code)}</TableCell>
-  //            <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
-  //            <TableCell>
-  //              <UserDialog user={user} />
-  //            </TableCell>
-  //          </TableRow>
-  //        ))}
-  //      </TableBody>
-  //    </Table>
-  //    {!!count ? (
-  //      // TODO: make previous and next work
-  //      <Pagination className="justify-end mt-4">
-  //        <PaginationContent>
-  //          <PaginationItem>
-  //            <PaginationPrevious />
-  //          </PaginationItem>
-
-  //          {pages.map(page => (
-  //            <PaginationItem key={page}>
-  //              <PaginationRouterLink href={`/admin/users?page=${page}`}>{page}</PaginationRouterLink>
-  //            </PaginationItem>
-  //          ))}
-
-  //          <PaginationItem>
-  //            <PaginationNext />
-  //          </PaginationItem>
-  //        </PaginationContent>
-  //      </Pagination>
-  //    ) : (
-  //      <p>Getting total users count...</p>
-  //    )}
-  //    {!!checkedIds.length && (
-  //      <Button disabled={isPending} variant="destructive" onClick={deleteSelected}>Delete</Button>
-  //    )}
-  //  </>
-  //)
 }

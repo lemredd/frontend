@@ -4,7 +4,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
+  TableOptions,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -17,21 +17,32 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "./button"
+import { useState } from "react"
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData, TValue> extends Partial<TableOptions<TData>> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onDeleteSelected: () => any
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pageCount,
+  manualPagination,
+  onPaginationChange,
+  state
 }: DataTableProps<TData, TValue>) {
+  const [rowSelection, setRowSelection] = useState({})
   const table = useReactTable({
     data,
     columns,
+    pageCount,
+    manualPagination,
+    onPaginationChange,
+    state: { ...state, rowSelection },
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    onRowSelectionChange: setRowSelection,
   })
 
   return (
@@ -78,23 +89,36 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex items-center justify-between px-2">
+        <div className="flex items-center justify-end space-x-2 py-4">
+          {!!table.getIsSomePageRowsSelected() && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => console.log("delte seleted")}
+            >
+              Delete selected
+            </Button>
+          )}
+        </div>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   )
