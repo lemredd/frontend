@@ -106,3 +106,22 @@ export const getDateMonth = (date: Date): string => {
     month: 'long',
   })
 }
+
+export function calculateTrend(
+  current: number | undefined,
+  previous: number | undefined,
+): { trendText: string; isTrendingUp: boolean } {
+  const currentVal: number = current ?? 0
+  const previousVal: number = previous ?? 0
+
+  const trendChange: number = previousVal
+    ? ((currentVal - previousVal) / previousVal) * 100
+    : 0
+  const isTrendingUp: boolean = trendChange > 0
+
+  const trendText: string = isTrendingUp
+    ? `Trending up by ${trendChange.toFixed(1)}%`
+    : `Trending down by ${Math.abs(Number(trendChange.toFixed(1)))}%`
+
+  return { trendText, isTrendingUp }
+}

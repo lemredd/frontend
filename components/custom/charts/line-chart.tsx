@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchChartData } from '@/hooks/admin/useFetchChartData'
+import { calculateTrend } from '@/lib/utils'
 
 export function LineChartLabel() {
   const { chartData, chartConfig, loading } = useFetchChartData({
@@ -30,19 +31,16 @@ export function LineChartLabel() {
   const currentMonthData = chartData[chartData.length - 1]?.count
   const previousMonthData = chartData[chartData.length - 2]?.count
 
-  const trendChange = previousMonthData
-    ? ((currentMonthData - previousMonthData) / previousMonthData) * 100
-    : 0
-  const isTrendingUp = trendChange > 0
+  const { trendText, isTrendingUp } = calculateTrend(
+    currentMonthData,
+    previousMonthData,
+  )
 
   const trendIcon = isTrendingUp ? (
     <TrendingUp className="h-4 w-4 text-green-500" />
   ) : (
     <TrendingDown className="h-4 w-4 text-red-500" />
   )
-  const trendText = isTrendingUp
-    ? `Trending up by ${trendChange.toFixed(1)}%`
-    : `Trending down by ${Math.abs(Number(trendChange.toFixed(1)))}%`
 
   if (loading) {
     return (
@@ -65,8 +63,13 @@ export function LineChartLabel() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Line Chart - Label</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>User Registration Trend</CardTitle>
+        <CardDescription>
+          {chartData.length > 1 &&
+            `${chartData[0].month} - ${
+              chartData[chartData.length - 1].month
+            } 2024`}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

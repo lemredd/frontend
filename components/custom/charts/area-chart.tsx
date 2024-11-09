@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFetchChartData } from '@/hooks/admin/useFetchChartData'
+import { calculateTrend } from '@/lib/utils'
 
 export function AreaChartLegend() {
   const { chartData, chartConfig, loading } = useFetchChartData({
@@ -36,20 +37,17 @@ export function AreaChartLegend() {
     currentMonthData?.seeker + currentMonthData?.provider || 0
   const previousTotal =
     previousMonthData?.seeker + previousMonthData?.provider || 0
-  const trendChange = previousTotal
-    ? ((currentTotal - previousTotal) / previousTotal) * 100
-    : 0
-  const isTrendingUp = trendChange > 0
+
+  const { trendText, isTrendingUp } = calculateTrend(
+    currentTotal,
+    previousTotal,
+  )
 
   const trendIcon = isTrendingUp ? (
     <TrendingUp className="h-4 w-4 text-green-500" />
   ) : (
     <TrendingDown className="h-4 w-4 text-red-500" />
   )
-  const trendText = isTrendingUp
-    ? `Trending up by ${trendChange.toFixed(1)}%`
-    : `Trending down by ${Math.abs(Number(trendChange.toFixed(1)))}%`
-
   if (loading) {
     return (
       <Card>
