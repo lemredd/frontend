@@ -18,11 +18,12 @@ import {
 } from "@/components/ui/table"
 import { Button } from "./button"
 import { useState } from "react"
+import { SelectedActionsProps } from "../custom/admin/user-table"
 
 interface DataTableProps<TData, TValue> extends Partial<TableOptions<TData>> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  onDeleteSelected: () => any
+  SelectedActions?: (props: SelectedActionsProps<TData>) => React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -31,7 +32,8 @@ export function DataTable<TData, TValue>({
   pageCount,
   manualPagination,
   onPaginationChange,
-  state
+  state,
+  SelectedActions
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
   const table = useReactTable({
@@ -91,14 +93,10 @@ export function DataTable<TData, TValue>({
       </Table>
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center justify-end space-x-2 py-4">
-          {!!table.getIsSomePageRowsSelected() && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => console.log("delte seleted")}
-            >
-              Delete selected
-            </Button>
+          {!!table.getIsSomePageRowsSelected() && !!SelectedActions ? (
+            <SelectedActions table={table} />
+          ) : (
+            null
           )}
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
