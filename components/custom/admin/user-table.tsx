@@ -10,7 +10,7 @@ import { DataTable } from "@/components/ui/data-table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog"
 import { createClient } from "@/utils/supabase/client"
 import { useEffect, useState, useTransition } from "react"
-import { PROFILE_STORE_FIELDS } from "@/lib/constants"
+import { PROFILE_STORE_FIELDS, USER_LIST_PAGE_SIZE } from "@/lib/constants"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { deleteUser as _deleteUser, countUsers, deleteMultipleUsers } from "@/actions/user"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -57,8 +57,6 @@ const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
     )
   }
 ]
-
-const PAGE_SIZE = 10
 
 interface UserDialogProps {
   user: User
@@ -159,10 +157,10 @@ export function UserTable({ users }: UserTableProps) {
     countUsers().then(({ data }) => setCount(data))
   }, [])
 
-  const pageCount = !!count ? Math.ceil(count / PAGE_SIZE) : 0
+  const pageCount = !!count ? Math.ceil(count / USER_LIST_PAGE_SIZE) : 0
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: PAGE_SIZE
+    pageSize: USER_LIST_PAGE_SIZE
   })
 
   useEffect(() => {
