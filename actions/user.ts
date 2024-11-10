@@ -5,6 +5,8 @@ import { User } from "@supabase/supabase-js"
 
 import { PROFILE_STORE_FIELDS, USER_LIST_PAGE_SIZE } from "@/lib/constants"
 import { createAdminClient, createClient } from "@/utils/supabase/server"
+import { z } from "zod"
+import { ChangeAdminPasswordSchema } from "@/lib/schema"
 
 /**
  * Refetches the authenticated user.
@@ -116,4 +118,19 @@ export async function deleteMultipleUsers(ids: string[]) {
 
   revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
-  }
+}
+
+export async function changeAdminPassword(values: z.infer<typeof ChangeAdminPasswordSchema>) {
+  const supabase = createAdminClient()
+  const validatedFields = ChangeAdminPasswordSchema.safeParse(values)
+  if (!validatedFields.success) return { error: { message: 'Invalid fields!', errors: validatedFields.error.errors } }
+
+  const { error } = await supabase.rpc('change_admin_password', {
+    user_id: validatedFields.data.user_id,
+    old_password: validatedFields.data.old_password,
+    new_password: validatedFields.data.new_password
+  })
+  if (error) return { error: error.message }
+
+  return { success: 'Password changed successfully!' }
+}
