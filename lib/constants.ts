@@ -4,3 +4,4 @@ export const MAX_COLOR_VARIABLES = 10
 
 // List page sizes
 export const USER_LIST_PAGE_SIZE = 10
+export const SKILL_LIST_PAGE_SIZE = 10
