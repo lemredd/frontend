@@ -1,6 +1,6 @@
 'use client'
 
-import { deleteJob as _deleteJob, editJob } from '@/actions/pdr/job'
+import { deleteJob as _deleteJob, editJob } from '@/actions/job'
 import JobDetailsSkills from '@/components/custom/job/job-details-skills'
 import NotFound from '@/components/custom/not-found'
 import { Button } from '@/components/ui/button'

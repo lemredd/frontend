@@ -1,7 +1,10 @@
-'use server'
+"use server"
 
-import { PROFILE_STORE_FIELDS } from '@/lib/constants'
-import { createAdminClient, createClient } from '@/utils/supabase/server'
+import { revalidatePath } from "next/cache"
+import { User } from "@supabase/supabase-js"
+
+import { PROFILE_STORE_FIELDS, USER_LIST_PAGE_SIZE } from "@/lib/constants"
+import { createAdminClient, createClient } from "@/utils/supabase/server"
 
 /**
  * Refetches the authenticated user.
@@ -67,11 +70,28 @@ export async function countUsersByMonthCreated() {
   return await supabase.rpc('count_users_by_month_created')
 }
 
-export async function listUsers(page: number) {
-  const supabase = createAdminClient()
-  return await supabase.auth.admin.listUsers({
-    page,
-    perPage: 10,
+export async function listUsers(page: number, search?: string) {
+  const
+    supabase = createAdminClient(),
+    start = (page - 1) * USER_LIST_PAGE_SIZE,
+    _arguments: Record<string, any> = { _offset: start, _limit: USER_LIST_PAGE_SIZE }
+
+  if (search) _arguments["search"] = search
+  return await supabase.rpc('list_users', _arguments).then(result => {
+    if (result.error || !result.data.users) return result
+
+    const users = result.data.users.map((user: User & { raw_user_meta_data: Record<string, any> }) => ({
+      ...user,
+      user_metadata: user.raw_user_meta_data
+    }))
+    const data = {
+      ...result.data,
+      users
+    }
+    return {
+      ...result,
+      data
+    }
   })
 }
 
@@ -84,6 +104,8 @@ export async function deleteUser(id: string) {
   const supabase = createAdminClient()
   const { error } = await supabase.auth.admin.deleteUser(id)
   if (error) return { error: error.message }
+
+  revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
 }
 
@@ -91,5 +113,7 @@ export async function deleteMultipleUsers(ids: string[]) {
   const supabase = createAdminClient()
   const { error } = await supabase.rpc('delete_users_by_ids', { ids })
   if (error) return { error: error.message }
+
+  revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
-}
+  }

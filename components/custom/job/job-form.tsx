@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { postJob } from '@/actions/pdr/job'
+import { postJob } from '@/actions/job'
 import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'

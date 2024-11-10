@@ -125,3 +125,13 @@ export function calculateTrend(
 
   return { trendText, isTrendingUp }
 }
+
+export function getHumanReadableRole<K extends "PDR" | "SKR" | "ADMIN">(role: K) {
+  const ROLES = {
+    "PDR": "Provider",
+    "SKR": "Seeker",
+    "ADMIN": "Admin",
+  } as Record<K, string>
+
+  return ROLES[role]
+}

@@ -81,6 +81,20 @@ export const SkillsSchema = z.object({
     .min(1, { message: 'skill is required' }),
 })
 
+export const SkillSchema = z.object({
+  name: z.string().min(1, {
+    message: 'Name is required',
+  }),
+  skill_category_id: z.string().min(1, {
+    message: 'skill_category_id is required',
+  }).transform(value => value.split('|')[0]),
+})
+
+export const EditSkillSchema = z.object({
+  id: z.string().min(1, { message: 'id is required' }),
+  ...SkillSchema.shape,
+})
+
 export const ProfileDescriptionSchema = z.object({
   username: z.string().min(1, {
     message: 'Username is required',

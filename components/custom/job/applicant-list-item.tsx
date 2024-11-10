@@ -1,6 +1,6 @@
 'use client'
 
-import { approveApplicant } from '@/actions/pdr/job'
+import { approveApplicant } from '@/actions/job'
 import { CollapsibleDesc } from '@/components/custom/collapsible-desc'
 import Spinner from '@/components/custom/spinner'
 import { Button } from '@/components/ui/button'

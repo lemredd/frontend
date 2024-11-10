@@ -10,7 +10,8 @@ import {
   EditJobSchema,
   JobSchema,
 } from '@/lib/schema'
-import { createClient } from '@/utils/supabase/server'
+import { createAdminClient, createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
 
 export async function postJob(
   values: z.infer<typeof JobSchema>,
@@ -239,4 +240,17 @@ export async function approveApplicant(
   if (error) return { error: error.message }
 
   return { success: 'Applicant approved' }
+}
+
+/**
+* Admin Actions
+*/
+
+export async function deleteJobs(ids: string[]) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('jobs').delete().in('id', ids)
+  if (error) return { error: error.message }
+
+  revalidatePath('/admin/jobs')
+  return { success: 'Jobs deleted successfully!' }
 }

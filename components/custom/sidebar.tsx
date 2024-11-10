@@ -1,9 +1,11 @@
 'use client'
 
 import {
+  BriefcaseBusiness,
   ChevronRight,
   ChevronsUpDown,
   Home,
+  Lightbulb,
   Settings2,
   Users,
 } from 'lucide-react'
@@ -47,17 +49,16 @@ import { RiUserSearchFill } from 'react-icons/ri'
 const data = {
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
-    // { name: 'Reports', url: '/admin/reports/', icon: LineChart },
     { name: 'Users', url: '/admin/users/', icon: Users },
+    { name: 'jobs', url: '/admin/jobs/', icon: BriefcaseBusiness },
+    { name: 'Skills', url: '/admin/skills/', icon: Lightbulb },
   ],
   settings: [
     {
       title: 'Settings',
       icon: Settings2,
       items: [
-        { title: 'Profile', url: '/settings/profile/' },
-        { title: 'Preferences', url: '/settings/preferences/' },
-        { title: 'Security', url: '/settings/security/' },
+        { title: 'account', url: '/admin/settings/account' },
       ],
     },
   ],
@@ -105,7 +106,7 @@ export function AdminSidebar() {
                   >
                     <Link href={item.url}>
                       <item.icon />
-                      <span>{item.name}</span>
+                      <span className="capitalize">{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
