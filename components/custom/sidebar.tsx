@@ -129,7 +129,7 @@ export function AdminSidebar() {
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton>
                       {item.icon && <item.icon />}
-                      <span>{item.title}</span>
+                      <span className="capitalize">{item.title}</span>
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
@@ -146,7 +146,7 @@ export function AdminSidebar() {
                               )}
                             >
                               <Link href={subItem.url}>
-                                <span>{subItem.title}</span>
+                                <span className="capitalize">{subItem.title}</span>
                               </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
