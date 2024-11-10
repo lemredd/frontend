@@ -61,7 +61,7 @@ function SelectedActions({ table }: SelectedActionsProps<User>) {
     startTransition(() => {
       const ids = table.getSelectedRowModel().rows.map(row => row.original.id)
       deleteJobs(ids).then(({ error, success }) => {
-        if (error) return toast({ variant: "destructive", title: error })
+        if (error) return toast({ variant: "destructive", title: error.message })
         table.toggleAllRowsSelected(false)
         toast({ title: success, variant: "success" })
       })

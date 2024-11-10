@@ -180,7 +180,7 @@ function EditSkillForm({ skill }: EditSkillFormProps) {
           name="skill_category_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Category</FormLabel>
               <FormControl>
                 <AsyncStrictCombobox
                   items={categories}

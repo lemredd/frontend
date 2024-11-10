@@ -130,7 +130,7 @@ export async function changeAdminPassword(values: z.infer<typeof ChangeAdminPass
     old_password: validatedFields.data.old_password,
     new_password: validatedFields.data.new_password
   })
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   return { success: 'Password changed successfully!' }
 }
