@@ -58,9 +58,7 @@ const data = {
       title: 'Settings',
       icon: Settings2,
       items: [
-        { title: 'Profile', url: '/settings/profile/' },
-        { title: 'Preferences', url: '/settings/preferences/' },
-        { title: 'Security', url: '/settings/security/' },
+        { title: 'account', url: '/admin/settings/account' },
       ],
     },
   ],
