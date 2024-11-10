@@ -1,6 +1,6 @@
 'use client'
 
-import { applyJob, checkJobApplication } from '@/actions/pdr/job'
+import { applyJob, checkJobApplication } from '@/actions/job'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
