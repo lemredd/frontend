@@ -65,7 +65,7 @@ export const LoginForm = () => {
       headerLabel="Welcome back"
       backButtonLabel="Don't have an account?"
       backButtonHref="/auth/join"
-      showSocial
+      showSocial={false}
     >
       <Form {...form}>
         <form
