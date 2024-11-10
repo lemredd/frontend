@@ -3,7 +3,7 @@
 import { Pencil } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { User } from "@supabase/supabase-js"
-import { ColumnDef, PaginationState, Table } from "@tanstack/react-table"
+import { ColumnDef, PaginationState } from "@tanstack/react-table"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -13,8 +13,9 @@ import { createClient } from "@/utils/supabase/client"
 import { useEffect, useState, useTransition } from "react"
 import { PROFILE_STORE_FIELDS, USER_LIST_PAGE_SIZE } from "@/lib/constants"
 import { DialogTitle } from "@radix-ui/react-dialog"
-import { deleteUser as _deleteUser, countUsers, deleteMultipleUsers } from "@/actions/user"
+import { deleteUser as _deleteUser, deleteMultipleUsers } from "@/actions/user"
 import { Checkbox } from "@/components/ui/checkbox"
+import { listUsers } from "@/actions/user"
 
 import { getHumanReadableRole } from "@/lib/utils"
 import { TableInjectionProps } from "@/lib/types"
@@ -146,10 +147,7 @@ function SelectedActions({ table }: SelectedActionsProps<User>) {
   )
 }
 
-export interface UserSearchInputProps<TData> extends TableInjectionProps<TData> {
-  table: Table<TData>
-}
-function UserSearchInput({ table }: UserSearchInputProps<User>) {
+function UserSearchInput() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [value, setValue] = useState(searchParams.get("search") || "")
@@ -157,15 +155,14 @@ function UserSearchInput({ table }: UserSearchInputProps<User>) {
   useEffect(() => {
     let to = location.pathname
     if (!to.endsWith("?")) to += "?"
-    to += `&search=${value}`
+    if (value) to += `&search=${value}`
 
     const debouncer = setTimeout(() => {
       router.push(to)
-      table.getColumn("email")?.setFilterValue(value)
     }, 700)
 
     return () => clearTimeout(debouncer)
-  }, [router, value, table])
+  }, [router, value])
 
   return (
     <Input
@@ -178,16 +175,11 @@ function UserSearchInput({ table }: UserSearchInputProps<User>) {
 }
 
 interface UserTableProps {
-  users: User[]
+  data: Awaited<ReturnType<typeof listUsers>>["data"]
 }
-export function UserTable({ users }: UserTableProps) {
-  const [count, setCount] = useState<number>()
+export function UserTable({ data: { users, count } }: UserTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  useEffect(() => {
-    countUsers().then(({ data }) => setCount(data))
-  }, [])
 
   const pageCount = !!count ? Math.ceil(count / USER_LIST_PAGE_SIZE) : 0
   const [pagination, setPagination] = useState<PaginationState>({
@@ -197,7 +189,8 @@ export function UserTable({ users }: UserTableProps) {
 
   useEffect(() => {
     const newSearchParams = new URLSearchParams(searchParams.toString())
-    newSearchParams.set("page", (pagination.pageIndex + 1).toString())
+    if (pagination.pageIndex) newSearchParams.set("page", (pagination.pageIndex + 1).toString())
+    else newSearchParams.delete("page")
     const to = location.pathname + "?" + newSearchParams.toString()
     router.push(to)
   }, [pagination, router, searchParams])
