@@ -3,9 +3,10 @@
 import { deleteJobs } from "@/actions/job";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 import { getAddress } from "@/lib/utils";
 import { Info } from "lucide-react";
-import { useTransition } from "react";
+import { useRef, useTransition } from "react";
 
 interface JobInfoProps {
   job: Record<string, any>
@@ -25,10 +26,13 @@ function Details({ job }: JobInfoProps) {
 
 export function JobInfo({ job }: JobInfoProps) {
   const [isPending, startTransition] = useTransition()
+  const dialogCloser = useRef<HTMLButtonElement>(null)
   function deleteJob() {
     startTransition(() => {
-      deleteJobs([job.id]).then(({ error }) => {
-        if (error) return console.error(error)
+      deleteJobs([job.id]).then(({ success, error }) => {
+        if (error) toast({ title: error.message, variant: "destructive" })
+        dialogCloser.current?.click()
+        toast({ title: success, variant: "success" })
       })
     })
   }
@@ -45,7 +49,7 @@ export function JobInfo({ job }: JobInfoProps) {
         <Details job={job} />
         <DialogFooter>
           <Button variant="destructive" onClick={deleteJob} disabled={isPending}>Delete</Button>
-          <DialogClose asChild>
+          <DialogClose asChild ref={dialogCloser}>
             <Button variant="secondary">Close</Button>
           </DialogClose>
         </DialogFooter>

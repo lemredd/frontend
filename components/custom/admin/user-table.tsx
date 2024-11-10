@@ -19,6 +19,7 @@ import { listUsers } from "@/actions/user"
 
 import { getHumanReadableRole } from "@/lib/utils"
 import { TableInjectionProps } from "@/lib/types"
+import { toast } from "@/hooks/use-toast"
 
 const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
   {
@@ -86,9 +87,9 @@ function UserDialog({ user }: UserDialogProps) {
 
   function deleteUser() {
     startTransition(() => {
-      _deleteUser(user.id).then(({ error }) => {
-        if (error) return console.error(error)
-        location.reload()
+      _deleteUser(user.id).then(({ success, error }) => {
+        if (error) return toast({ title: error, variant: "destructive" })
+        toast({ title: success, variant: "success" })
       })
     })
   }
@@ -128,9 +129,10 @@ function SelectedActions({ table }: SelectedActionsProps<User>) {
   function deleteSelected() {
     startTransition(() => {
       const ids = table.getSelectedRowModel().rows.map(row => row.original.id)
-      deleteMultipleUsers(ids).then(({ error }) => {
-        if (error) return console.error(error)
+      deleteMultipleUsers(ids).then(({ error, success }) => {
+        if (error) return toast({ title: error, variant: "destructive" })
         table.toggleAllRowsSelected(false)
+        toast({ title: success, variant: "success" })
       })
     })
   }
