@@ -27,7 +27,7 @@ interface DataTableProps<TData, TValue> extends Partial<TableOptions<TData>> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   SelectedActions?: (props: TableInjectionProps<TData>) => React.ReactNode,
-  SearchInput?: (props: TableInjectionProps<TData>) => React.ReactNode
+  SearchInput?: () => React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -59,7 +59,7 @@ export function DataTable<TData, TValue>({
     <>
       {!!SearchInput && (
         <div className="flex items-center py-4">
-          <SearchInput table={table} />
+          <SearchInput />
         </div>
       )}
       <div className="rounded-md border">
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
         </Table>
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center justify-end space-x-2 py-4">
-            {!!table.getIsSomePageRowsSelected() && !!SelectedActions ? (
+            {(table.getIsSomePageRowsSelected() || table.getIsAllPageRowsSelected()) && !!SelectedActions ? (
               <SelectedActions table={table} />
             ) : (
               null
