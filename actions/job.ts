@@ -249,7 +249,7 @@ export async function approveApplicant(
 export async function deleteJobs(ids: string[]) {
   const supabase = createAdminClient()
   const { error } = await supabase.from('jobs').delete().in('id', ids)
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   revalidatePath('/admin/jobs')
   return { success: 'Jobs deleted successfully!' }

@@ -21,9 +21,10 @@ export async function addSkill(values: z.infer<typeof SkillSchema>) {
     ...validatedFields.data,
     verified_at: new Date().toISOString(),
   }])
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   revalidatePath('/admin/skills')
+  return { success: 'Skill added successfully!' }
 }
 
 export async function editSkill(values: z.infer<typeof EditSkillSchema>) {
@@ -41,7 +42,7 @@ export async function editSkill(values: z.infer<typeof EditSkillSchema>) {
     .from('skills')
     .update({ ...validatedFields.data })
     .eq('id', validatedFields.data.id)
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   revalidatePath('/admin/skills')
   return { success: 'Skill updated successfully!' }
@@ -51,7 +52,7 @@ export async function deleteSkills(ids: string[]) {
   const supabase = createAdminClient()
   const { error } = await supabase.from('skills').delete().in('id', ids)
 
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   revalidatePath('/admin/skills')
   return { success: 'Skills deleted successfully!' }
