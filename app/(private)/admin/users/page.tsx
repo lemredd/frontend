@@ -20,8 +20,8 @@ interface UsersProps {
   searchParams: Record<string, string | string[] | undefined>
 }
 export default async function Users({ searchParams }: UsersProps) {
-  const { page } = searchParams
-  const { data } = await listUsers(searchParams.page ? parseInt(page as string) : 1)
+  const { page, search } = searchParams
+  const { data } = await listUsers(searchParams.page ? parseInt(page as string) : 1, search as string)
 
   return (
     <Suspense fallback={<Fallback />}>
@@ -32,7 +32,7 @@ export default async function Users({ searchParams }: UsersProps) {
           <div className="aspect-video rounded-xl bg-muted/50" />
         </div>
         <div className="min-h-[100vh] px-4 py-2 flex-1 rounded-xl bg-muted/50 md:min-h-min">
-          <UserTable users={data?.users} />
+          <UserTable data={data} />
         </div>
       </div>
     </Suspense>
