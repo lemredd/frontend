@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  BriefcaseBusiness,
   ChevronRight,
   ChevronsUpDown,
   Home,
@@ -49,6 +50,7 @@ const data = {
   dashboards: [
     { name: 'Overview', url: '/admin/', icon: Home },
     { name: 'Users', url: '/admin/users/', icon: Users },
+    { name: 'jobs', url: '/admin/jobs/', icon: BriefcaseBusiness },
     { name: 'Skills', url: '/admin/skills/', icon: Lightbulb },
   ],
   settings: [
@@ -106,7 +108,7 @@ export function AdminSidebar() {
                   >
                     <Link href={item.url}>
                       <item.icon />
-                      <span>{item.name}</span>
+                      <span className="capitalize">{item.name}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
