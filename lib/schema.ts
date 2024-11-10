@@ -223,3 +223,18 @@ export const CompleteJobWithFeedbackSchema = z.object({
   ...FeedbackSchema.shape,
   job_id: z.string().min(1, { message: 'job_id is required' }),
 })
+
+export const ChangeAdminPasswordSchema = z.object({
+  user_id: z.string().min(1, { message: 'user_id is required' }),
+  old_password: z.string().min(1, { message: 'old_password is required' }),
+  new_password: z.string().min(1, { message: 'new_password is required' }),
+  confirm_new_password: z.string().min(1, { message: 'new_password is required' }),
+}).superRefine(({ confirm_new_password, new_password }, ctx) => {
+  if (confirm_new_password !== new_password) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'The passwords did not match',
+      path: ['confirmPassword'],
+    })
+  }
+})

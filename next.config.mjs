@@ -44,6 +44,11 @@ const nextConfig = {
       source: '/pdr/setup/',
       destination: '/pdr/setup/project',
       permanent: true,
+    },
+    {
+      source: '/admin/settings/',
+      destination: '/admin/settings/account',
+      permanent: true,
     }
   ]
 }

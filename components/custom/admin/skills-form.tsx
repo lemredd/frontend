@@ -14,6 +14,7 @@ import { z } from "zod";
 import { AsyncStrictCombobox } from "../combobox";
 import { ComboboxItem } from "@/lib/types";
 import { addSkill, deleteSkills, editSkill } from "@/actions/skills";
+import { toast } from "@/hooks/use-toast";
 
 function AddSkillForm() {
   const [isPending, startTransition] = useTransition()
@@ -28,8 +29,9 @@ function AddSkillForm() {
 
   function onSubmit() {
     startTransition(() => {
-      addSkill(form.getValues()).then(data => {
-        if (data?.error) return console.error(data.error)
+      addSkill(form.getValues()).then(({ error, success }) => {
+        if (error) return toast({ title: error.message, variant: "destructive" })
+        toast({ title: success, variant: "success" })
       })
     })
   }
@@ -115,9 +117,10 @@ function EditSkillForm({ skill }: EditSkillFormProps) {
   function onSubmit() {
     console.log(form.getValues())
     startTransition(() => {
-      editSkill(form.getValues()).then(({ error }) => {
-        if (error) return console.error(error)
+      editSkill(form.getValues()).then(({ error, success }) => {
+        if (error) return toast({ title: error.message, variant: "destructive" })
         dialogCloser.current?.click()
+        toast({ title: success, variant: "success" })
       })
     })
   }
@@ -128,9 +131,10 @@ function EditSkillForm({ skill }: EditSkillFormProps) {
 
   function deleteSkill() {
     startTransition(() => {
-      deleteSkills([skill.id]).then(({ error }) => {
-        if (error) return console.error(error)
+      deleteSkills([skill.id]).then(({ error, success }) => {
+        if (error) return toast({ title: error.message, variant: "destructive" })
         dialogCloser?.current?.click()
+        toast({ title: success, variant: "success" })
       })
     })
   }

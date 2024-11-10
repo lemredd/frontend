@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DataTable } from "@/components/ui/data-table"
 import { JOB_LIST_PAGE_SIZE } from "@/lib/constants"
 import { JobInfo } from "./job-info"
+import { toast } from "@/hooks/use-toast"
 
 const JOB_TABLE_COLUMNS: ColumnDef<User>[] = [
   {
@@ -59,9 +60,10 @@ function SelectedActions({ table }: SelectedActionsProps<User>) {
   function deleteSelected() {
     startTransition(() => {
       const ids = table.getSelectedRowModel().rows.map(row => row.original.id)
-      deleteJobs(ids).then(({ error }) => {
-        if (error) return console.error(error)
+      deleteJobs(ids).then(({ error, success }) => {
+        if (error) return toast({ variant: "destructive", title: error })
         table.toggleAllRowsSelected(false)
+        toast({ title: success, variant: "success" })
       })
     })
   }
