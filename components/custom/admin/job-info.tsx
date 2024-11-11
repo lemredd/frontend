@@ -1,12 +1,20 @@
-"use client"
+'use client'
 
-import { deleteJobs } from "@/actions/job";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "@/hooks/use-toast";
-import { getAddress } from "@/lib/utils";
-import { Info } from "lucide-react";
-import { useRef, useTransition } from "react";
+import { deleteJobs } from '@/actions/job'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { getAddress } from '@/lib/utils'
+import { Info } from 'lucide-react'
+import { useTransition } from 'react'
 
 interface JobInfoProps {
   job: Record<string, any>
@@ -14,42 +22,68 @@ interface JobInfoProps {
 
 function Details({ job }: JobInfoProps) {
   return (
-    <div className="grid grid-cols-2 grid-rows-auto gap-y-2 grid-flow-row">
-      <div>Name</div><div>{job.name}</div>
-      <div>Location</div><div>{getAddress(job)}</div>
-      <div>Created At</div><div>{new Date(job.created_at).toLocaleString()}</div>
-      <div>Setup</div><div>{job.setup}</div>
-      <div>Skills</div><div>{job.job_skills.map((job_skill: Record<string, any>) => job_skill.skills.name).join(", ")}</div>
+    <div className="space-y-4">
+      <div className="text-lg font-semibold ">Details</div>
+      <div className="grid grid-cols-[1fr_2fr] gap-y-2 text-sm ">
+        <div className="font-medium">Name</div>
+        <div>{job.name}</div>
+        <div className="font-medium">Location</div>
+        <div>{getAddress(job)}</div>
+        <div className="font-medium">Created At</div>
+        <div>{new Date(job.created_at).toLocaleString()}</div>
+        <div className="font-medium">Setup</div>
+        <div>{job.setup}</div>
+      </div>
+
+      <div className="mt-4 text-lg font-semibold ">Skills</div>
+      <div className="text-sm ">
+        {job.job_skills
+          .map((job_skill: Record<string, any>) => job_skill.skills.name)
+          .join(', ')}
+      </div>
     </div>
   )
 }
 
 export function JobInfo({ job }: JobInfoProps) {
   const [isPending, startTransition] = useTransition()
-  const dialogCloser = useRef<HTMLButtonElement>(null)
+
   function deleteJob() {
     startTransition(() => {
-      deleteJobs([job.id]).then(({ success, error }) => {
-        if (error) toast({ title: error.message, variant: "destructive" })
-        dialogCloser.current?.click()
-        toast({ title: success, variant: "success" })
+      deleteJobs([job.id]).then(({ error }) => {
+        if (error) return console.error(error)
       })
     })
   }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Info className="cursor-pointer" />
+        <Info className="cursor-pointer text-blue-600 hover:text-blue-700" />
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Job Information</DialogTitle>
-          <DialogDescription>Details about this job</DialogDescription>
+          <DialogTitle className="text-xl font-semibold">
+            Job Information
+          </DialogTitle>
+          <DialogDescription className="text-sm ">
+            Details about this job
+          </DialogDescription>
         </DialogHeader>
-        <Details job={job} />
-        <DialogFooter>
-          <Button variant="destructive" onClick={deleteJob} disabled={isPending}>Delete</Button>
-          <DialogClose asChild ref={dialogCloser}>
+
+        <div className="mt-4">
+          <Details job={job} />
+        </div>
+
+        <DialogFooter className="flex justify-end space-x-2 mt-6">
+          <Button
+            variant="destructive"
+            onClick={deleteJob}
+            disabled={isPending}
+          >
+            Delete
+          </Button>
+          <DialogClose asChild>
             <Button variant="secondary">Close</Button>
           </DialogClose>
         </DialogFooter>

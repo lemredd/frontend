@@ -85,9 +85,12 @@ export const SkillSchema = z.object({
   name: z.string().min(1, {
     message: 'Name is required',
   }),
-  skill_category_id: z.string().min(1, {
-    message: 'skill_category_id is required',
-  }).transform(value => value.split('|')[0]),
+  skill_category_id: z
+    .string()
+    .min(1, {
+      message: 'skill_category_id is required',
+    })
+    .transform((value) => value.split('|')[0]),
 })
 
 export const EditSkillSchema = z.object({
@@ -224,17 +227,19 @@ export const CompleteJobWithFeedbackSchema = z.object({
   job_id: z.string().min(1, { message: 'job_id is required' }),
 })
 
-export const ChangeAdminPasswordSchema = z.object({
-  user_id: z.string().min(1, { message: 'user_id is required' }),
-  old_password: z.string().min(1, { message: 'old_password is required' }),
-  new_password: z.string().min(1, { message: 'new_password is required' }),
-  confirm_new_password: z.string().min(1, { message: 'new_password is required' }),
-}).superRefine(({ confirm_new_password, new_password }, ctx) => {
-  if (confirm_new_password !== new_password) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'The passwords did not match',
-      path: ['confirmPassword'],
-    })
-  }
-})
+export const ChangeAdminPasswordSchema = z
+  .object({
+    user_id: z.string().min(1, { message: 'user_id is required' }),
+    old_password: z.string().min(1, { message: 'old password is required' }),
+    new_password: passwordSchema,
+    confirm_new_password: passwordSchema,
+  })
+  .superRefine(({ confirm_new_password, new_password }, ctx) => {
+    if (confirm_new_password !== new_password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'The passwords did not match',
+        path: ['confirm_new_password'],
+      })
+    }
+  })
