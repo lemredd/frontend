@@ -88,7 +88,7 @@ export const RegisterForm = () => {
       headerLabel={!step ? 'Create an account' : 'Select your role'}
       backButtonLabel="Already have an account?"
       backButtonHref="/auth/login"
-      showSocial
+      showSocial={false}
     >
       {!step && (
         <Form {...form}>
