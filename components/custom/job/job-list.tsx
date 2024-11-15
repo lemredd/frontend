@@ -10,6 +10,7 @@ import { RefreshCwIcon } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import JobListItem, { ProfileJobListItem } from './job-list-item'
+import { toast } from '@/hooks/use-toast'
 
 interface ProfileJobListProps {
   role: 'seeker' | 'provider'
@@ -66,7 +67,7 @@ export default function JobList({ role }: ProfileJobListProps) {
     query.then(({ data, error }) => {
       if (error) {
         setError('Failed to fetch jobs. Please try again later.')
-        return console.error(error)
+        return toast({ title: error.message, variant: 'destructive' })
       }
 
       console.log(data)
@@ -142,6 +143,7 @@ export default function JobList({ role }: ProfileJobListProps) {
 export function ProfileJobList({ role }: ProfileJobListProps) {
   const { profile } = useAuthStore()
   const supabase = createClient()
+  const searchParams = useSearchParams()
 
   const [jobs, setJobs] = useState<Record<string, any>[]>([])
   const [loading, setLoading] = useState(true)
@@ -152,21 +154,59 @@ export function ProfileJobList({ role }: ProfileJobListProps) {
       return
     }
 
-    const matcher = role === 'seeker' ? 'seeker_id' : 'profile_id'
-    const selectedFields = '*, feedbacks(*)'
-    supabase
-      .from('jobs')
-      .select(selectedFields)
-      .eq(matcher, profile.id)
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (error) return console.error(error)
-        if (data) {
-          setJobs(data)
-        }
-        setLoading(false)
-      })
-  }, [profile, role, supabase])
+    if (role === "seeker") {
+      const status = searchParams.get("status") || "pending"
+      const search = searchParams.get("search") || ""
+
+      if (["pending", "declined"].includes(status)) {
+        supabase
+          .from("job_applicants")
+          .select("jobs(*, feedbacks(*))")
+          .match({
+            "status": status,
+            "profile_id": profile.id
+          })
+          .ilike("jobs.name", `%${search}%`)
+          .order("created_at", { ascending: false })
+          .then(({ data, error }) => {
+            if (error) return toast({ title: error.message, variant: "destructive" })
+            setJobs(data.map(application => application.jobs).filter(Boolean))
+          })
+      } else {
+        const selectedFields = '*, feedbacks(*)'
+        supabase
+          .from('jobs')
+          .select(selectedFields)
+          .match({
+            "status": status,
+            "seeker_id": profile.id
+          })
+          .ilike("name", `%${search}%`)
+          .order('created_at', { ascending: false })
+          .then(({ data, error }) => {
+            if (error) return toast({ title: error.message, variant: "destructive" })
+            if (data) {
+              setJobs(data)
+            }
+            setLoading(false)
+          })
+      }
+    } else {
+      const selectedFields = '*, feedbacks(*)'
+      supabase
+        .from('jobs')
+        .select(selectedFields)
+        .eq("profile_id", profile.id)
+        .order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (error) return toast({ title: error.message, variant: "destructive" })
+          if (data) {
+            setJobs(data)
+          }
+          setLoading(false)
+        })
+    }
+  }, [profile, role, supabase, searchParams])
 
   if (loading) {
     return (
@@ -179,13 +219,13 @@ export function ProfileJobList({ role }: ProfileJobListProps) {
   }
 
   if (jobs.length === 0) {
-    return <EmptyState message="You have no jobs listed." />
+    return <EmptyState message="No jobs found." />
   }
 
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">
-        {role === 'seeker' ? 'Jobs You’re Interested In' : 'Jobs You’ve Posted'}
+        {role === 'seeker' ? 'Your Tasks' : 'Tasks You’ve Posted'}
       </h2>
       <div className="space-y-4">
         {jobs.map((job) => (
