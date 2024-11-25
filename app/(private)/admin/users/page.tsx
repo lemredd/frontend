@@ -22,8 +22,12 @@ interface UsersProps {
   searchParams: Record<string, string | string[] | undefined>
 }
 export default async function Users({ searchParams }: UsersProps) {
-  const { page, search } = searchParams
-  const { data } = await listUsers(searchParams.page ? parseInt(page as string) : 1, search as string)
+  const { page, search, role } = searchParams
+  const { data } = await listUsers(
+    searchParams.page ? parseInt(page as string) : 1,
+    search as string,
+    role as string
+  )
 
   return (
     <Suspense fallback={<Fallback />}>
