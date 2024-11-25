@@ -72,13 +72,14 @@ export async function countUsersByMonthCreated() {
   return await supabase.rpc('count_users_by_month_created')
 }
 
-export async function listUsers(page: number, search?: string) {
+export async function listUsers(page: number, search?: string, role?: string) {
   const
     supabase = createAdminClient(),
     start = (page - 1) * USER_LIST_PAGE_SIZE,
     _arguments: Record<string, any> = { _offset: start, _limit: USER_LIST_PAGE_SIZE }
 
   if (search) _arguments["search"] = search
+  _arguments["role_code"] = role?.toLocaleUpperCase() ?? "skr".toLocaleUpperCase()
   return await supabase.rpc('list_users', _arguments).then(result => {
     if (result.error || !result.data.users) return result
 
