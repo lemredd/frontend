@@ -155,6 +155,33 @@ function UserDialog({ user }: UserDialogProps) {
           <div>{getFullName()}</div>
         </div>
 
+        {user.user_metadata.role_code === "SKR" && (
+          <div className="grid grid-cols-2 gap-y-2 text-sm">
+            <h2 className="col-span-full text-lg">Approval</h2>
+            <div className="font-medium text-muted-foreground">Status</div>
+            <div>{profile?.approvals?.status || 'N/A'}</div>
+
+            <div className="font-medium text-muted-foreground">Valid ID</div>
+            <div>
+              {profile?.approvals.valid_id_pic_name ? (
+                <Button asChild variant="outline" className="justify-start">
+                  <Link
+                    target="_blank"
+                    href={getUrl(profile.approvals.valid_id_pic_name)}
+                    className="space-x-2"
+                  >
+                    <ExternalLink size={16} />
+                    <span className="max-w-[100px] truncate">{profile.approvals.valid_id_pic_name}</span>
+                  </Link>
+                </Button>
+              ) : "N/A"}
+            </div>
+
+            <div className="font-medium text-muted-foreground">Other Documents</div>
+            <div>{/* TODO: display other documents */}</div>
+          </div>
+        )}
+
         <DialogFooter className="flex justify-end gap-2 pt-6">
           <Button
             variant="destructive"
