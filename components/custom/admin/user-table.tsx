@@ -2,8 +2,8 @@
 
 import { User } from '@supabase/supabase-js'
 import { ColumnDef, PaginationState } from '@tanstack/react-table'
-import { Pencil } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { ExternalLink, Pencil } from 'lucide-react'
+import { ReadonlyURLSearchParams, useRouter, useSearchParams } from 'next/navigation'
 
 import {
   deleteUser as _deleteUser,
@@ -30,6 +30,8 @@ import { useEffect, useState, useTransition } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { TableInjectionProps } from '@/lib/types'
 import { getHumanReadableRole } from '@/lib/utils'
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from 'next/link'
 
 const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
   {
@@ -82,18 +84,20 @@ function UserDialog({ user }: UserDialogProps) {
   const [profile, setProfile] = useState<Record<string, any>>()
   const [isPending, startTransition] = useTransition()
 
-  useEffect(() => {
-    if (user) getProfile()
-  }, [user])
-
   function getProfile() {
+    const FIELDS = "*, approvals(*)"
     supabase
       .from('profiles')
-      .select(PROFILE_STORE_FIELDS)
+      .select(FIELDS)
       .eq('user_id', user.id)
       .single()
       .then(({ data }) => setProfile(data))
   }
+
+  useEffect(() => {
+    if (user) getProfile()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   function getFullName() {
     if (!profile) return 'N/A'
@@ -111,6 +115,10 @@ function UserDialog({ user }: UserDialogProps) {
     })
   }
 
+  function getUrl(name: string) {
+    return supabase.storage.from("documents").getPublicUrl(name.trim()).data.publicUrl
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -121,8 +129,8 @@ function UserDialog({ user }: UserDialogProps) {
           <Pencil size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full lg:max-w-[700px] p-6 rounded-lg">
-        <DialogHeader className="pb-4">
+      <DialogContent className="w-full lg:max-w-[700px] p-6 space-y-2 rounded-lg">
+        <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             {getFullName()}
           </DialogTitle>
@@ -132,12 +140,13 @@ function UserDialog({ user }: UserDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
+        <div className="grid grid-cols-2 gap-y-2 text-sm">
+          <h2 className="col-span-full text-lg">General Info</h2>
           <div className="font-medium text-muted-foreground">Username</div>
           <div>{profile?.username || 'N/A'}</div>
 
           <div className="font-medium text-muted-foreground">Role</div>
-          <div>{user.user_metadata.role || 'N/A'}</div>
+          <div>{user.user_metadata.role_code || 'N/A'}</div>
 
           <div className="font-medium text-muted-foreground">Email Status</div>
           <div>{user.email_confirmed_at ? 'Confirmed' : 'Pending'}</div>
@@ -174,7 +183,7 @@ function UserDialog({ user }: UserDialogProps) {
 }
 
 export interface SelectedActionsProps<TData>
-  extends TableInjectionProps<TData> {}
+  extends TableInjectionProps<TData> { }
 function SelectedActions({ table }: SelectedActionsProps<User>) {
   const [isPending, startTransition] = useTransition()
 
@@ -211,6 +220,8 @@ function UserSearchInput() {
     if (!to.endsWith('?')) to += '?'
     if (value) to += `&search=${value}`
 
+    if (searchParams.get('role')) to += `&role=${searchParams.get('role')}`
+
     const debouncer = setTimeout(() => {
       router.push(to)
     }, 700)
@@ -225,6 +236,32 @@ function UserSearchInput() {
       onChange={(event) => setValue(event.target.value)}
       className="max-w-sm"
     />
+  )
+}
+
+function buildLink(searchParams: ReadonlyURLSearchParams, role: string) {
+  let to = `./?role=${role}`
+  if (searchParams.get('search'))
+    to += `&search=${searchParams.get('search')}`
+  return to
+}
+
+function RoleTabs() {
+  const searchParams = useSearchParams()
+  const ROLE_CODES = { "skr": "Seekers", "pdr": "Providers" }
+
+  return (
+    <Tabs defaultValue="account" className="w-full">
+      <TabsList className="w-full">
+        {Object.entries(ROLE_CODES).map(([key, val]) => (
+          <TabsTrigger key={key} value={key} asChild>
+            <Link href={buildLink(searchParams, key)} className="w-full">
+              <span className="capitalize">{val}</span>
+            </Link>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   )
 }
 
@@ -253,15 +290,18 @@ export function UserTable({ data: { users, count } }: UserTableProps) {
   }, [pagination, router, searchParams])
 
   return (
-    <DataTable
-      columns={USER_TABLE_COLUMNS}
-      data={users}
-      pageCount={pageCount}
-      manualPagination={!!count}
-      onPaginationChange={setPagination}
-      state={{ pagination }}
-      SelectedActions={SelectedActions}
-      SearchInput={UserSearchInput}
-    />
+    <div className="mt-2">
+      <RoleTabs />
+      <DataTable
+        columns={USER_TABLE_COLUMNS}
+        data={users}
+        pageCount={pageCount}
+        manualPagination={!!count}
+        onPaginationChange={setPagination}
+        state={{ pagination }}
+        SelectedActions={SelectedActions}
+        SearchInput={UserSearchInput}
+      />
+    </div>
   )
 }
