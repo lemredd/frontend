@@ -1,7 +1,8 @@
 'use server'
 
 import { ValidDocumentSchema, ValidIdSchema } from '@/lib/schema'
-import { createClient } from '@/utils/supabase/server'
+import { createAdminClient, createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
 
 // ! TODO: FIX
 export async function uploadDocument(form: FormData, type: 'id' | 'document') {
@@ -39,4 +40,16 @@ export async function uploadDocument(form: FormData, type: 'id' | 'document') {
   }
 
   return { success: 'Document uploaded' }
+}
+
+export async function getOtherDocuments(ownerId: string) {
+  const supabase = createAdminClient()
+
+  const { data, error } = await supabase
+    .rpc('get_other_documents', { _owner_id: ownerId })
+
+  if (error) return { error }
+
+  revalidatePath('/admin/users')
+  return { data }
 }
