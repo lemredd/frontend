@@ -106,7 +106,7 @@ export async function countUsers() {
 export async function deleteUser(id: string) {
   const supabase = createAdminClient()
   const { error } = await supabase.auth.admin.deleteUser(id)
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
@@ -134,4 +134,16 @@ export async function changeAdminPassword(values: z.infer<typeof ChangeAdminPass
   if (error) return { error }
 
   return { success: 'Password changed successfully!' }
+}
+
+export async function modifySeekerApproval(approvalId: string, status: "approved" | "declined") {
+  const supabase = createAdminClient()
+
+  const { error } = await supabase
+    .from("approvals")
+    .update({ status })
+    .eq("id", approvalId)
+
+  if (error) return { error }
+  return { success: 'Approval updated successfully!' }
 }
