@@ -7,7 +7,10 @@ import * as z from 'zod'
 import { AddressSchema, EditAddressSchema } from '@/lib/schema'
 import { createClient } from '@/utils/supabase/server'
 
-export const makeAddress = async (values: z.infer<typeof AddressSchema>, to = "/skr/setup/skills") => {
+export const makeAddress = async (
+  values: z.infer<typeof AddressSchema>,
+  to = '/skr/setup/documents',
+) => {
   const supabase = createClient()
   const validatedFields = AddressSchema.safeParse(values)
 
@@ -40,7 +43,7 @@ export const makeAddress = async (values: z.infer<typeof AddressSchema>, to = "/
 
 export async function editAddress(
   values: z.infer<typeof EditAddressSchema>,
-  roleLink: "skr" | "pdr"
+  roleLink: 'skr' | 'pdr',
 ) {
   const validatedFields = EditAddressSchema.safeParse(values)
   if (!validatedFields.success) {
@@ -51,9 +54,9 @@ export async function editAddress(
 
   const supabase = createClient()
   const { error } = await supabase
-    .from("addresses")
+    .from('addresses')
     .update(validatedFields.data)
-    .eq("id", validatedFields.data.id)
+    .eq('id', validatedFields.data.id)
 
   if (error) return { error: error.message }
   revalidatePath('/', 'layout')
