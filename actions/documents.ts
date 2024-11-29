@@ -4,7 +4,6 @@ import { ValidDocumentSchema, ValidIdSchema } from '@/lib/schema'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-// ! TODO: FIX
 export async function uploadDocument(form: FormData, type: 'id' | 'document') {
   const validatedFields =
     type === 'id'
@@ -33,7 +32,7 @@ export async function uploadDocument(form: FormData, type: 'id' | 'document') {
   const supabase = createClient()
   const { error } = await supabase.storage
     .from('documents')
-    .upload(data.name, file, { upsert: true })
+    .upload(`${data.name}/${type}`, file, { upsert: true })
 
   if (error) {
     return { error: error.message }
@@ -45,8 +44,9 @@ export async function uploadDocument(form: FormData, type: 'id' | 'document') {
 export async function getOtherDocuments(ownerId: string) {
   const supabase = createAdminClient()
 
-  const { data, error } = await supabase
-    .rpc('get_other_documents', { _owner_id: ownerId })
+  const { data, error } = await supabase.rpc('get_other_documents', {
+    _owner_id: ownerId,
+  })
 
   if (error) return { error }
 
