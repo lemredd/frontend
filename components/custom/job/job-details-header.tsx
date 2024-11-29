@@ -74,7 +74,7 @@ interface Props {
 }
 
 export default function JobDetailsHeader({ job }: Props) {
-  const { user } = useAuthStore()
+  const { user, profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [application, setApplication] = useState<Record<string, unknown>>()
   const [proposal, setProposal] = useState('')
@@ -139,7 +139,7 @@ export default function JobDetailsHeader({ job }: Props) {
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
-              <Button disabled={isPending}>
+              <Button disabled={isPending || profile?.approvals?.status === "pending"}>
                 {isPending ? <Spinner size="sm" /> : 'Apply Now'}
               </Button>
             </DialogTrigger>
