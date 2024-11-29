@@ -72,13 +72,14 @@ export async function countUsersByMonthCreated() {
   return await supabase.rpc('count_users_by_month_created')
 }
 
-export async function listUsers(page: number, search?: string) {
+export async function listUsers(page: number, search?: string, role?: string) {
   const
     supabase = createAdminClient(),
     start = (page - 1) * USER_LIST_PAGE_SIZE,
     _arguments: Record<string, any> = { _offset: start, _limit: USER_LIST_PAGE_SIZE }
 
   if (search) _arguments["search"] = search
+  _arguments["role_code"] = role?.toLocaleUpperCase() ?? "skr".toLocaleUpperCase()
   return await supabase.rpc('list_users', _arguments).then(result => {
     if (result.error || !result.data.users) return result
 
@@ -105,7 +106,7 @@ export async function countUsers() {
 export async function deleteUser(id: string) {
   const supabase = createAdminClient()
   const { error } = await supabase.auth.admin.deleteUser(id)
-  if (error) return { error: error.message }
+  if (error) return { error }
 
   revalidatePath('/admin/users')
   return { success: 'User deleted successfully!' }
@@ -133,4 +134,16 @@ export async function changeAdminPassword(values: z.infer<typeof ChangeAdminPass
   if (error) return { error }
 
   return { success: 'Password changed successfully!' }
+}
+
+export async function modifySeekerApproval(approvalId: string, status: "approved" | "declined") {
+  const supabase = createAdminClient()
+
+  const { error } = await supabase
+    .from("approvals")
+    .update({ status })
+    .eq("id", approvalId)
+
+  if (error) return { error }
+  return { success: 'Approval updated successfully!' }
 }

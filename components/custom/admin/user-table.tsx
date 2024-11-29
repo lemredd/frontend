@@ -2,13 +2,14 @@
 
 import { User } from '@supabase/supabase-js'
 import { ColumnDef, PaginationState } from '@tanstack/react-table'
-import { Pencil } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { ExternalLink, Pencil } from 'lucide-react'
+import { ReadonlyURLSearchParams, useRouter, useSearchParams } from 'next/navigation'
 
 import {
   deleteUser as _deleteUser,
   deleteMultipleUsers,
   listUsers,
+  modifySeekerApproval,
 } from '@/actions/user'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -22,7 +23,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { PROFILE_STORE_FIELDS, USER_LIST_PAGE_SIZE } from '@/lib/constants'
+import { USER_LIST_PAGE_SIZE } from '@/lib/constants'
 import { createClient } from '@/utils/supabase/client'
 import { DialogTitle } from '@radix-ui/react-dialog'
 import { useEffect, useState, useTransition } from 'react'
@@ -30,6 +31,9 @@ import { useEffect, useState, useTransition } from 'react'
 import { toast } from '@/hooks/use-toast'
 import { TableInjectionProps } from '@/lib/types'
 import { getHumanReadableRole } from '@/lib/utils'
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Link from 'next/link'
+import { getOtherDocuments } from '@/actions/documents'
 
 const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
   {
@@ -81,19 +85,27 @@ function UserDialog({ user }: UserDialogProps) {
   const supabase = createClient()
   const [profile, setProfile] = useState<Record<string, any>>()
   const [isPending, startTransition] = useTransition()
-
-  useEffect(() => {
-    if (user) getProfile()
-  }, [user])
+  const [otherDocumentNames, setOtherDocumentNames] = useState<string[]>([])
 
   function getProfile() {
+    const FIELDS = "*, approvals(*)"
     supabase
       .from('profiles')
-      .select(PROFILE_STORE_FIELDS)
+      .select(FIELDS)
       .eq('user_id', user.id)
       .single()
       .then(({ data }) => setProfile(data))
   }
+
+  useEffect(() => {
+    if (!user) return
+    getProfile()
+    getOtherDocuments(user.id).then(({ data, error }) => {
+      if (error) return toast({ title: error.message, variant: 'destructive' })
+      setOtherDocumentNames(data.map((doc: Record<string, any>) => doc.object_name))
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   function getFullName() {
     if (!profile) return 'N/A'
@@ -105,7 +117,31 @@ function UserDialog({ user }: UserDialogProps) {
   function deleteUser() {
     startTransition(() => {
       _deleteUser(user.id).then(({ success, error }) => {
-        if (error) return toast({ title: error, variant: 'destructive' })
+        if (error) return toast({ title: error.message, variant: 'destructive' })
+        toast({ title: success, variant: 'success' })
+      })
+    })
+  }
+
+  function getUrl(name: string) {
+    return supabase.storage.from("documents").getPublicUrl(name.trim()).data.publicUrl
+  }
+
+  function approve() {
+    if (!profile?.approvals) return
+    startTransition(() => {
+      modifySeekerApproval(profile.approvals.id, "approved").then(({ success, error }) => {
+        if (error) return toast({ title: error.message, variant: 'destructive' })
+        toast({ title: success, variant: 'success' })
+      })
+    })
+  }
+
+  function decline() {
+    if (!profile?.approvals) return
+    startTransition(() => {
+      modifySeekerApproval(profile.approvals.id, "declined").then(({ success, error }) => {
+        if (error) return toast({ title: error.message, variant: 'destructive' })
         toast({ title: success, variant: 'success' })
       })
     })
@@ -121,8 +157,8 @@ function UserDialog({ user }: UserDialogProps) {
           <Pencil size={16} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full lg:max-w-[700px] p-6 rounded-lg">
-        <DialogHeader className="pb-4">
+      <DialogContent className="w-full lg:max-w-[700px] p-6 space-y-2 rounded-lg">
+        <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             {getFullName()}
           </DialogTitle>
@@ -132,12 +168,13 @@ function UserDialog({ user }: UserDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
+        <div className="grid grid-cols-2 gap-y-2 text-sm">
+          <h2 className="col-span-full text-lg">General Info</h2>
           <div className="font-medium text-muted-foreground">Username</div>
           <div>{profile?.username || 'N/A'}</div>
 
           <div className="font-medium text-muted-foreground">Role</div>
-          <div>{user.user_metadata.role || 'N/A'}</div>
+          <div>{user.user_metadata.role_code || 'N/A'}</div>
 
           <div className="font-medium text-muted-foreground">Email Status</div>
           <div>{user.email_confirmed_at ? 'Confirmed' : 'Pending'}</div>
@@ -145,6 +182,44 @@ function UserDialog({ user }: UserDialogProps) {
           <div className="font-medium text-muted-foreground">Full Name</div>
           <div>{getFullName()}</div>
         </div>
+
+        {user.user_metadata.role_code === "SKR" && (
+          <div className="grid grid-cols-2 gap-y-2 text-sm">
+            <h2 className="col-span-full text-lg">Approval</h2>
+            <div className="font-medium text-muted-foreground">Status</div>
+            <div>{profile?.approvals?.status || 'N/A'}</div>
+
+            <div className="font-medium text-muted-foreground">Valid ID</div>
+            <div>
+              {profile?.approvals?.valid_id_pic_name ? (
+                <Button asChild variant="outline" className="justify-start">
+                  <Link
+                    target="_blank"
+                    href={getUrl(profile.approvals.valid_id_pic_name)}
+                    className="space-x-2"
+                  >
+                    <ExternalLink size={16} />
+                    <span className="max-w-[100px] truncate">{profile.approvals.valid_id_pic_name}</span>
+                  </Link>
+                </Button>
+              ) : "N/A"}
+            </div>
+
+            <div className="font-medium text-muted-foreground">Other Documents</div>
+            <div>{otherDocumentNames.length ? otherDocumentNames.map(name => (
+              <Button key={name} asChild variant="outline" className="justify-start">
+                <Link
+                  target="_blank"
+                  href={getUrl(name)}
+                  className="space-x-2"
+                >
+                  <ExternalLink size={16} />
+                  <span className="max-w-[100px] truncate">{name}</span>
+                </Link>
+              </Button>
+            )) : "N/A"}</div>
+          </div>
+        )}
 
         <DialogFooter className="flex justify-end gap-2 pt-6">
           <Button
@@ -154,18 +229,22 @@ function UserDialog({ user }: UserDialogProps) {
           >
             Delete
           </Button>
-          <Button
-            variant="secondary"
-            disabled={isPending}
-          >
-            Reset Password
-          </Button>
-          <Button
-            variant="outline"
-            disabled={isPending || !!user.email_confirmed_at}
-          >
-            Confirm Email
-          </Button>
+          {profile?.approvals?.status === "pending" && (
+            <>
+              <Button
+                variant="outline"
+                onClick={approve}
+              >
+                Approve
+              </Button>
+              <Button
+                variant="warning"
+                onClick={decline}
+              >
+                decline
+              </Button>
+            </>
+          )}
           <Button disabled={isPending}>Save</Button>
         </DialogFooter>
       </DialogContent>
@@ -174,7 +253,7 @@ function UserDialog({ user }: UserDialogProps) {
 }
 
 export interface SelectedActionsProps<TData>
-  extends TableInjectionProps<TData> {}
+  extends TableInjectionProps<TData> { }
 function SelectedActions({ table }: SelectedActionsProps<User>) {
   const [isPending, startTransition] = useTransition()
 
@@ -211,6 +290,8 @@ function UserSearchInput() {
     if (!to.endsWith('?')) to += '?'
     if (value) to += `&search=${value}`
 
+    if (searchParams.get('role')) to += `&role=${searchParams.get('role')}`
+
     const debouncer = setTimeout(() => {
       router.push(to)
     }, 700)
@@ -225,6 +306,32 @@ function UserSearchInput() {
       onChange={(event) => setValue(event.target.value)}
       className="max-w-sm"
     />
+  )
+}
+
+function buildLink(searchParams: ReadonlyURLSearchParams, role: string) {
+  let to = `./?role=${role}`
+  if (searchParams.get('search'))
+    to += `&search=${searchParams.get('search')}`
+  return to
+}
+
+function RoleTabs() {
+  const searchParams = useSearchParams()
+  const ROLE_CODES = { "skr": "Seekers", "pdr": "Providers" }
+
+  return (
+    <Tabs defaultValue="account" className="w-full">
+      <TabsList className="w-full">
+        {Object.entries(ROLE_CODES).map(([key, val]) => (
+          <TabsTrigger key={key} value={key} asChild>
+            <Link href={buildLink(searchParams, key)} className="w-full">
+              <span className="capitalize">{val}</span>
+            </Link>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   )
 }
 
@@ -253,15 +360,18 @@ export function UserTable({ data: { users, count } }: UserTableProps) {
   }, [pagination, router, searchParams])
 
   return (
-    <DataTable
-      columns={USER_TABLE_COLUMNS}
-      data={users}
-      pageCount={pageCount}
-      manualPagination={!!count}
-      onPaginationChange={setPagination}
-      state={{ pagination }}
-      SelectedActions={SelectedActions}
-      SearchInput={UserSearchInput}
-    />
+    <div className="mt-2">
+      <RoleTabs />
+      <DataTable
+        columns={USER_TABLE_COLUMNS}
+        data={users}
+        pageCount={pageCount}
+        manualPagination={!!count}
+        onPaginationChange={setPagination}
+        state={{ pagination }}
+        SelectedActions={SelectedActions}
+        SearchInput={UserSearchInput}
+      />
+    </div>
   )
 }
