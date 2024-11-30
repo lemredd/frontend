@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 
 import { uploadDocuments } from '@/actions/documents'
 import { FormError } from '@/components/custom/form-error'
@@ -15,9 +15,14 @@ export default function ValidDocumentsPage() {
   const { refreshUser, profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string>()
+  const form = useRef<HTMLFormElement>(null)
   const [validIdPreview, setValidIdPreview] = useState('')
   const [documentsInputValue, setDocumentsInputValue] = useState('')
   const [validDocuments, setValidDocuments] = useState<File[]>([])
+  const isSubmittable = !form.current ? false : (
+    [...new FormData(form.current).values()].length > 0
+    && validDocuments.length > 0
+  )
 
   useEffect(() => refreshUser(), [])
 
@@ -47,7 +52,9 @@ export default function ValidDocumentsPage() {
     }
 
     startTransition(() => {
-      uploadDocuments(form, profile.id).then()
+      uploadDocuments(form, profile.id).then(data => {
+        if (data?.error) return setError(data.error)
+      })
     })
   }
 
@@ -58,6 +65,7 @@ export default function ValidDocumentsPage() {
     >
       <form
         onSubmit={onSubmit}
+        ref={form}
         className="space-y-8 p-6 shadow rounded-lg"
       >
         {/* VALID ID UPLOAD */}
@@ -171,7 +179,7 @@ export default function ValidDocumentsPage() {
         <div className="text-right">
           <Button
             type="submit"
-            disabled={isPending}
+            disabled={isPending || !isSubmittable}
             className="relative"
           >
             {isPending && <span className="absolute left-4 spinner"></span>}
