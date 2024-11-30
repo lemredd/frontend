@@ -1,7 +1,7 @@
 'use client'
 
 import { User } from '@supabase/supabase-js'
-import { ColumnDef, PaginationState } from '@tanstack/react-table'
+import { ColumnDef, PaginationState, VisibilityState } from '@tanstack/react-table'
 import { ExternalLink, Pencil } from 'lucide-react'
 import { ReadonlyURLSearchParams, useRouter, useSearchParams } from 'next/navigation'
 
@@ -34,6 +34,7 @@ import { getHumanReadableRole } from '@/lib/utils'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from 'next/link'
 import { getOtherDocuments } from '@/actions/documents'
+import { Chip } from '@/components/ui/chip'
 
 const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
   {
@@ -72,11 +73,46 @@ const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
     cell: ({ row }) => new Date(row.original.created_at).toLocaleString(),
   },
   {
+    id: 'approval',
+    header: 'Approval',
+    cell: ({ row }) => <UserApproval user={row.original} />,
+    enableHiding: true,
+  },
+  {
     id: 'actions',
     header: 'Actions',
     cell: ({ row }) => <UserDialog user={row.original} />,
   },
 ]
+
+
+interface UserApprovalProps {
+  user: User
+}
+function UserApproval({ user }: UserApprovalProps) {
+  const supabase = createClient()
+  const [profile, setProfile] = useState<Record<string, any>>()
+
+  useEffect(() => {
+    if (!user) return
+
+    const FIELDS = "approvals(*)"
+    supabase
+      .from('profiles')
+      .select(FIELDS)
+      .eq('user_id', user.id)
+      .then(({ data, error }) => {
+        if (error) return toast({ title: error.message, variant: 'destructive' })
+        if (data[0]) setProfile(data[0])
+      })
+  }, [user, supabase])
+
+  if (!profile) return <div>Loading...</div>
+
+  return (
+    <Chip className='w-[100px] justify-center' content={profile?.approvals?.status || "N/A"} getStatusColor />
+  )
+}
 
 interface UserDialogProps {
   user: User
@@ -350,7 +386,12 @@ export function UserTable({ data: { users, count } }: UserTableProps) {
     pageSize: USER_LIST_PAGE_SIZE,
   })
 
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    approval: searchParams.get('role') !== 'pdr',
+  })
+
   useEffect(() => {
+    setColumnVisibility({ approval: searchParams.get('role') !== 'pdr' })
     const newSearchParams = new URLSearchParams(searchParams.toString())
     if (pagination.pageIndex)
       newSearchParams.set('page', (pagination.pageIndex + 1).toString())
@@ -368,7 +409,7 @@ export function UserTable({ data: { users, count } }: UserTableProps) {
         pageCount={pageCount}
         manualPagination={!!count}
         onPaginationChange={setPagination}
-        state={{ pagination }}
+        state={{ pagination, columnVisibility }}
         SelectedActions={SelectedActions}
         SearchInput={UserSearchInput}
       />
