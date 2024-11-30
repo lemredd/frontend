@@ -1,30 +1,28 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { useEffect, useRef, useState, useTransition } from 'react'
 
-import { uploadDocument } from '@/actions/documents'
+import { uploadDocuments } from '@/actions/documents'
 import { FormError } from '@/components/custom/form-error'
 import SetupWrapper from '@/components/custom/setup-wrapper'
 import { Button } from '@/components/ui/button'
-import { Form } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { ValidDocumentSchema } from '@/lib/schema'
 import { useAuthStore } from '@/store/AuthStore'
-import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
+import { CircleX } from 'lucide-react'
 
 export default function ValidDocumentsPage() {
-  const { refreshUser } = useAuthStore()
+  const { refreshUser, profile } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string>()
-  const { profile } = useAuthStore()
-  const form = useForm<z.infer<typeof ValidDocumentSchema>>({
-    resolver: zodResolver(ValidDocumentSchema),
-  })
+  const form = useRef<HTMLFormElement>(null)
   const [validIdPreview, setValidIdPreview] = useState('')
-  const [validDocumentPreview, setValidDocumentPreview] = useState('')
+  const [documentsInputValue, setDocumentsInputValue] = useState('')
+  const [validDocuments, setValidDocuments] = useState<File[]>([])
+  const isSubmittable = !form.current ? false : (
+    [...new FormData(form.current).values()].length > 0
+    && validDocuments.length > 0
+  )
 
   useEffect(() => refreshUser(), [])
 
@@ -33,26 +31,30 @@ export default function ValidDocumentsPage() {
     type: 'id' | 'document',
   ) {
     const { files } = e.target
-    const image = files?.item(0)
 
-    if (!image) return
-    const form = new FormData()
-    form.set(type === 'id' ? 'valid_id' : 'valid_document', image)
-    form.set('name', profile!.id)
+    if (type === 'id') {
+      const image = files![0]
+      return setValidIdPreview(URL.createObjectURL(image))
+    }
 
-    uploadDocument(form, type).then((data) => {
-      if (data?.error) return console.error(data?.error)
-      if (type === 'id') {
-        setValidIdPreview(URL.createObjectURL(image))
-      } else {
-        setValidDocumentPreview(URL.createObjectURL(image))
-      }
-    })
+    for (const file of files!) {
+      setValidDocuments(prev => [...prev, file])
+    }
   }
 
-  function onSubmit() {
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (!profile) return
+    event.preventDefault()
+
+    const form = new FormData(event.currentTarget)
+    for (const document of validDocuments) {
+      form.append('documents', document)
+    }
+
     startTransition(() => {
-      console.log(form.getValues())
+      uploadDocuments(form, profile.id).then(data => {
+        if (data?.error) return setError(data.error)
+      })
     })
   }
 
@@ -61,100 +63,130 @@ export default function ValidDocumentsPage() {
       title="Upload Your Valid ID and Document"
       description="Provide a valid government-issued ID and additional document to verify your account."
     >
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 p-6 shadow rounded-lg"
-        >
-          {/* VALID ID UPLOAD */}
-          <div>
-            <h2 className="text-lg font-semibold mb-2">Upload Valid ID</h2>
-            <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center space-y-4">
-              <label
-                htmlFor="valid_id"
-                className="relative w-full max-w-lg group cursor-pointer"
-              >
-                <Image
-                  src={
-                    validIdPreview || '/images/landscape_id_placeholder.webp'
-                  }
-                  alt="Valid ID Preview"
-                  width={600}
-                  height={338}
-                  className="object-cover rounded-md border bg-gray-50"
-                />
-                <span className="absolute inset-0 flex items-center justify-center text-sm text-white bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition">
-                  Click to change
-                </span>
-              </label>
-              <Input
-                type="file"
-                id="valid_id"
-                className="hidden"
-                accept="image/*"
-                onChange={(e) => handleFileChange(e, 'id')}
+      <form
+        onSubmit={onSubmit}
+        ref={form}
+        className="space-y-8 p-6 shadow rounded-lg"
+      >
+        {/* VALID ID UPLOAD */}
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Upload Valid ID</h2>
+          <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center space-y-4">
+            <label
+              htmlFor="valid_id"
+              className="relative w-full max-w-lg group cursor-pointer"
+            >
+              <Image
+                src={
+                  validIdPreview || '/images/landscape_id_placeholder.webp'
+                }
+                alt="Valid ID Preview"
+                width={600}
+                height={338}
+                className="object-cover rounded-md border bg-gray-50"
               />
-              <p className="text-sm text-muted-foreground">
-                Supported formats: JPG, JPEG, PNG. Recommended size: Landscape
-                orientation (16:9).
-              </p>
-            </div>
+              <span className="absolute inset-0 flex items-center justify-center text-sm text-white bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition">
+                Click to change
+              </span>
+            </label>
+            <Input
+              type="file"
+              id="valid_id"
+              name="id"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, 'id')}
+            />
+            <p className="text-sm text-muted-foreground">
+              Supported formats: JPG, JPEG, PNG. Recommended size: Landscape
+              orientation (16:9).
+            </p>
           </div>
+        </div>
 
-          {/* VALID DOCUMENT UPLOAD */}
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              Upload Valid Document
-            </h2>
-            <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center space-y-4">
+        {/* VALID DOCUMENT UPLOAD */}
+        <div>
+          <h2 className="text-lg font-semibold mb-2">
+            Upload Valid Documents
+          </h2>
+          <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center space-y-4">
+            {validDocuments.length ? (
+              <>
+                <div className='flex gap-2 items-center'>
+                  {validDocuments.map((file, idx) => (
+                    <div key={idx} className="relative group" >
+                      <Image
+                        src={URL.createObjectURL(file)}
+                        alt="Valid ID Preview"
+                        width={100}
+                        height={100}
+                        className="object-cover rounded-md border bg-gray-50"
+                      />
+                      <CircleX
+                        onClick={() => setValidDocuments(prev => prev.filter((_, i) => i !== idx))}
+                        className="absolute top-0 right-0 flex items-center justify-center text-sm text-white bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <label
+                  htmlFor="valid_document"
+                  className="relative w-full cursor-pointer"
+                >
+                  <span className="absolute inset-0 flex items-center justify-center text-sm text-white bg-black bg-opacity-50 rounded-md">
+                    + Click to add
+                  </span>
+                </label>
+              </>
+            ) : (
               <label
                 htmlFor="valid_document"
-                className="relative w-full max-w-lg group cursor-pointer"
+                className="relative group cursor-pointer"
               >
+                <span className="absolute inset-0 flex items-center justify-center text-sm text-white bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition">
+                  + Click to add
+                </span>
                 <Image
-                  src={
-                    validDocumentPreview ||
-                    '/images/landscape_id_placeholder.webp'
-                  }
-                  alt="Valid Document Preview"
-                  width={600}
-                  height={338}
+                  src="/images/landscape_id_placeholder.webp"
+                  alt="Valid ID Preview"
+                  width={100}
+                  height={100}
                   className="object-cover rounded-md border bg-gray-50"
                 />
-                <span className="absolute inset-0 flex items-center justify-center text-sm text-white bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition">
-                  Click to change
-                </span>
               </label>
-              <Input
-                type="file"
-                id="valid_document"
-                className="hidden"
-                accept="image/*"
-                onChange={(e) => handleFileChange(e, 'document')}
-              />
-              <p className="text-sm text-muted-foreground">
-                Upload documents like Proof of Competency, TESDA Certification,
-                etc.
-              </p>
-            </div>
+            )}
+            <Input
+              type="file"
+              multiple
+              id="valid_document"
+              className="hidden"
+              accept="image/*"
+              value={documentsInputValue}
+              onClick={() => setDocumentsInputValue('')}
+              onChange={(e) => handleFileChange(e, 'document')}
+            />
+            <p className="text-sm text-muted-foreground">
+              Upload documents like Proof of Competency, TESDA Certification,
+              etc.
+            </p>
           </div>
+        </div>
 
-          {/* Error Message */}
-          {error && <FormError message={error} />}
+        {/* Error Message */}
+        {error && <FormError message={error} />}
 
-          {/* Submit Button */}
-          <div className="text-right">
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="relative"
-            >
-              {isPending && <span className="absolute left-4 spinner"></span>}
-              Submit
-            </Button>
-          </div>
-        </form>
-      </Form>
+        {/* Submit Button */}
+        <div className="text-right">
+          <Button
+            type="submit"
+            disabled={isPending || !isSubmittable}
+            className="relative"
+          >
+            {isPending && <span className="absolute left-4 spinner"></span>}
+            Submit
+          </Button>
+        </div>
+      </form>
     </SetupWrapper>
   )
 }

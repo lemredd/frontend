@@ -74,10 +74,13 @@ interface Props {
 }
 
 export default function JobDetailsHeader({ job }: Props) {
-  const { user } = useAuthStore()
+  const { user, profile, refreshUser } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [application, setApplication] = useState<Record<string, unknown>>()
   const [proposal, setProposal] = useState('')
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => refreshUser(), [])
 
   function apply() {
     if (!user) return
@@ -139,7 +142,7 @@ export default function JobDetailsHeader({ job }: Props) {
         {!application && (
           <Dialog>
             <DialogTrigger asChild>
-              <Button disabled={isPending}>
+              <Button disabled={isPending || profile?.approvals?.status === "pending"}>
                 {isPending ? <Spinner size="sm" /> : 'Apply Now'}
               </Button>
             </DialogTrigger>

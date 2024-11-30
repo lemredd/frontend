@@ -232,7 +232,7 @@ function UserDialog({ user }: UserDialogProps) {
           {profile?.approvals?.status === "pending" && (
             <>
               <Button
-                variant="outline"
+                variant="success"
                 onClick={approve}
               >
                 Approve

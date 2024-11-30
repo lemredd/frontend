@@ -153,24 +153,14 @@ export const ProfilePictureSchema = z.object({
   name: z.string().min(1, 'name is required'),
 })
 
-export const ValidDocumentSchema = z.object({
-  valid_document: z
+export const ValidDocumentsSchema = z.object({
+  documents: z
     .instanceof(File)
-    .refine((file) => file.size <= 10_000_000, 'File too large'),
-  name: z.string().min(1, 'name is required'),
+    .refine((file) => file.size <= 10_000_000, 'File too large')
+    .array(),
+  id: z.instanceof(File).refine((file) => file.size <= 10_000_000, 'File too large'),
 })
 
-export const ValidIdSchema = z.object({
-  valid_id: z
-    .instanceof(File)
-    .refine((file) => file.size <= 10_000_000, 'File too large'),
-  name: z.string().min(1, 'name is required'),
-})
-
-export const ValidIdDocumentSchema = z.object({
-  valid_id: z.any(),
-  valid_document: z.any(),
-})
 
 export const ContactUsSchema = z.object({
   name: z.string().min(1, {

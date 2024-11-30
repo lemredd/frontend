@@ -21,15 +21,16 @@ import { useCallback, useEffect, useState } from 'react'
 import { RiUserSearchFill } from 'react-icons/ri'
 
 export function Navbar() {
-  const user = useAuthStore((state) => state.user)
-  const profile = useAuthStore((state) => state.profile)
-  const isLoading = useAuthStore((state) => state.isLoading)
+  const { user, profile, isLoading, refreshUser } = useAuthStore()
   const navbarRoutes = useNavbarRoutes(user?.user_metadata?.role_code)
   const activePath = useActivePath()
   const [showBackground, setShowBackground] = useState<boolean>(false)
   const [prevScrollPos, setPrevScrollPos] = useState<number>(0)
 
   const TOP_OFFSET = 50
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => refreshUser(), [])
 
   const handleScroll = useCallback(() => {
     const currentScrollPos = window.scrollY
@@ -185,6 +186,10 @@ export function Navbar() {
           </Sheet>
         </div>
       </div>
+
+      {profile?.approvals?.status === "pending" && (
+        <div className="bg-amber-200 text-yellow-700 text-center mt-2 py-2">Your profile is under review. You may view tasks but cannot apply.</div>
+      )}
     </nav>
   )
 }

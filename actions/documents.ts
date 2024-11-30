@@ -1,14 +1,15 @@
 'use server'
 
-import { ValidDocumentSchema, ValidIdSchema } from '@/lib/schema'
+import { ValidDocumentsSchema } from '@/lib/schema'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
-export async function uploadDocument(form: FormData, type: 'id' | 'document') {
-  const validatedFields =
-    type === 'id'
-      ? ValidIdSchema.safeParse(Object.fromEntries(form))
-      : ValidDocumentSchema.safeParse(Object.fromEntries(form))
+export async function uploadDocuments(form: FormData, profileId: string) {
+  const validatedFields = ValidDocumentsSchema.safeParse({
+    id: form.get('id') as File,
+    documents: Array.from(form.getAll('documents') as File[]),
+  })
 
   if (!validatedFields.success) {
     return { error: 'Invalid fields!' }
@@ -16,37 +17,30 @@ export async function uploadDocument(form: FormData, type: 'id' | 'document') {
 
   const data = validatedFields.data
 
-  let file: File
-  if (type === 'id') {
-    if (!('valid_id' in data)) {
-      return { error: 'Field "valid_id" is missing!' }
-    }
-    file = data.valid_id
-  } else {
-    if (!('valid_document' in data)) {
-      return { error: 'Field "valid_document" is missing!' }
-    }
-    file = data.valid_document
-  }
-
   const supabase = createClient()
-  const { error } = await supabase.storage
+  const idFileName = `id_${profileId}`
+  const { error: idError } = await supabase.storage
     .from('documents')
-    .upload(`${data.name}/${type}`, file, { upsert: true })
+    .upload(idFileName, data.id, { upsert: true })
+  if (idError) return { error: idError.message }
 
-  if (error) {
-    return { error: error.message }
+  for (const document of data.documents) {
+    const { error: documentError } = await supabase
+      .storage
+      .from('documents')
+      .upload(document.name, document, { upsert: true })
+    if (documentError) return { error: documentError.message }
   }
 
-  return { success: 'Document uploaded' }
+  redirect("/skr/setup/skills")
 }
+
 
 export async function getOtherDocuments(ownerId: string) {
   const supabase = createAdminClient()
 
-  const { data, error } = await supabase.rpc('get_other_documents', {
-    _owner_id: ownerId,
-  })
+  const { data, error } = await supabase
+    .rpc('get_other_documents', { _owner_id: ownerId })
 
   if (error) return { error }
 
