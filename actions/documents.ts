@@ -18,12 +18,11 @@ export async function uploadDocuments(form: FormData, profileId: string) {
   const data = validatedFields.data
 
   const supabase = createClient()
-  const idFileName = `id_${profileId}.webp`
+  const idFileName = `id_${profileId}`
   const { error: idError } = await supabase.storage
     .from('documents')
-    // not sure about webp
     .upload(idFileName, data.id, { upsert: true })
-  if (idError) return { error: idError }
+  if (idError) return { error: idError.message }
 
   for (const document of data.documents) {
     const { error: documentError } = await supabase
@@ -32,11 +31,6 @@ export async function uploadDocuments(form: FormData, profileId: string) {
       .upload(document.name, document, { upsert: true })
     if (documentError) return { error: documentError.message }
   }
-
-  const { error: approvalError } = await supabase
-    .from("approvals")
-    .insert({ seeker_id: profileId, valid_id_pic_name: idFileName })
-  if (approvalError) return { error: approvalError.message }
 
   redirect("/skr/setup/skills")
 }
