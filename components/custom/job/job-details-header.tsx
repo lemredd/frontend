@@ -74,10 +74,13 @@ interface Props {
 }
 
 export default function JobDetailsHeader({ job }: Props) {
-  const { user, profile } = useAuthStore()
+  const { user, profile, refreshUser } = useAuthStore()
   const [isPending, startTransition] = useTransition()
   const [application, setApplication] = useState<Record<string, unknown>>()
   const [proposal, setProposal] = useState('')
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => refreshUser(), [])
 
   function apply() {
     if (!user) return

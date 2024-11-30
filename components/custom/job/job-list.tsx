@@ -70,7 +70,6 @@ export default function JobList({ role }: ProfileJobListProps) {
         return toast({ title: error.message, variant: 'destructive' })
       }
 
-      console.log(data)
       setJobs(data)
       setLoading(false)
     })
