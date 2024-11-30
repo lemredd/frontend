@@ -3,6 +3,7 @@
 import { ValidDocumentsSchema } from '@/lib/schema'
 import { createAdminClient, createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function uploadDocuments(form: FormData, profileId: string) {
   const validatedFields = ValidDocumentsSchema.safeParse({
@@ -17,10 +18,11 @@ export async function uploadDocuments(form: FormData, profileId: string) {
   const data = validatedFields.data
 
   const supabase = createClient()
+  const idFileName = `id_${profileId}.webp`
   const { error: idError } = await supabase.storage
     .from('documents')
     // not sure about webp
-    .upload(`id_${profileId}.webp`, data.id, { upsert: true })
+    .upload(idFileName, data.id, { upsert: true })
   if (idError) return { error: idError }
 
   for (const document of data.documents) {
@@ -28,10 +30,15 @@ export async function uploadDocuments(form: FormData, profileId: string) {
       .storage
       .from('documents')
       .upload(document.name, document, { upsert: true })
-    if (documentError) return { error: documentError }
+    if (documentError) return { error: documentError.message }
   }
 
-  return { success: 'Document uploaded' }
+  const { error: approvalError } = await supabase
+    .from("approvals")
+    .insert({ seeker_id: profileId, valid_id_pic_name: idFileName })
+  if (approvalError) return { error: approvalError.message }
+
+  redirect("/skr/setup/skills")
 }
 
 
