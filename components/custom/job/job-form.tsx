@@ -253,8 +253,8 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
     supabase
       .from('skills')
       .select('id,name')
+      .ilike('name', `%${search}%`)
       .order('name', { ascending: true })
-      .range(0, 5)
       .then(({ data }) => {
         if (!data) return
         setSkills(
@@ -263,7 +263,7 @@ function SkillsField({ form, setStep }: PartialFieldsProps) {
             .map(({ id, name }) => ({ value: `${id}|${name}`, label: name })),
         )
       })
-  }, [form.getValues().skill_ids])
+  }, [form, search, supabase])
 
   useEffect(() => {
     const subscription = form.watch(({ skill_ids }, { name }) => {
