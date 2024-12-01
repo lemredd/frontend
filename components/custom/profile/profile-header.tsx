@@ -18,6 +18,7 @@ import { EditAddressForm } from './edit-address-form'
 import { ProfilePicture } from './picture'
 import { ProfileRating } from './rating'
 import { SeekerSkillsList } from './skills-list'
+import { SeekerDocuments } from './documents'
 
 export function OwnProfileHeader() {
   const { profile, user } = useAuthStore()
@@ -98,6 +99,9 @@ export function OwnProfileHeader() {
 
         {/* Verification List */}
         <VerificationList />
+
+        {/* Documents */}
+        <SeekerDocuments profile={profile} />
       </CardContent>
     </Card>
   )
@@ -127,14 +131,14 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
         setAddressContent(
           profile?.address
             ? [
-                profile.address?.barangay,
-                profile.address?.city_muni,
-                profile.address?.province,
-              ].join(', ')
+              profile.address?.barangay,
+              profile.address?.city_muni,
+              profile.address?.province,
+            ].join(', ')
             : 'No address yet',
         )
       })
-  }, [supabase, username, router])
+  }, [supabase, username, router, profile?.address])
 
   const joinedDate = new Date(profile?.created_at).toLocaleDateString('PH', {
     month: 'long',
@@ -189,6 +193,10 @@ export function ProfileHeader({ username }: ProfileHeaderProps) {
 
         {/* Verification List */}
         <SeekerVerificationList username={username} />
+        <hr className="hidden lg:block" />
+
+        {/* Verification List */}
+        <SeekerDocuments profile={profile} />
       </CardContent>
     </Card>
   )

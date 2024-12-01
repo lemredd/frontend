@@ -10,6 +10,7 @@ interface ChipProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const statusColors: { [key: string]: string } = {
   completed: 'bg-green-100 text-green-800 border-green-300',
+  approved: 'bg-green-100 text-green-800 border-green-300',
   ongoing: 'bg-yellow-100 text-yellow-800 border-yellow-300',
   open: 'bg-blue-100 text-blue-800 border-blue-300',
   close: 'bg-red-100 text-red-800 border-red-300',
@@ -33,7 +34,7 @@ export function Chip({
       className={cn(
         'rounded-full px-1.5 py-0.5 sm:px-2 sm:py-1 flex items-center gap-1.5 border  flex-wrap max-w-full',
         getStatusColor &&
-          statusColors[content.toLowerCase() as keyof typeof statusColors],
+        statusColors[content.toLowerCase() as keyof typeof statusColors],
         className,
       )}
       title={content}

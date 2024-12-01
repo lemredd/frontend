@@ -2,7 +2,7 @@
 
 import { User } from '@supabase/supabase-js'
 import { ColumnDef, PaginationState, VisibilityState } from '@tanstack/react-table'
-import { ExternalLink, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { ReadonlyURLSearchParams, useRouter, useSearchParams } from 'next/navigation'
 
 import {
@@ -35,6 +35,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from 'next/link'
 import { getOtherDocuments } from '@/actions/documents'
 import { Chip } from '@/components/ui/chip'
+import { DocumentLink } from '../profile/documents'
 
 const USER_TABLE_COLUMNS: ColumnDef<User>[] = [
   {
@@ -159,10 +160,6 @@ function UserDialog({ user }: UserDialogProps) {
     })
   }
 
-  function getUrl(name: string) {
-    return supabase.storage.from("documents").getPublicUrl(name.trim()).data.publicUrl
-  }
-
   function approve() {
     if (!profile?.approvals) return
     startTransition(() => {
@@ -228,31 +225,13 @@ function UserDialog({ user }: UserDialogProps) {
             <div className="font-medium text-muted-foreground">Valid ID</div>
             <div>
               {profile?.approvals?.valid_id_pic_name ? (
-                <Button asChild variant="outline" className="justify-start">
-                  <Link
-                    target="_blank"
-                    href={getUrl(profile.approvals.valid_id_pic_name)}
-                    className="space-x-2"
-                  >
-                    <ExternalLink size={16} />
-                    <span className="max-w-[100px] truncate">{profile.approvals.valid_id_pic_name}</span>
-                  </Link>
-                </Button>
+                <DocumentLink document={profile.approvals.valid_id_pic_name} />
               ) : "N/A"}
             </div>
 
             <div className="font-medium text-muted-foreground">Other Documents</div>
             <div>{otherDocumentNames.length ? otherDocumentNames.map(name => (
-              <Button key={name} asChild variant="outline" className="justify-start">
-                <Link
-                  target="_blank"
-                  href={getUrl(name)}
-                  className="space-x-2"
-                >
-                  <ExternalLink size={16} />
-                  <span className="max-w-[100px] truncate">{name}</span>
-                </Link>
-              </Button>
+              <DocumentLink key={name} document={name} />
             )) : "N/A"}</div>
           </div>
         )}

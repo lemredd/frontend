@@ -88,7 +88,7 @@ export function SeekerVerificationList({ username }: SeekerVerificationListProps
   }, [username])
 
   return (
-    <Card className="shadow-lg rounded-md">
+    <Card className="shadow-lg rounded-md lg:border-0">
       <CardHeader className="pb-4">
         <h3 className="text-lg font-semibold">Contacts</h3>
       </CardHeader>
@@ -97,7 +97,7 @@ export function SeekerVerificationList({ username }: SeekerVerificationListProps
           {VERIFICATIONS.map((verification) => (
             <li
               key={verification.name}
-              className="flex items-center justify-between gap-x-12"
+              className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 lg:gap-12"
             >
               <div className="flex items-center gap-x-3">
                 <verification.icon
