@@ -88,7 +88,7 @@ export function SeekerVerificationList({ username }: SeekerVerificationListProps
   }, [username])
 
   return (
-    <Card className="shadow-lg rounded-md">
+    <Card className="shadow-lg rounded-md lg:border-0">
       <CardHeader className="pb-4">
         <h3 className="text-lg font-semibold">Contacts</h3>
       </CardHeader>
