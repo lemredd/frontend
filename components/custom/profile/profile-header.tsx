@@ -99,6 +99,9 @@ export function OwnProfileHeader() {
 
         {/* Verification List */}
         <VerificationList />
+
+        {/* Documents */}
+        <SeekerDocuments profile={profile} />
       </CardContent>
     </Card>
   )
