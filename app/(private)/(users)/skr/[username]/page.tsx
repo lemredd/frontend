@@ -22,7 +22,7 @@ export default function SkrProfilePage({ params: { username } }: Props) {
   }, [profile, router, username])
 
   return (
-    <section className="container mx-auto h-screen">
+    <section className="container mx-auto">
       <ProfileHeader username={username} />
     </section>
   )

@@ -50,7 +50,7 @@ export function SeekerDocuments({ profile }: SeekerDocumentsProps) {
   }, [profile])
 
   return (
-    <div className="grid grid-cols-2 gap-y-2 items-center gap-4 w-max">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-2 items-center gap-4 w-max">
       <h3 className="text-lg font-semibold col-span-full">Documents</h3>
       <>
         <div className="self-center">ID:</div><div>{profile?.approvals?.valid_id_pic_name ? (
@@ -60,7 +60,7 @@ export function SeekerDocuments({ profile }: SeekerDocumentsProps) {
         )}</div>
       </>
       <>
-        <div className="self-center">Relevant Documents:</div><div>{documents.length ? documents.map((name, idx) => (
+        <div className="self-center">Relevant Documents:</div><div className="flex flex-col lg:flex-row flex-wrap gap-2">{documents.length ? documents.map((name, idx) => (
           <Button key={idx} asChild variant="outline" className="justify-start">
             <Link
               target="_blank"
